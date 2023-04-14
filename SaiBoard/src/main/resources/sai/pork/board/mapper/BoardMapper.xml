@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper				
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"			
+	"https://mybatis.org/dtd/mybatis-3-mapper.dtd">			
+<mapper namespace="sai.pork.board.mapper.BoardMapper">	
+
+	<select id="getAllBoards" resultType="sai.pork.board.model.BoardDTO">
+		SELECT * FROM boards ORDER BY board_seq DESC
+	</select>
+	
+	<!-- parameterType이 String이면 #{id}는 잘 안받아와짐. #{value}로 하는것이 좋음 -->
+	<!-- 그래서 String 말고 -->
+	<select id="getSpecificBoards" parameterType="Map" resultType="sai.pork.board.model.BoardDTO">
+		SELECT * FROM boards
+		WHERE board_category = #{category}
+		ORDER BY ${orderBy} DESC
+	</select>
+	
+	<select id="getTotalSpecificBoards" parameterType="Map" resultType="sai.pork.board.model.BoardDTO">
+		SELECT * FROM boards
+		ORDER BY ${orderBy} DESC
+	</select>	
+	
+	<select id="getSearchedBoards" parameterType="Map" resultType="sai.pork.board.model.BoardDTO">
+		SELECT * FROM boards
+		WHERE board_category = #{category} AND ${searchCategory} LIKE '%'||#{searchKeyword}||'%'
+		ORDER BY ${orderBy} DESC
+	</select>
+	
+	<select id="getTotalSearchedBoards" parameterType="Map" resultType="sai.pork.board.model.BoardDTO">
+		SELECT * FROM boards
+		WHERE ${searchCategory} LIKE '%'||#{searchKeyword}||'%'
+		ORDER BY ${orderBy} DESC
+	</select>
+
+</mapper>
