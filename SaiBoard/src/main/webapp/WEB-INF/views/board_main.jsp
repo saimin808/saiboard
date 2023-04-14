@@ -188,7 +188,7 @@
 									<tr>
 										<td>${board.board_seq}</td>
 										<td>${board.board_category}</td>
-										<td>${board.board_title}</td>
+										<td><a href="<%= request.getContextPath()%>/board/read?board_seq=${board.board_seq}">${board.board_title}</a></td>
 										<td>${board.board_writer}</td>
 										<td>${board.board_view}</td>
 										<td>${board.getCreationDateTime()}</td>
@@ -203,7 +203,7 @@
 				</table>
 			</div>
 			<div id="button-container" class="container-xxl d-flex justify-content-end">
-				<button type="button" class="btn btn-secondary">글 쓰기</button>
+				<button id="write-button" type="button" class="btn btn-secondary">글 쓰기</button>
 			</div>
 			<div id="pagination-container" class="container-xxl">
 				<nav>

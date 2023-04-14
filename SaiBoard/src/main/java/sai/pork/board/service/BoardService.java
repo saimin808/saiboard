@@ -11,8 +11,5 @@ public interface BoardService {
 
 	void showBoards(HttpServletRequest req, Map<String, String> parameters);
 	
-//	void showSpecificBoards(HttpServletRequest req, Map<String, String> parameters);
-//	
-//	void showSearchedBoards(HttpServletRequest req, Map<String, String> parameters);
-	
+	BoardDTO readBoard(Integer board_seq);
 }

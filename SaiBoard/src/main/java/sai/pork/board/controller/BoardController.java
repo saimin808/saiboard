@@ -31,4 +31,17 @@ public class BoardController {
 		return "board_main";
 	}
 	
+	@GetMapping("/read")
+	public String readBoard(Model model, Integer board_seq) {
+		
+		model.addAttribute("board", boardService.readBoard(board_seq)); 
+		
+		return "read/board_read";
+	}
+	
+	@GetMapping("/write")
+	public String writeBoard() {
+		
+		return "write/board_write";
+	}
 }

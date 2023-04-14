@@ -9,13 +9,14 @@
 	</select>
 	
 	<!-- parameterType이 String이면 #{id}는 잘 안받아와짐. #{value}로 하는것이 좋음 -->
-	<!-- 그래서 String 말고 -->
+	<!-- 그래서 String 말고 Map을 사용함 -->
 	<select id="getSpecificBoards" parameterType="Map" resultType="sai.pork.board.model.BoardDTO">
 		SELECT * FROM boards
 		WHERE board_category = #{category}
 		ORDER BY ${orderBy} DESC
 	</select>
 	
+	<!-- 카테고리가 전체 일때 -->
 	<select id="getTotalSpecificBoards" parameterType="Map" resultType="sai.pork.board.model.BoardDTO">
 		SELECT * FROM boards
 		ORDER BY ${orderBy} DESC
@@ -27,10 +28,17 @@
 		ORDER BY ${orderBy} DESC
 	</select>
 	
+	<!-- 카테고리가 전체 일때 -->
 	<select id="getTotalSearchedBoards" parameterType="Map" resultType="sai.pork.board.model.BoardDTO">
 		SELECT * FROM boards
 		WHERE ${searchCategory} LIKE '%'||#{searchKeyword}||'%'
 		ORDER BY ${orderBy} DESC
+	</select>
+	
+	<select id="getBoard" parameterType="Integer" resultType="sai.pork.board.model.BoardDTO">
+		SELECT board_seq, board_category, board_title, board_writer, board_content, board_view, board_write_date
+		FROM boards
+		WHERE board_seq = #{board_seq}
 	</select>
 
 </mapper>

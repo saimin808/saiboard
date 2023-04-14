@@ -117,3 +117,7 @@ if(urlParams != null) {
 												    '&searchKeyword=' + searchKeyword_text);
 	}
 }
+
+$('#write-button').click(function() {
+	location.href= contextPath + "/board/write";
+});

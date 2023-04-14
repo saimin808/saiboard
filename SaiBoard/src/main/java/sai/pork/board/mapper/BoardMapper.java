@@ -16,4 +16,6 @@ public interface BoardMapper {
 	List<BoardDTO> getSearchedBoards(Map<String, String> parameters);
 
 	List<BoardDTO> getTotalSearchedBoards(Map<String, String> parameters);
+	
+	BoardDTO getBoard(Integer board_seq);
 }
