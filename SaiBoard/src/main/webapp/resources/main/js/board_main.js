@@ -118,6 +118,7 @@ if(urlParams != null) {
 	}
 }
 
+// 글 쓰기 버튼 action
 $('#write-button').click(function() {
 	location.href= contextPath + "/board/write";
 });
