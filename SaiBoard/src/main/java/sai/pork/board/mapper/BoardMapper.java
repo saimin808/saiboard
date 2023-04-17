@@ -18,4 +18,10 @@ public interface BoardMapper {
 	List<BoardDTO> getTotalSearchedBoards(Map<String, String> parameters);
 	
 	BoardDTO getBoard(Integer board_seq);
+	
+	void updateView(Integer board_seq);
+	
+	String passwordCheck(Integer board_seq);
+	
+	Integer deleteBoard(Integer board_seq);
 }

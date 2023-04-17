@@ -6,7 +6,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>글 읽기 & 수정</title>
+<title>글 보기</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
 <style>
 	/* 전체 컨테이너 */
@@ -44,6 +44,59 @@
 		margin-left: 1rem;
 	}
 	
+	/* 모달의 버튼들 들어있는 footer */
+	.modal-footer {
+		padding: 0;
+		height: 60px;
+	}
+	
+	/* footer > div  */
+	.modal-footer div {
+		margin: 0;
+	}
+	
+	/* 모달의 버튼들 개별 div(col) */
+	.modal-footer div div {
+		padding: 0;
+		display: flex;
+	}
+	
+	/* 모달의 버튼들 개별 div(col)중 첫번째 */
+	.modal-footer div div:first-child {
+		border-right: 1px solid lightgrey;
+	}
+	
+	/* 모달의 버튼 */
+	.modal-footer div div button {
+		border-top-left-radius: 0;
+		border-top-right-radius: 0;
+		width: 100%;
+		height: 100%;
+	}
+	
+	/* 모달의 취소 버튼 */
+	#delete_cancel-button, #edit_cancel-button {
+		border-bottom-right-radius: 0;
+	}
+	
+	/* 모달의 확인 버튼 */
+	#delete_submit-button, #edit_submit-button {
+		border-bottom-left-radius: 0;
+	}
+	
+	/* 모달의 버튼 hover */
+	.modal-footer div div button:hover {
+		background-color: lightgray;
+	}
+	
+	/* comment(댓글) 입력 컨테이너 */
+	#comment-container {
+		margin: 0 0.7rem;
+	}
+	
+	#comment_title-container {
+		margin: 1rem 0;
+	}
 </style>
 </head>
 <body>
@@ -90,10 +143,112 @@
 					</tbody>
 				</table>
 				<div id="button-container" class="container-xxl d-flex justify-content-end">
-					<button id="delete-button" type="button" class="btn btn-light">삭제</button>
-					<button id="edit-button" type="button" class="btn btn-light">수정</button>
+					<button id="delete-button" type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#deleteModal">삭제</button>
+					<button id="edit-button" type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#editModal">수정</button>
 					<button id="home-button" type="button" class="btn btn-secondary">목록</button>
 				</div>
+				<!-- 글 삭제 모달 -->
+				<div class="modal fade" id="deleteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
+					<div class="modal-dialog modal-dialog-centered justify-content-center">
+						<div class="modal-content w-75">
+							<div class="modal-header justify-content-center">
+						       <h1 class="modal-title fs-4 fw-bold" id="modalTitle">글 삭제 비밀번호 확인</h1>
+					      	</div>
+					      	<div class="modal-body container">
+					      		<div class="row text-center">
+					        		<p class="text-info">비밀번호를 입력하세요</p>
+					        	</div>
+					        	<form id="deleteForm" class="row justify-content-center" action="<%= request.getContextPath()%>/board/delete" method="POST">
+					        		<input id="deletePassword" type="password" class="form-control text-center w-75">
+					        	</form>
+					        	<c:if test="${not empty status && status eq 'delete_wrong_pw'}">
+						        	<div class="row text-center">
+						        		<p id="deleteWarningMsg" class="text-danger">잘못된 비밀번호입니다!</p>
+						        	</div>
+					        	</c:if>
+					      	</div>
+					      	<div class="modal-footer container justify-content-center">
+					      		<div class="row w-100 h-100 text-center">
+					      			<div class="col-6">
+					        			<button id="delete_cancel-button" type="button" class="btn btn-white fw-semibold text-secondary" data-bs-dismiss="modal">취소</button>
+					        		</div>
+					        		<div class="col-6">
+					        			<button id="delete_submit-button" type="button" class="btn btn-white fw-semibold text-info">확인</button>
+					        		</div>
+					        	</div>
+					      	</div>
+						</div>
+					</div>
+				</div>
+				<!-- 글 수정 모달 -->
+				<div class="modal fade" id="editModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
+					<div class="modal-dialog modal-dialog-centered justify-content-center">
+						<div class="modal-content w-75">
+							<div class="modal-header justify-content-center">
+						       <h1 class="modal-title fs-4 fw-bold" id="modalTitle">글 수정 비밀번호 확인</h1>
+					      	</div>
+					      	<div class="modal-body container ">
+					      		<div class="row text-center">
+					        		<p class="text-info">비밀번호를 입력하세요</p>
+					        	</div>
+					        	<form id="editForm" class="row justify-content-center" action="<%= request.getContextPath()%>/board/edit" method="POST">
+					        		<input id="editPassword" type="password" class="form-control text-center w-75">
+					        	</form>
+					        	<c:if test="${not empty status && status eq 'edit_wrong_pw'}">
+						        	<div class="row text-center">
+						        		<p id="editWarningMsg" class="text-danger">잘못된 비밀번호입니다!</p>
+						        	</div>
+					        	</c:if>
+					      	</div>
+					      	<div class="modal-footer container justify-content-center">
+					      		<div class="row w-100 h-100 text-center">
+					      			<div class="col-6">
+					        			<button id="edit_cancel-button" type="button" class="btn btn-white fw-semibold text-secondary" data-bs-dismiss="modal">취소</button>
+					        		</div>
+					        		<div class="col-6">
+					        			<button id="edit_submit-button" type="button" class="btn btn-white fw-semibold text-info">확인</button>
+					        		</div>
+					        	</div>
+					      	</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div id="comment-container" class="container-lg w-75">
+			<div id="comment_title-container" class="row container-lg">
+				<h3 class="fw-bold">댓글 개</h3>
+			</div>
+			<div id="commnet_info-conatiner" class="row container-lg">
+				<div class="col-auto">
+					<label for="comment_id-text" style="display:inline-block" class="fs-4">ID</label>
+				</div>
+				<div class="col-auto">
+					<input type="text" class="form-control" id="comment_id-text">
+				</div>
+				<div class="col-auto">
+					<label for="comment_pw-text" style="display:inline-block;" class="fs-4">PW</label>
+				</div>
+				<div class="col-auto">
+					<input type="password" class="form-control" id="comment_pw-text">				
+				</div>
+				<div class="col-auto" style="padding-top: 0.5rem;">
+					<p>*영어, 숫자 포함 4 ~ 6자</p>
+				</div>
+				<div class="col-auto">
+					<button type="button" class="btn btn-secondary">쓰기</button>
+				</div>
+			</div>
+			<div id="comment_content-container" class="row container-lg">
+				<div class="col-11">
+					<textarea class="form-control" placeholder="내용을 입력해주세요."></textarea>
+				</div>
+			</div>
+		</div>
+		<div id="comment_list-container" class="row container-lg">
+			<div class="col">
+					
 			</div>
 		</div>
 	</div>
@@ -102,6 +257,8 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
 <!-- fontawesome : 아이콘 사용을 위한 script -->
 <script src="https://kit.fontawesome.com/8fdf7187c9.js" crossorigin="anonymous"></script>
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
 <!-- contextPath 변수 선언을 위한 script -->
 <script>
 	const contextPath = '<%=request.getContextPath()%>';

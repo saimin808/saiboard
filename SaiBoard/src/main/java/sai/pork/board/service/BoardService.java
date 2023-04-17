@@ -12,4 +12,6 @@ public interface BoardService {
 	void showBoards(HttpServletRequest req, Map<String, String> parameters);
 	
 	BoardDTO readBoard(Integer board_seq);
+	
+	String deleteBoard(BoardDTO board);
 }

@@ -17,6 +17,18 @@
 		margin: 5% auto;
 	}
 	
+	/* 페이지 제목 a태그 (Sai Board) */
+	#title {
+		text-decoration: none;
+		color: black;
+	}
+	
+	/* 페이지 제목 a태그 (Sai Board) hover */
+	#title:hover {
+		text-decoration: none;
+		color: black;
+	}
+	
 	/* 카테고리 & 검색 컨테이너 */
 	#category-container {
 		height: 45px;
@@ -105,7 +117,7 @@
 	<div id="container" class="container-xxl">
 		<!-- title -->
 		<div id="title-container" class="container-xxl">
-			<h1 class="fw-bold text-center">Sai Board</h1>
+			<h1 class="fw-bold text-center"><a id="title" href="<%= request.getContextPath()%>/board">Sai Board</a></h1>
 		</div>
 		<!-- Board -->
 		<div id="board-container" class="container-xxl">
@@ -151,10 +163,7 @@
 									  	<i class="fa-solid fa-magnifying-glass"></i>
 									  </button>
 									  <input type="text" id="search-text" name="searchKeyword" class="form-control"
-									  	data-bs-container="body" data-bs-placement="top" data-bs-toggle="popover"
-									  	data-bs-trigger="focus" data-bs-custom-class="warning-popover"
-									  	data-bs-content="검색어를 입력해주세요!"
-									  	aria-describedby="search-button">
+									   aria-describedby="search-button">
 									</div>
 								</div>
 							</div>

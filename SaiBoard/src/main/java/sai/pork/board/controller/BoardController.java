@@ -8,9 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import sai.pork.board.model.BoardDTO;
 import sai.pork.board.service.BoardService;
 
 @Controller
@@ -37,6 +39,24 @@ public class BoardController {
 		model.addAttribute("board", boardService.readBoard(board_seq)); 
 		
 		return "read/board_read";
+	}
+	
+	@PostMapping("/delete")
+	public String deleteBoard(Model model, BoardDTO board) {
+		
+		String result = boardService.deleteBoard(board);
+		
+		if(result == "delete_wrong_pw") {
+			return "redirect:/board/read?board_seq=" + board.getBoard_seq() + "status=" + result;
+		} else {
+			return "redirect:/board?status" + result;
+		}
+	}
+	
+	@PostMapping("/edit")
+	public String editBoard(Model model, Integer board_seq) {
+		
+		return "read/board_edit";
 	}
 	
 	@GetMapping("/write")

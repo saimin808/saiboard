@@ -56,7 +56,7 @@ public class BoardServiceImpl implements BoardService {
 					// 그 조건을 제거한 Mapper로 연결해 준다.
 					boards = boardMapper.getTotalSpecificBoards(parameters);
 				}
-			} else if (!searchKeyword.equals("null")) {
+			} else if (!searchKeyword.equals("null") || searchKeyword.equals("")) {
 				System.out.println("searchKeyword : " + searchKeyword);
 				System.out.println("getSearchedBoards");
 				if (category.equals("news")) {
@@ -124,8 +124,28 @@ public class BoardServiceImpl implements BoardService {
 		req.setAttribute("boardSize", boardSize);
 	}
 	
+	
+	@Override
+	public String deleteBoard(BoardDTO board) {
+		
+		if(board.getBoard_pw().equals(boardMapper.passwordCheck(board.getBoard_seq()))) {
+			Integer row = boardMapper.deleteBoard(board.getBoard_seq());
+			
+			if(row > 0) {
+				return "delete_success";
+			} else {
+				return "delete_fail";
+			}
+		} else {
+			return "delete_wrong_pw";
+		}
+	 }
+	 
+	
 	@Override
 	public BoardDTO readBoard(Integer board_seq) {
+		
+		boardMapper.updateView(board_seq);
 		
 		return boardMapper.getBoard(board_seq);
 	}

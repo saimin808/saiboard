@@ -40,5 +40,21 @@
 		FROM boards
 		WHERE board_seq = #{board_seq}
 	</select>
+	
+	<select id="updateView" parameterType="Integer">
+		UPDATE boards SET board_view = board_view + 1 WHERE board_seq = #{board_seq}
+	</select>
+	
+	<select id="passwordCheck" parameterType="Integer">
+		SELECT board_pw FROM boards WHERE board_seq = #{board_seq}
+	</select>
+	
+	<delete id="deleteBoard" parameterType="Integer">
+		DELETE FROM boards WHERE board_seq = #{board_seq}
+	</delete>
+	
+	<!-- <update id="updateBoard" parameterType="sai.pork.board.model.BoardDTO">
+		UPDATE boards SET board_
+	</update> -->
 
 </mapper>

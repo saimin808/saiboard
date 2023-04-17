@@ -1,21 +1,36 @@
 // url parameter를 불러온 변수
 const urlParams = new URLSearchParams(location.search);
 
-// url parameter에서 받아온 값으로 선택한 select 유지
+// url parameter에서 받아온 값으로 선택한 select 유지 및 hidden 값 변경
 if(urlParams.get('category') != null) {
+	$('#category-select option:selected').removeAttr('selected');
+	
 	const category = urlParams.get('category');
 
-	$('#category-select').val(category).prop('selected', true);	
+	$('#category-select').val(category).attr('selected', true);
+	
+	// category hidden 값 변경
+	$('#category').attr('value', category);	
 }
 if(urlParams.get('orderBy') != null) {
+	$('#orderBy-select option:selected').removeAttr('selected');
+	
 	const orderBy = urlParams.get('orderBy');
 	
-	$('#orderBy-select').val(orderBy).prop('selected', true);
+	$('#orderBy-select').val(orderBy).attr('selected', true);
+	
+	// orderBy hidden 값 변경
+	$('#orderBy').attr('value', orderBy);
 }
 if(urlParams.get('searchCategory') != null) {
+	$('#searchCategory-select option:selected').removeAttr('selected');
+	
 	const searchCategory = urlParams.get('searchCategory');
 
-	$('#searchCategory-select').val(searchCategory).prop('selected', true);
+	$('#searchCategory-select').val(searchCategory).attr('selected', true);
+	
+	// searchCategory hidden 값 변경
+	$('#searchCategory').attr('value', searchCategory);
 }
 
 // url parameter에서 받아온 값으로 입력한 검색어 유지
@@ -45,10 +60,7 @@ $("#category-select").change(function() {
     // form으로 넘겨주기 위해 Hidden에다가 select value 대입
     $('input[name=category]').attr('value', category_selected);
  	
- 	// 검색어 지워주기
- 	$('input[name=searchKeyword]').val("");
- 	
- 	// form submit 	
+ 	// form submit
  	$('#board-form').submit();
 });
 
@@ -58,9 +70,6 @@ $("#orderBy-select").change(function() {
 	
 	// form으로 넘겨주기 위해 Hidden에다가 select value 대입
     $('input[name=orderBy]').attr('value', orderBy_selected);
-	
-	// 검색어 지워주기
-	$('input[name=searchKeyword]').val("");
 	
 	// form submit
  	$('#board-form').submit();
@@ -74,21 +83,17 @@ $("#searchCategory-select").change(function() {
 });
 
 $("#search-button").click(function() {
-	searchKeyword_text = $('input[name=searchKeyword]').val();
 	
-	if(searchKeyword_text == null || searchKeyword_text == "") {
+//	if(searchKeyword_text == null || searchKeyword_text == "") {
 	
-		$("[data-bs-toggle='popover']").popover();
+//		$("[data-bs-toggle='popover']").popover();
 		
-		$('input[name=searchKeyword]').focus();
+//		$('input[name=searchKeyword]').focus();
 		
-	} else {
-		// form으로 넘겨주기 위해 Hidden에다가 select value 대입
-	    $('input[name=searchKeyword]').attr('value', searchKeyword_text);
-		
+//	} else {
 		// form submit
 		$('#board-form').submit();
-	}
+//	}
 	
 });
 
@@ -120,5 +125,5 @@ if(urlParams != null) {
 
 // 글 쓰기 버튼 action
 $('#write-button').click(function() {
-	location.href= contextPath + "/board/write";
+	location.href = contextPath + "/board/write";
 });
