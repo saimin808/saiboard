@@ -114,7 +114,7 @@ if(urlParams != null) {
 											   '&searchKeyword=' + searchKeyword_text);
 		
 	// 번호 링크
-	for(i = paginationStart; i <= paginationEnd; i++) {
+	for(let i = paginationStart; i <= paginationEnd; i++) {
 		$('a[id=' + i + 'page]').attr('href', contextPath + '/board?page=' + pageNum[i-1] +
 												    '&category=' + category_selected +
 												    '&orderBy=' + orderBy_selected +

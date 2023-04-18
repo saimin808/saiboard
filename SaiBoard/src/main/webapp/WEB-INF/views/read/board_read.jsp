@@ -90,13 +90,83 @@
 	}
 	
 	/* comment(댓글) 입력 컨테이너 */
-	#comment-container {
+	#comment-container  {
 		margin: 0 0.7rem;
+		width: 60%;
 	}
 	
-	#comment_title-container {
+	/* 댓글 입력 container와 그 내부의 container들 */
+	#comment_input-container, #comment_input-container div {
+		margin: 0.4rem 0;
+	}
+	
+	/* 비밀번호 input text */
+	#comment_pw-text {
+		width: 15rem;
+	}
+	
+	/* 댓글 리스트 container */
+	#comment_list-container {
 		margin: 1rem 0;
 	}
+	
+	/* 댓글 리스트의 행들 */
+	#comment_list-container .row {
+		padding-top: 0.8rem;
+		padding-bottom: 0.8rem;
+		margin: 0;
+	}
+	
+	/* 댓글 리스트의 첫번째 행 */
+	#comment_table-container {
+		
+	}
+	
+	#comment_table-container .row.row-cols-1.container-lg.w-100.pt-0 {
+		border-bottom: 2px solid lightgrey;
+	}
+	
+	/* 댓글 리스트의 첫번째 행 */
+	#comment_table-container .row:first-child {
+		border-top: 2px solid lightgrey;
+	}
+	
+	/* 수정, 삭제 링크 hover */
+	#editComment:hover, #deleteComment:hover {
+		cursor: pointer;
+	}
+	
+	/* 댓글 수정 삭제 dialog */
+	.dialog {
+		width: 250px;
+		background-color: rgb(235,235,235);
+		border: none;
+		position: absolute;
+		left: 500px;
+	}
+	
+	/* 페이지네이션 */
+	.page-link {
+	  color: #000; 
+	  background-color: #fff;
+	  border: 1px solid #6c757d; 
+	}
+	
+	.page-item.active .page-link {
+	 z-index: 1;
+	 color: #555;
+	 font-weight:bold;
+	 background-color: #f1f1f1;
+	 border-color: #6c757d;
+	 
+	}
+	
+	.page-link:focus, .page-link:hover {
+	  color: white;
+	  background-color: #6c757d; 
+	  border-color: #6c757d;
+	}
+	
 </style>
 </head>
 <body>
@@ -216,42 +286,139 @@
 			</div>
 		</div>
 		
-		<div id="comment-container" class="container-lg w-75">
-			<div id="comment_title-container" class="row container-lg">
-				<h3 class="fw-bold">댓글 개</h3>
+		<div id="comment-container" class="container-lg">
+			<div id="comment_input-container" class="container-lg w-100">
+				<form name="writeComment-form" action="<%=request.getContextPath()%>/board/write_comment" method="POST"></form> 
+				<div id="commentTitle" class="row row-cols-1 w-100">
+					<h3 class="fw-bold">댓글 ${commentSize}개</h3>
+				</div>
+				<div id="commentInput" class="row row-cols-6 w-100">
+					<div class="col-auto text-center">
+						<label for="comment_id-text" style="display:inline-block" class="fs-4">ID</label>
+					</div>
+					<div class="col-4">
+						<input type="text" class="form-control" id="comment_id-text" form="writeComment-form" placeholder="영어, 숫자 포함 2 ~ 6자">
+					</div>
+					<div class="col-auto text-center">
+						<label for="comment_pw-text" style="display:inline-block;" class="fs-4">PW</label>
+					</div>
+					<div class="col-4">
+						<input type="password" class="form-control" id="comment_pw-text" form="writeComment-form" placeholder="영어, 숫자, 기호 포함 4 ~ 6자">				
+					</div>
+					<div class="col-2 text-end" style="padding-right: 0;">
+						<button id="writeCommentSubmit-button" type="button" class="btn btn-secondary">쓰기</button>
+					</div>
+				</div>
+				<div id="commentContent" class="row row-cols-1 w-100">
+					<div class="col-12">
+						<textarea class="form-control" cols="20" wrap="hard"
+								  form="writeComment-form" placeholder="내용을 입력해주세요."></textarea>
+					</div>
+				</div>
 			</div>
-			<div id="commnet_info-conatiner" class="row container-lg">
-				<div class="col-auto">
-					<label for="comment_id-text" style="display:inline-block" class="fs-4">ID</label>
-				</div>
-				<div class="col-auto">
-					<input type="text" class="form-control" id="comment_id-text">
-				</div>
-				<div class="col-auto">
-					<label for="comment_pw-text" style="display:inline-block;" class="fs-4">PW</label>
-				</div>
-				<div class="col-auto">
-					<input type="password" class="form-control" id="comment_pw-text">				
-				</div>
-				<div class="col-auto" style="padding-top: 0.5rem;">
-					<p>*영어, 숫자 포함 4 ~ 6자</p>
-				</div>
-				<div class="col-auto">
-					<button type="button" class="btn btn-secondary">쓰기</button>
+			<div id="comment_list-container" class="container-lg w-100">
+				<div id="comment_table-container" class="container-lg w-100">
+					<c:choose>
+						<c:when test="${not empty comments}">
+							<c:forEach items="${comments}" var="comment" varStatus="i">
+								<div class="row row-cols-3 pb-0">
+									<div class="col-2">
+										<p class="fs-6">${comment.comment_id}</p>
+									</div>
+									<div class="col-7">
+										<p class="fs-6">${comment.getCreationDateTime()}</p>
+									</div>
+									<div class="col-3 text-end">
+										<button id="editComment${i.count}" class="btn btn-white">수정</button>
+										<button id="deleteComment${i.count}" class="btn btn-white">삭제</button>
+									</div>
+									<dialog id="commentPwCheck-dialog${i.count}" class="dialog">
+										<div>
+											<div style="display:inline-block; margin-right: 47px;">◀</div>
+											<h5 class="fw-semibold" style="display:inline-block;">댓글 수정</h5>
+										</div>
+										<div class="mb-3">
+											<form id="commentPwCheckForm${i.count}"
+												action="<%=request.getContextPath()%>/board/comment_pw_check"
+												method="POST">
+												<input type="text" id="editCommentPassword${i.count}" class="form-control text-center"
+														placeholder="비밀번호를 입력해주세요.">
+											</form>
+										</div>
+										<div class="text-center">
+											<button id="commentPwCheckCancel-button${i.count}" class="btn btn-light">취소</button>
+											<button id="commentPwCheckSubmit-button${i.count}" class="btn btn-secondary">확인</button>
+										</div>
+									</dialog>
+								</div>
+								<div class="row row-cols-1 container-lg w-100 pt-0">
+									<div class="col-12">${comment.comment_content}</div>
+								</div>
+							</c:forEach>
+						</c:when>
+						<c:otherwise>
+							<div class="row row-cols-1 container-lg w-100 pb-0">
+								<div class="col-12">댓글이 없습니다.</div>
+							</div>
+						</c:otherwise>
+					</c:choose>
 				</div>
 			</div>
-			<div id="comment_content-container" class="row container-lg">
-				<div class="col-11">
-					<textarea class="form-control" placeholder="내용을 입력해주세요."></textarea>
+			<div id="comment_pagi-conatiner" class="container-lg w-100">
+				<div class="row row-cols-1 container-lg w-100">
+					<div id="pagination-container" class="container-xxl">
+						<nav>
+							<ul class="pagination justify-content-center">
+								<li class="page-item">
+									<c:choose>
+										<c:when test="${paginationStart > 5}">
+											<a id="prev-link" class="page-link" href="<%=request.getContextPath()%>/board/read?board_seq=${board.board_seq}&page=${previousPage}" aria-label="Previous">
+												<span aria-hidden="true">&laquo;</span>
+											</a>
+										</c:when>
+										<c:otherwise>
+											<a class="page-link" aria-label="Previous"
+												style="pointer-event: none; cursor: default;">
+												<span aria-hidden="true">&laquo;</span>
+											</a>
+										</c:otherwise>
+									</c:choose>
+								</li>
+								<c:forEach begin="${paginationStart}" end="${paginationEnd}" var="i">
+									<li class="page-item">
+										<c:choose>
+											<c:when test="${page == i}">
+												<a id="${i}page" class="page-link" style="color: white; background-color: #6c757d;
+																			pointer-event: none; cursor: default;">${i}</a>
+											</c:when>
+											<c:otherwise>
+												<a id="${i}page" class="page-link">${i}</a>
+											</c:otherwise>
+										</c:choose>
+									</li>
+								</c:forEach>
+								<li class="page-item">
+									<c:choose>
+										<c:when test="${paginationEnd % 5 == 0 && commentSize > paginationEnd * 5}">
+											<a id="next-link" class="page-link" href="<%=request.getContextPath()%>/board/read?board_seq=${board.board_seq}&page=${nextPage}" aria-label="Next">
+												<span aria-hidden="true">&raquo;</span>
+											</a>
+										</c:when>
+										<c:otherwise>
+											<a class="page-link" aria-label="Next"
+												style="pointer-event: none; cursor: default;">
+												<span aria-hidden="true">&raquo;</span>
+											</a>								
+										</c:otherwise>
+									</c:choose>
+								</li>
+							</ul>
+						</nav>
+					</div>
 				</div>
 			</div>
-		</div>
-		<div id="comment_list-container" class="row container-lg">
-			<div class="col">
-					
-			</div>
-		</div>
 	</div>
+</div>
 
 <!-- bootstrap script -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
@@ -262,6 +429,15 @@
 <!-- contextPath 변수 선언을 위한 script -->
 <script>
 	const contextPath = '<%=request.getContextPath()%>';
+	
+	const commentSize = '<%=request.getAttribute("commentSize")%>';
+	console.log(commentSize);
+	const paginationStart = '<%=request.getAttribute("paginationStart")%>';
+	const paginationEnd = '<%=request.getAttribute("paginationEnd")%>';
+	let pageNum = [];
+	for(i = paginationStart; i <= paginationEnd; i++) {
+		pageNum[i-1] = i;
+	}
 </script>
 <!-- board_read.js -->
 <script src="<%=request.getContextPath()%>/resources/read/js/board_read.js"></script>

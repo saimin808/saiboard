@@ -43,3 +43,29 @@ $('#home-button').click(function() {
 	// 새롭게 board_main으로 넘어가기
 	location.href = contextPath + '/board';
 });
+
+
+// comment
+console.log(commentSize);
+for(let i = 1; i < commentSize; i++) {
+	// 수정 삭제 링크 action
+	$('button[id=editComment' + i + ']').click(function() {
+		$('dialog').removeAttr('open');
+		$('dialog[id=commentPwCheck-dialog' + i + ']').attr('open', 'open');	
+	});
+	
+	// dialog 취소 버튼 action
+	$('button[id=commentPwCheckCancel-button' + i + ']').click(function(){
+		$('dialog[id=commentPwCheck-dialog' + i + ']').removeAttr('open');
+	});
+}
+ 
+
+// comment 페이지네이션 action
+if(urlParams != null) {
+	// 번호 링크
+	for(let i = paginationStart; i <= paginationEnd; i++) {
+		$('a[id=' + i + 'page]').attr('href', contextPath + '/board/read?board_seq=' + urlParams.get('board_seq') +
+															'&page='+ pageNum[i-1]);
+	}
+}

@@ -36,9 +36,16 @@
 	</select>
 	
 	<select id="getBoard" parameterType="Integer" resultType="sai.pork.board.model.BoardDTO">
-		SELECT board_seq, board_category, board_title, board_writer, board_content, board_view, board_write_date
-		FROM boards
+		SELECT * FROM boards
 		WHERE board_seq = #{board_seq}
+	</select>
+
+	<insert id="writeComment" parameterType="Map">
+		INSERT INTO comments VALUES(comment_seq.nextval, #{board_seq}, #{comment_id}, #{comment_pw}, #{comment_content}, sysdate));
+	</insert>
+	
+	<select id="getComments" parameterType="Integer" resultType="sai.pork.board.model.CommentDTO">
+		SELECT * FROM comments WHERE board_seq=#{board_seq} ORDER BY comment_seq DESC
 	</select>
 	
 	<select id="updateView" parameterType="Integer">

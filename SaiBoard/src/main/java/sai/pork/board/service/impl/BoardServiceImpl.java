@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import sai.pork.board.mapper.BoardMapper;
 import sai.pork.board.model.BoardDTO;
+import sai.pork.board.model.CommentDTO;
 import sai.pork.board.service.BoardService;
 
 @Service
@@ -124,6 +125,13 @@ public class BoardServiceImpl implements BoardService {
 		req.setAttribute("boardSize", boardSize);
 	}
 	
+	@Override
+	public BoardDTO readBoard(Integer board_seq) {
+		
+		boardMapper.updateView(board_seq);
+		
+		return boardMapper.getBoard(board_seq);
+	}
 	
 	@Override
 	public String deleteBoard(BoardDTO board) {
@@ -140,13 +148,80 @@ public class BoardServiceImpl implements BoardService {
 			return "delete_wrong_pw";
 		}
 	 }
-	 
 	
 	@Override
-	public BoardDTO readBoard(Integer board_seq) {
+	public void showComments(HttpServletRequest req, Map<String, String> parameters) {
 		
-		boardMapper.updateView(board_seq);
+		// 선택한 페이지 숫자를 불러옴
+		String pageStr = parameters.get("page");
 		
-		return boardMapper.getBoard(board_seq);
+		// page : 총 댓글 수
+		int page;
+
+		if (pageStr == null) {
+			page = 1;
+		} else {
+			page = Integer.parseInt(pageStr);
+		}
+		
+		List<CommentDTO> comments = boardMapper.getComments(Integer.parseInt(parameters.get("board_seq")));
+		
+		// pageSize : 한 페이지에 한번에 출력할 댓글 갯수 
+		int pageSize = 5;
+		// boardSize : 전체 댓글 사이즈
+		int	commentSize = comments.size();
+		// startIndex : 출력할 5개의 댓글 중에서 첫 댓글의 순서
+		int startIndex = (page - 1) * pageSize;
+		// endIndex : 출력할 5개의 댓글 중에서 마지막 댓글의 순서
+		int endIndex = page * pageSize;
+		// 마지막 페이지에 표시되는 댓글들은 딱 5개로 떨어지지 않을 수도 있으니
+		// 전체 댓글 사이즈(boardSize)와 page * pageSize(endIndex)를 비교해서
+		// endIndex가 더 크면 boardSize로 boardSize가 더 크거나 같으면 endIndex 그대로 대입해준다.
+		endIndex = endIndex > commentSize ? commentSize : endIndex;
+
+		System.out.printf("현재 페이지는 %d페이지고, 시작 인덱스는 %d, 마지막 인덱스는 %d 입니다.\n", page, startIndex, endIndex);
+
+		// 전체 페이지 사이즈
+		int maxPage = commentSize % pageSize == 0 ? commentSize / pageSize : commentSize / pageSize + 1;
+
+		// paginationSize : 한번에 출력할 페이지네이션 사이즈
+		int paginationSize = 5;
+		// paginationStart : 전체 페이지네이션 시작 숫자
+		int paginationStart = (page / paginationSize) * paginationSize + 1;
+
+		paginationStart = page % paginationSize == 0 ? page - 4 : paginationStart;
+
+		// paginationEnd : 전체 페이지네이션 마지막 숫자
+		int paginationEnd = (page / paginationSize + 1) * paginationSize;
+		if (page % paginationSize == 0) {
+			paginationEnd = paginationEnd - paginationSize;
+		} else {
+			paginationEnd = paginationEnd > maxPage ? maxPage : paginationEnd;
+		}
+
+		int nextPage = paginationEnd + 1;
+		int previousPage = paginationStart - 1;
+
+		System.out.printf("현재 페이지는 %d페이지고, 페이지네이션 시작은 %d, 마지막 숫자는 %d 입니다. \n", page, paginationStart, paginationEnd);
+		
+		req.setAttribute("page", page);
+		req.setAttribute("comments", comments.subList(startIndex, endIndex));
+		req.setAttribute("paginationStart", paginationStart);
+		req.setAttribute("paginationEnd", paginationEnd);
+		req.setAttribute("nextPage", nextPage);
+		req.setAttribute("previousPage", previousPage);
+		req.setAttribute("commentSize", commentSize);
+	}
+	
+	@Override
+	public String writeComment(Map<String, String> parameters) {
+		
+		Integer result = boardMapper.writeComment(parameters);
+		
+		if(result > 0) {
+			return "write_comment_success";
+		} else {
+			return "write_comment_failed";
+		}
 	}
 }

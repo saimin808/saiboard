@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,9 +35,12 @@ public class BoardController {
 	}
 	
 	@GetMapping("/read")
-	public String readBoard(Model model, Integer board_seq) {
+	public String readBoard(Model model, HttpServletRequest req, @RequestParam Map<String, String> parameters) {
 		
-		model.addAttribute("board", boardService.readBoard(board_seq)); 
+		System.out.println("parameters : " + parameters);
+		
+		model.addAttribute("board", boardService.readBoard(Integer.parseInt(parameters.get("board_seq")))); 
+		boardService.showComments(req, parameters);
 		
 		return "read/board_read";
 	}
@@ -63,5 +67,17 @@ public class BoardController {
 	public String writeBoard() {
 		
 		return "write/board_write";
+	}
+	
+	@PostMapping("/write_comment")
+	public String writeComment(Model model, HttpServletRequest req, Map<String,String> parameters) {
+		
+		boardService.showComments(req, parameters);
+		String result = boardService.writeComment(parameters);
+		
+		model.addAttribute("board_seq", parameters.get("board_seq"));
+		model.addAttribute("page", 1);
+		model.addAttribute("status", result);
+		return "redirect:/board/read";
 	}
 }

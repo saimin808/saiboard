@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import sai.pork.board.model.BoardDTO;
+import sai.pork.board.model.CommentDTO;
 
 public interface BoardMapper {
 
@@ -19,9 +20,14 @@ public interface BoardMapper {
 	
 	BoardDTO getBoard(Integer board_seq);
 	
+	List<CommentDTO> getComments(Integer board_seq);
+	
+	Integer writeComment(Map<String, String> parameters);
+	
 	void updateView(Integer board_seq);
 	
 	String passwordCheck(Integer board_seq);
 	
 	Integer deleteBoard(Integer board_seq);
+	
 }
