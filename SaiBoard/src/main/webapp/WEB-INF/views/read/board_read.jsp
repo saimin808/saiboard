@@ -101,8 +101,16 @@
 	}
 	
 	/* 비밀번호 input text */
-	#comment_pw-text {
+	#commentPw-text {
 		width: 15rem;
+	}
+	
+	/* 팝 오버 CSS */
+	.warning-popover {
+		--bs-popover-bg: var(--bs-warning);
+		--bs-popover-body-color: var(--bs-danger);
+		font-size: 20px;
+		font-weight: bold;
 	}
 	
 	/* 댓글 리스트 container */
@@ -115,11 +123,6 @@
 		padding-top: 0.8rem;
 		padding-bottom: 0.8rem;
 		margin: 0;
-	}
-	
-	/* 댓글 리스트의 첫번째 행 */
-	#comment_table-container {
-		
 	}
 	
 	#comment_table-container .row.row-cols-1.container-lg.w-100.pt-0 {
@@ -136,13 +139,22 @@
 		cursor: pointer;
 	}
 	
-	/* 댓글 수정 삭제 dialog */
+	/* 댓글 수정 삭제 비밀번호 확인 dialog */
 	.dialog {
 		width: 250px;
 		background-color: rgb(235,235,235);
 		border: none;
 		position: absolute;
 		left: 500px;
+	}
+	
+	/* 댓글 수정 dialog */
+	.editComment-dialog {
+		width: 700px;
+		background-color: rgb(235,235,235);
+		border: none;
+		position: absolute;
+		left: 400px;
 	}
 	
 	/* 페이지네이션 */
@@ -229,7 +241,8 @@
 					        		<p class="text-info">비밀번호를 입력하세요</p>
 					        	</div>
 					        	<form id="deleteForm" class="row justify-content-center" action="<%= request.getContextPath()%>/board/delete" method="POST">
-					        		<input id="deletePassword" type="password" class="form-control text-center w-75">
+					        		<input type="hidden" name="board_seq" value="${board.board_seq}"/>
+					        		<input id="deletePassword" name="input_pw" type="password" class="form-control text-center w-75">
 					        	</form>
 					        	<c:if test="${not empty status && status eq 'delete_wrong_pw'}">
 						        	<div class="row text-center">
@@ -288,32 +301,46 @@
 		
 		<div id="comment-container" class="container-lg">
 			<div id="comment_input-container" class="container-lg w-100">
-				<form name="writeComment-form" action="<%=request.getContextPath()%>/board/write_comment" method="POST"></form> 
-				<div id="commentTitle" class="row row-cols-1 w-100">
-					<h3 class="fw-bold">댓글 ${commentSize}개</h3>
-				</div>
-				<div id="commentInput" class="row row-cols-6 w-100">
-					<div class="col-auto text-center">
-						<label for="comment_id-text" style="display:inline-block" class="fs-4">ID</label>
+				<form id="writeComment-form" name="writeComment-form" action="<%=request.getContextPath()%>/board/write_comment" method="POST">
+					<input type="hidden" name="board_seq" form="writeComment-form" value="${board.board_seq}"/> 
+					<div id="commentTitle" class="row row-cols-1 w-100">
+						<h3 class="fw-bold">댓글 ${commentSize}개</h3>
 					</div>
-					<div class="col-4">
-						<input type="text" class="form-control" id="comment_id-text" form="writeComment-form" placeholder="영어, 숫자 포함 2 ~ 6자">
+					<div id="commentInput" class="row row-cols-6 w-100">
+						<div class="col-auto text-center">
+							<label for="comment_id-text" style="display:inline-block" class="fs-4">ID</label>
+						</div>
+						<div class="col-4">
+							<input type="text" class="form-control" id="commentId-text" name="comment_id"
+									form="writeComment-form" maxlength="8" placeholder="영어, 숫자 포함 4 ~ 8자"
+									data-bs-container="body" data-bs-toggle="popover" data-bs-placement="top"
+									data-bs-custom-class="warning-popover" data-bs-content="아이디를 제대로 입력해주세요!">
+						</div>
+						<div class="col-auto text-center">
+							<label for="commentPw-text" style="display:inline-block;" class="fs-4">PW</label>
+						</div>
+						<div class="col-4">
+							<input type="password" class="form-control" id="commentPw-text" name="comment_pw"
+									form="writeComment-form" maxlength="6" placeholder="영어, 숫자, 기호 포함 4 ~ 6자"
+									data-bs-container="body" data-bs-toggle="popover" data-bs-placement="top"
+									data-bs-custom-class="warning-popover" data-bs-content="비밀번호를 제대로 입력해주세요!">				
+						</div>
+						<div class="col-2 text-end" style="padding-right: 0;">
+							<button id="writeCommentSubmit-button" type="button" class="btn btn-secondary">쓰기</button>
+						</div>
 					</div>
-					<div class="col-auto text-center">
-						<label for="comment_pw-text" style="display:inline-block;" class="fs-4">PW</label>
+					<div id="commentContent" class="row row-cols-1 mb-0 w-100">
+						<div class="col-12 mb-0">
+							<textarea id="commentContent-text" class="form-control" rows="1" cols="40" wrap="hard"
+									  placeholder="내용을 입력해주세요. (4 ~ 40자)" onkeyup="fn_checkByte(this)"
+									  data-bs-container="body" data-bs-toggle="popover" data-bs-placement="right"
+									  data-bs-custom-class="warning-popover" data-bs-content="내용을 제대로 입력해주세요!"></textarea>
+							<input type="hidden" id="commentContent-hidden" name="comment_content" form="writeComment-form"/>
+						</div>
 					</div>
-					<div class="col-4">
-						<input type="password" class="form-control" id="comment_pw-text" form="writeComment-form" placeholder="영어, 숫자, 기호 포함 4 ~ 6자">				
-					</div>
-					<div class="col-2 text-end" style="padding-right: 0;">
-						<button id="writeCommentSubmit-button" type="button" class="btn btn-secondary">쓰기</button>
-					</div>
-				</div>
-				<div id="commentContent" class="row row-cols-1 w-100">
-					<div class="col-12">
-						<textarea class="form-control" cols="20" wrap="hard"
-								  form="writeComment-form" placeholder="내용을 입력해주세요."></textarea>
-					</div>
+				</form>
+				<div class="row row-cols-1 w-100 mt-0">
+					<div class="col-12 mt-0 text-end">(<span id="nowLetter">0</span>/40자)</div>
 				</div>
 			</div>
 			<div id="comment_list-container" class="container-lg w-100">
@@ -335,19 +362,55 @@
 									<dialog id="commentPwCheck-dialog${i.count}" class="dialog">
 										<div>
 											<div style="display:inline-block; margin-right: 47px;">◀</div>
-											<h5 class="fw-semibold" style="display:inline-block;">댓글 수정</h5>
+											<h5 id="commentPwCheck-title${i.count}" class="fw-semibold" style="display:inline-block;">댓글 수정</h5>
 										</div>
 										<div class="mb-3">
-											<form id="commentPwCheckForm${i.count}"
-												action="<%=request.getContextPath()%>/board/comment_pw_check"
-												method="POST">
-												<input type="text" id="editCommentPassword${i.count}" class="form-control text-center"
-														placeholder="비밀번호를 입력해주세요.">
+											<form id="commentPwCheck-form${i.count}" action="<%=request.getContextPath()%>/board/edit_comment_pw_check" method="POST">
+												<input type="password" id="commentPwCheckPassword-text${i.count}" name="comment_pw"
+														class="form-control text-center" placeholder="비밀번호를 입력해주세요.">
+												<input type="hidden" name="comment_seq" value="${comment.comment_seq}"/>
+												<input type="hidden" name="board_seq" value="${board.board_seq}"/>
+												<input type="hidden" name="dialog_seq" value="${i.count}"/>
 											</form>
 										</div>
 										<div class="text-center">
 											<button id="commentPwCheckCancel-button${i.count}" class="btn btn-light">취소</button>
 											<button id="commentPwCheckSubmit-button${i.count}" class="btn btn-secondary">확인</button>
+										</div>
+									</dialog>
+									<input type="hidden" id="editCommentStatus-hidden${i.count}" value="${param.status}"/>
+									<dialog id="editComment-dialog${i.count}" class="editComment-dialog">
+										<div>
+											<div style="display:inline-block; margin-right: 170px;">◀</div>
+											<h5 id="editComment-title${i.count}" class="fw-semibold" style="display:inline-block;">댓글 수정</h5>
+										</div>
+										<div class="mb-3">
+											<form id="editComment-form${i.count}" action="<%=request.getContextPath()%>/board/edit_comment" method="POST">
+												<div class="w-25 m-2" style="display:inline-block;">
+													<input type="text" id="editCommentId-text${i.count}" name="comment_id"
+															value="${comment.comment_id}" maxlength="8" class="form-control" placeholder="ID"/>
+												</div>
+												<div class="w-25 m-2"style="display:inline-block;">
+													<input type="password" id="editCommentPassword-text${i.count}" name="comment_pw"
+															maxlength="6" class="form-control" placeholder="Password">
+												</div>
+												<div class="mb-0">
+													<textarea id="commentContent-text${i.count}" class="form-control" rows="1" cols="40" wrap="hard"
+														 name="comment_content" placeholder="내용을 입력해주세요. (4 ~ 40자)"
+														 onkeyup="edit_fn_checkByte(this)">${comment.comment_content}</textarea>
+													<%-- <input type="hidden"id="commentContent-hidden${i.count}" name="comment_content"
+															value="${comment.comment_content}"/> --%>
+												</div>
+												<div class="w-100 mt-0">
+													<div class="mt-0 text-end">(<span id="edit_nowLetter">0</span>/40자)</div>
+												</div>
+												<input type="hidden" name="comment_seq" value="${comment.comment_seq}"/>
+												<input type="hidden" name="board_seq" value="${board.board_seq}"/>
+											</form>
+										</div>
+										<div class="text-center">
+											<button id="editCommentCancel-button${i.count}" class="btn btn-light">취소</button>
+											<button id="editCommentSubmit-button${i.count}" class="btn btn-secondary">확인</button>
 										</div>
 									</dialog>
 								</div>
@@ -362,7 +425,6 @@
 							</div>
 						</c:otherwise>
 					</c:choose>
-				</div>
 			</div>
 			<div id="comment_pagi-conatiner" class="container-lg w-100">
 				<div class="row row-cols-1 container-lg w-100">
@@ -417,6 +479,7 @@
 					</div>
 				</div>
 			</div>
+		</div>
 	</div>
 </div>
 

@@ -20,14 +20,20 @@ public interface BoardMapper {
 	
 	BoardDTO getBoard(Integer board_seq);
 	
+	void updateView(Integer board_seq);
+	
+	String boardPasswordCheck(Integer board_seq);
+	
+	Integer deleteBoard(Integer board_seq);
+	
 	List<CommentDTO> getComments(Integer board_seq);
 	
 	Integer writeComment(Map<String, String> parameters);
 	
-	void updateView(Integer board_seq);
+	String commentPasswordCheck(Integer comment_seq);
 	
-	String passwordCheck(Integer board_seq);
+	Integer editComment(Map<String, String> parameters);
 	
-	Integer deleteBoard(Integer board_seq);
+	Integer deleteComment(Integer comment_seq);
 	
 }

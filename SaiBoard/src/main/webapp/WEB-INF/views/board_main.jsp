@@ -52,14 +52,6 @@
 		text-align: right;
 	}
 	
-	/* 팝 오버 CSS */
-	.warning-popover {
-		--bs-popover-bg: var(--bs-warning);
-		--bs-popover-body-color: var(--bs-danger);
-		font-size: 20px;
-		font-weight: bold;
-	}
-	
 	/* 테이블 CSS */	
 	/* 테이블 */
 	#table-container table {

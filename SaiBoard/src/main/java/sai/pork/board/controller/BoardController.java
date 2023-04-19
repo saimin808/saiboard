@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -46,14 +46,20 @@ public class BoardController {
 	}
 	
 	@PostMapping("/delete")
-	public String deleteBoard(Model model, BoardDTO board) {
+	public String deleteBoard(Model model, @RequestParam Map<String,String> parameters) {
+
+		System.out.println("delete_board: " + parameters);
 		
-		String result = boardService.deleteBoard(board);
+		String result = boardService.deleteBoard(parameters);
 		
 		if(result == "delete_wrong_pw") {
-			return "redirect:/board/read?board_seq=" + board.getBoard_seq() + "status=" + result;
+			model.addAttribute("board_seq", parameters.get("board_seq"));
+			model.addAttribute("status", result);
+			return "redirect:/board/read";
 		} else {
-			return "redirect:/board?status" + result;
+			model.addAttribute("board_seq", parameters.get("board_seq"));
+			model.addAttribute("status", result);
+			return "redirect:/board";
 		}
 	}
 	
@@ -70,13 +76,60 @@ public class BoardController {
 	}
 	
 	@PostMapping("/write_comment")
-	public String writeComment(Model model, HttpServletRequest req, Map<String,String> parameters) {
+	public String writeComment(Model model, HttpServletRequest req, @RequestParam Map<String,String> parameters) {
 		
 		boardService.showComments(req, parameters);
 		String result = boardService.writeComment(parameters);
 		
 		model.addAttribute("board_seq", parameters.get("board_seq"));
 		model.addAttribute("page", 1);
+		model.addAttribute("status", result);
+		return "redirect:/board/read";
+	}
+	
+	@PostMapping("/edit_comment_pw_check")
+	public String editCommentPasswordCheck(Model model, HttpServletRequest req, @RequestParam Map<String,String> parameters) {
+		
+		System.out.println("editCommentPwCheck : " + parameters);
+		boardService.showComments(req, parameters);
+		String comment_pw = boardService.commentPasswordCheck(Integer.parseInt(parameters.get("comment_seq")));
+		
+		if(comment_pw.equals(parameters.get("comment_pw"))) {
+			model.addAttribute("board_seq", parameters.get("board_seq"));
+			model.addAttribute("status", "edit_comment_pw_checked" + parameters.get("dialog_seq"));
+		} else {
+			model.addAttribute("board_seq", parameters.get("board_seq"));
+			model.addAttribute("status", "edit_comment_wrong_pw");
+		}
+		return "redirect:/board/read";
+	}
+	
+	@PostMapping("/delete_comment")
+	public String deleteComment(Model model, HttpServletRequest req, @RequestParam Map<String,String> parameters) {
+		
+		System.out.println("deleteCommentPwCheck : " + parameters);
+		boardService.showComments(req, parameters);
+		String comment_pw = boardService.commentPasswordCheck(Integer.parseInt(parameters.get("comment_seq")));
+		
+		if(comment_pw.equals(parameters.get("comment_pw"))) {
+			String result = boardService.deleteComment(Integer.parseInt(parameters.get("comment_seq")));
+			model.addAttribute("board_seq", parameters.get("board_seq"));
+			model.addAttribute("status", result);
+		} else {
+			model.addAttribute("board_seq", parameters.get("board_seq"));
+			model.addAttribute("status", "delete_comment_wrong_pw");
+		}
+		return "redirect:/board/read";
+	}
+	
+	@PostMapping("/edit_comment")
+	public String editComment(Model model, HttpServletRequest req, @RequestParam Map<String,String> parameters) {
+		
+		System.out.println("editComment : " + parameters);
+		boardService.showComments(req, parameters);
+		String result = boardService.editComment(parameters);
+		
+		model.addAttribute("board_seq", parameters.get("board_seq"));
 		model.addAttribute("status", result);
 		return "redirect:/board/read";
 	}

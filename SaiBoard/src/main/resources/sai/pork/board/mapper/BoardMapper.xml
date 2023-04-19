@@ -39,29 +39,42 @@
 		SELECT * FROM boards
 		WHERE board_seq = #{board_seq}
 	</select>
-
-	<insert id="writeComment" parameterType="Map">
-		INSERT INTO comments VALUES(comment_seq.nextval, #{board_seq}, #{comment_id}, #{comment_pw}, #{comment_content}, sysdate));
-	</insert>
 	
 	<select id="getComments" parameterType="Integer" resultType="sai.pork.board.model.CommentDTO">
 		SELECT * FROM comments WHERE board_seq=#{board_seq} ORDER BY comment_seq DESC
 	</select>
 	
-	<select id="updateView" parameterType="Integer">
-		UPDATE boards SET board_view = board_view + 1 WHERE board_seq = #{board_seq}
-	</select>
-	
-	<select id="passwordCheck" parameterType="Integer">
+	<select id="boardPasswordCheck" parameterType="Integer" resultType="String">
 		SELECT board_pw FROM boards WHERE board_seq = #{board_seq}
 	</select>
+	
+	<select id="commentPasswordCheck" parameterType="Integer" resultType="String">
+		SELECT comment_pw FROM comments WHERE comment_seq = #{comment_seq}
+	</select>
+	
+	<insert id="writeComment" parameterType="Map">
+		INSERT INTO comments VALUES(comment_seq.nextval, #{board_seq}, #{comment_id}, #{comment_pw}, #{comment_content}, sysdate)
+	</insert>
+	
+	<!-- <update id="updateBoard" parameterType="sai.pork.board.model.BoardDTO">
+		UPDATE boards SET board_
+	</update> -->
+	
+	<update id="updateView" parameterType="Integer">
+		UPDATE boards SET board_view = board_view + 1 WHERE board_seq = #{board_seq}
+	</update>
+	
+	<update id="editComment" parameterType="Map">
+		UPDATE comments SET comment_id = #{comment_id}, comment_pw = #{comment_pw}, comment_content = #{comment_content}
+		WHERE comment_seq = #{comment_seq}
+	</update>
 	
 	<delete id="deleteBoard" parameterType="Integer">
 		DELETE FROM boards WHERE board_seq = #{board_seq}
 	</delete>
 	
-	<!-- <update id="updateBoard" parameterType="sai.pork.board.model.BoardDTO">
-		UPDATE boards SET board_
-	</update> -->
+	<delete id="deleteComment" parameterType="Integer">
+		DELETE FROM comments WHERE comment_seq = #{comment_seq}
+	</delete>
 
 </mapper>

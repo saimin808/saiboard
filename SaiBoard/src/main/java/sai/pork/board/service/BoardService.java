@@ -1,6 +1,5 @@
 package sai.pork.board.service;
 
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,9 +12,15 @@ public interface BoardService {
 	
 	BoardDTO readBoard(Integer board_seq);
 	
-	String deleteBoard(BoardDTO board);
+	String deleteBoard(Map<String, String> parameters);
 	
 	void showComments(HttpServletRequest req, Map<String, String> parameters);
 	
+	String commentPasswordCheck(Integer comment_seq);
+	
 	String writeComment(Map<String, String> parameters);
+	
+	String editComment(Map<String, String> parameters);
+	
+	String deleteComment(Integer comment_seq);
 }

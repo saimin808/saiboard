@@ -84,16 +84,8 @@ $("#searchCategory-select").change(function() {
 
 $("#search-button").click(function() {
 	
-//	if(searchKeyword_text == null || searchKeyword_text == "") {
-	
-//		$("[data-bs-toggle='popover']").popover();
-		
-//		$('input[name=searchKeyword]').focus();
-		
-//	} else {
-		// form submit
-		$('#board-form').submit();
-//	}
+	// form submit
+	$('#board-form').submit();
 	
 });
 

@@ -39,7 +39,8 @@ public class BoardServiceImpl implements BoardService {
 		
 		// 들어온 파라미터 중 searchKeyword값(검색어)이 없으면 getSpecificBoards(검색어 없이 board 조회) 메서드로
 		// searchKeyword값이 있으면 getSearchedBoards(검색한 제목의 board만 조회) 메서드로 파라미터를 전달한다.
-		if (parameters.size() > 0) {
+		if (parameters.size() > 0 && parameters.get("category") != null && parameters.get("orderBy") != null
+				&& parameters.get("searchCategory") != null) {
 			String category = parameters.get("category");
 			String searchKeyword = parameters.get("searchKeyword");
 			if (searchKeyword.equals("null") || searchKeyword.equals("")) {
@@ -56,6 +57,8 @@ public class BoardServiceImpl implements BoardService {
 					// 들어온 파라미터 중 category(카테고리)값이 total(전체)이면 Query문에서 board_category 조건을 빼야하기 때문에
 					// 그 조건을 제거한 Mapper로 연결해 준다.
 					boards = boardMapper.getTotalSpecificBoards(parameters);
+				} else {
+					boards = boardMapper.getAllBoards();
 				}
 			} else if (!searchKeyword.equals("null") || searchKeyword.equals("")) {
 				System.out.println("searchKeyword : " + searchKeyword);
@@ -72,6 +75,8 @@ public class BoardServiceImpl implements BoardService {
 					// 들어온 파라미터 중 category(카테고리)값이 total(전체)이면 Query문에서 board_category 조건을 빼야하기 때문에
 					// 그 조건을 제거한 Mapper로 연결해 준다.
 					boards = boardMapper.getTotalSearchedBoards(parameters);
+				} else {
+					boards = boardMapper.getAllBoards();
 				}
 			}
 		}
@@ -134,10 +139,10 @@ public class BoardServiceImpl implements BoardService {
 	}
 	
 	@Override
-	public String deleteBoard(BoardDTO board) {
+	public String deleteBoard(Map<String, String> parameters) {
 		
-		if(board.getBoard_pw().equals(boardMapper.passwordCheck(board.getBoard_seq()))) {
-			Integer row = boardMapper.deleteBoard(board.getBoard_seq());
+		if(parameters.get("input_pw").equals(boardMapper.boardPasswordCheck(Integer.parseInt(parameters.get("board_seq"))))) {
+			Integer row = boardMapper.deleteBoard(Integer.parseInt(parameters.get("board_seq")));
 			
 			if(row > 0) {
 				return "delete_success";
@@ -214,6 +219,12 @@ public class BoardServiceImpl implements BoardService {
 	}
 	
 	@Override
+	public String commentPasswordCheck(Integer comment_seq) {
+		
+		return	boardMapper.commentPasswordCheck(comment_seq);
+	}
+	
+	@Override
 	public String writeComment(Map<String, String> parameters) {
 		
 		Integer result = boardMapper.writeComment(parameters);
@@ -222,6 +233,30 @@ public class BoardServiceImpl implements BoardService {
 			return "write_comment_success";
 		} else {
 			return "write_comment_failed";
+		}
+	}
+	
+	@Override
+	public String editComment(Map<String, String> parameters) {
+		
+		Integer result = boardMapper.editComment(parameters);
+		
+		if(result > 0) {
+			return "edit_comment_success";
+		} else {
+			return "edit_comment_failed";
+		}
+	}
+	
+	@Override
+	public String deleteComment(Integer comment_seq) {
+		
+		Integer result = boardMapper.deleteComment(comment_seq);
+		
+		if(result > 0) {
+			return "delete_comment_success";
+		} else {
+			return "delete_comment_failed";
 		}
 	}
 }
