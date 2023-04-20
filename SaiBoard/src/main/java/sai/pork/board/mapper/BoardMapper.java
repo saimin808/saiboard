@@ -5,6 +5,7 @@ import java.util.Map;
 
 import sai.pork.board.model.BoardDTO;
 import sai.pork.board.model.CommentDTO;
+import sai.pork.board.model.FileDTO;
 
 public interface BoardMapper {
 
@@ -18,6 +19,10 @@ public interface BoardMapper {
 
 	List<BoardDTO> getTotalSearchedBoards(Map<String, String> parameters);
 	
+	Integer writeBoard(BoardDTO board);
+	
+	Integer uploadFiles(List<FileDTO> files);
+	
 	BoardDTO getBoard(Integer board_seq);
 	
 	void updateView(Integer board_seq);
@@ -28,11 +33,11 @@ public interface BoardMapper {
 	
 	List<CommentDTO> getComments(Integer board_seq);
 	
-	Integer writeComment(Map<String, String> parameters);
+	Integer writeComment(CommentDTO comment);
 	
 	String commentPasswordCheck(Integer comment_seq);
 	
-	Integer editComment(Map<String, String> parameters);
+	Integer editComment(CommentDTO comment);
 	
 	Integer deleteComment(Integer comment_seq);
 	

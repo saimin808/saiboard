@@ -1,0 +1,91 @@
+/* 전체 컨테이너 */
+#container {
+	margin: 5% auto;
+	width: 1300px;
+}
+
+/* 페이지 제목 a태그 (Sai Board) */
+#title {
+	text-decoration: none;
+	color: black;
+}
+
+/* 페이지 제목 a태그 (Sai Board) hover */
+#title:hover {
+	text-decoration: none;
+	color: black;
+}
+
+/* 카테고리 & 검색 컨테이너 */
+#category-container {
+	height: 45px;
+}
+
+/* 정렬 셀렉트 박스 */
+#category-select {
+	width: 5.5rem;
+}
+
+#orderBy-select {
+	width: 6.5rem;
+}
+
+/* 검색 카테고리 select */
+#searchCategory-select {
+	width: 6rem;
+}
+
+/* 검색 input */
+#search-text {
+	text-align: right;
+}
+
+/* 테이블 CSS */
+/* 테이블 */
+#table-container table {
+	border-top: 2px solid lightgrey;
+	border-bottom: 2px solid lightgrey;
+}
+
+/* 테이블 헤더 행 */
+th, td {
+	text-align: center;
+}
+
+/* 테이블의 헤더 */
+#table-container table thead tr th {
+	text-align: center;
+	font-size: 1.5rem;
+}
+
+/* 테이블 행 */
+tr {
+	border-bottom: 2px solid lightgrey;
+}
+/* /테이블 CSS */
+
+/* 글쓰기 버튼 컨테이너 */
+#button-container {
+	margin: 1rem 0;
+}
+
+/* 페이지네이션 */
+.page-link {
+	color: #000;
+	background-color: #fff;
+	border: 1px solid #6c757d;
+}
+
+.page-item.active .page-link {
+	z-index: 1;
+	color: #555;
+	font-weight: bold;
+	background-color: #f1f1f1;
+	border-color: #6c757d;
+}
+
+.page-link:focus, .page-link:hover {
+	color: white;
+	background-color: #6c757d;
+	border-color: #6c757d;
+}

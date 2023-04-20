@@ -12,6 +12,7 @@
 	/* 전체 컨테이너 */
 	#container {
 		margin: 5% auto;
+		width: 1230px;
 	}
 	
 	/* 게시판 컨테이너 */
@@ -332,7 +333,7 @@
 					<div id="commentContent" class="row row-cols-1 mb-0 w-100">
 						<div class="col-12 mb-0">
 							<textarea id="commentContent-text" class="form-control" rows="1" cols="40" wrap="hard"
-									  placeholder="내용을 입력해주세요. (4 ~ 40자)" onkeyup="fn_checkByte(this)"
+									  placeholder="내용을 입력해주세요. (4 ~ 40자)" onkeyup="content_checkText(this)"
 									  data-bs-container="body" data-bs-toggle="popover" data-bs-placement="right"
 									  data-bs-custom-class="warning-popover" data-bs-content="내용을 제대로 입력해주세요!"></textarea>
 							<input type="hidden" id="commentContent-hidden" name="comment_content" form="writeComment-form"/>
@@ -397,7 +398,7 @@
 												<div class="mb-0">
 													<textarea id="commentContent-text${i.count}" class="form-control" rows="1" cols="40" wrap="hard"
 														 name="comment_content" placeholder="내용을 입력해주세요. (4 ~ 40자)"
-														 onkeyup="edit_fn_checkByte(this)">${comment.comment_content}</textarea>
+														 onkeyup="edit_content_checkText(this)">${comment.comment_content}</textarea>
 													<%-- <input type="hidden"id="commentContent-hidden${i.count}" name="comment_content"
 															value="${comment.comment_content}"/> --%>
 												</div>

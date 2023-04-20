@@ -52,19 +52,34 @@
 		SELECT comment_pw FROM comments WHERE comment_seq = #{comment_seq}
 	</select>
 	
-	<insert id="writeComment" parameterType="Map">
-		INSERT INTO comments VALUES(comment_seq.nextval, #{board_seq}, #{comment_id}, #{comment_pw}, #{comment_content}, sysdate)
+	<insert id="writeBoard" parameterType="sai.pork.board.model.BoardDTO">
+		INSERT INTO boards
+		VALUES(board_seq.nextval, #{board_category}, #{board_writer}, #{board_title},
+				#{board_content}, #{board_pw}, 1, sysdate)
 	</insert>
 	
-	<!-- <update id="updateBoard" parameterType="sai.pork.board.model.BoardDTO">
-		UPDATE boards SET board_
-	</update> -->
+	<insert id="uploadFiles" parameterType="sai.pork.board.model.FileDTO">
+		INSERT INTO files
+		VALUES(files_seq.nextval, #{board_seq}, #{board_name}, #{file_src})
+	</insert>
+	
+	<insert id="writeComment" parameterType="sai.pork.board.model.CommentDTO">
+		INSERT INTO comments
+		VALUES(comment_seq.nextval, #{board_seq}, #{comment_id}, #{comment_pw}, #{comment_content}, sysdate)
+	</insert>
+	
+	<update id="editBoard" parameterType="sai.pork.board.model.BoardDTO">
+		UPDATE boards
+		SET board_category = #{board_category}, board_writer = #{board_writer}, board_title = #{board_title},
+		board_content = #{board_content}, board_pw = #{board_pw},
+		WHERE board_seq = #{board_seq}
+	</update>
 	
 	<update id="updateView" parameterType="Integer">
 		UPDATE boards SET board_view = board_view + 1 WHERE board_seq = #{board_seq}
 	</update>
 	
-	<update id="editComment" parameterType="Map">
+	<update id="editComment" parameterType="sai.pork.board.model.CommentDTO">
 		UPDATE comments SET comment_id = #{comment_id}, comment_pw = #{comment_pw}, comment_content = #{comment_content}
 		WHERE comment_seq = #{comment_seq}
 	</update>
