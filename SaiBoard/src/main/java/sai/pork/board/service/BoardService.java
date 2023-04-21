@@ -10,16 +10,19 @@ import org.springframework.web.multipart.MultipartFile;
 
 import sai.pork.board.model.BoardDTO;
 import sai.pork.board.model.CommentDTO;
+import sai.pork.board.model.FileDTO;
 
 public interface BoardService {
 
+	List<BoardDTO> getAllBoards();
+	
 	void showBoards(HttpServletRequest req, Map<String, String> parameters);
 	
 	void writeBoard(HttpServletRequest req, BoardDTO board);
 	
 	String uploadFiles(Integer board_seq, List<MultipartFile> files) throws IllegalStateException, IOException;
-	
-	BoardDTO readBoard(Integer board_seq);
+		
+	void readBoard(HttpServletRequest req, Integer board_seq);
 	
 	String deleteBoard(Map<String, String> parameters);
 	

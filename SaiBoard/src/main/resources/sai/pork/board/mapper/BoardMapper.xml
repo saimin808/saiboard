@@ -8,6 +8,10 @@
 		SELECT * FROM boards ORDER BY board_seq DESC
 	</select>
 	
+	<select id="getAllFiles" parameterType="Integer" resultType="sai.pork.board.model.FileDTO">
+		SELECT * FROM files
+	</select>
+	
 	<!-- parameterType이 String이면 #{id}는 잘 안받아와짐. #{value}로 하는것이 좋음 -->
 	<!-- 그래서 String 말고 Map을 사용함 -->
 	<select id="getSpecificBoards" parameterType="Map" resultType="sai.pork.board.model.BoardDTO">
@@ -40,6 +44,11 @@
 		WHERE board_seq = #{board_seq}
 	</select>
 	
+	<select id="getFiles" parameterType="Integer" resultType="sai.pork.board.model.FileDTO">
+		SELECT * FROM files
+		WHERE board_seq = #{board_seq}
+	</select>
+	
 	<select id="getComments" parameterType="Integer" resultType="sai.pork.board.model.CommentDTO">
 		SELECT * FROM comments WHERE board_seq=#{board_seq} ORDER BY comment_seq DESC
 	</select>
@@ -54,13 +63,13 @@
 	
 	<insert id="writeBoard" parameterType="sai.pork.board.model.BoardDTO">
 		INSERT INTO boards
-		VALUES(board_seq.nextval, #{board_category}, #{board_writer}, #{board_title},
+		VALUES(board_seq.nextval, #{board_category}, #{board_title}, #{board_writer},
 				#{board_content}, #{board_pw}, 1, sysdate)
 	</insert>
 	
 	<insert id="uploadFiles" parameterType="sai.pork.board.model.FileDTO">
 		INSERT INTO files
-		VALUES(files_seq.nextval, #{board_seq}, #{board_name}, #{file_src})
+		VALUES(file_seq.nextval, #{board_seq}, #{file_name}, #{file_src})
 	</insert>
 	
 	<insert id="writeComment" parameterType="sai.pork.board.model.CommentDTO">

@@ -44,7 +44,7 @@ public class BoardController {
 		
 		System.out.println("parameters : " + board_seq);
 		
-		model.addAttribute("board", boardService.readBoard(board_seq)); 
+		boardService.readBoard(req, board_seq); 
 		boardService.showComments(req, board_seq);
 		
 		return "read/board_read";
@@ -69,10 +69,10 @@ public class BoardController {
 	}
 	
 	@GetMapping("/edit")
-	public String editBoard(Model model, @ModelAttribute Integer board_seq) {
+	public String editBoard(Model model, HttpServletRequest req, @ModelAttribute Integer board_seq) {
 		
 		model.addAttribute("purpose", "edit");
-		model.addAttribute("board", boardService.readBoard(board_seq));
+		boardService.readBoard(req, board_seq);
 		
 		return "write/board_write";
 	}
@@ -94,9 +94,12 @@ public class BoardController {
 		System.out.println("files : " + upload_files.toString());
 		
 		boardService.writeBoard(req, board);
-		
-		// board_seq를 글쓰기에서는 못받아와 주니까 만든 다음에 board를 가져와서 seq를 전달해줘야됨 		
-		boardService.uploadFiles(board.getBoard_seq(), upload_files);
+		// board_seq를 글쓰기에서는 못받아와 주니까 만든 다음에 board를 가져와서 seq를 전달해줘야됨 
+		if(upload_files.size() > 0) {
+			List<BoardDTO> boards = boardService.getAllBoards();
+			Integer newBoard_seq = boards.get(0).getBoard_seq();		
+			boardService.uploadFiles(newBoard_seq, upload_files);
+		}
 		
 		return "redirect:/board";
 	}

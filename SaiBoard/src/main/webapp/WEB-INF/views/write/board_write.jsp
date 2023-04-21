@@ -25,6 +25,14 @@
 	width: 210px;
 }
 
+/* 팝 오버 CSS */
+.warning-popover {
+	--bs-popover-bg: var(--bs-warning);
+	--bs-popover-body-color: var(--bs-danger);
+	font-size: 18px;
+	font-weight: bold;
+}
+
 /* 취소 작성 버튼 */
 #boardCancel-button, #boardSubmit-button {
 	width: 100px;
@@ -87,24 +95,24 @@
 						<div class="mb-3 row">
 							<label for="boardUpload-file1" class="col-1 col-form-label">파일 1</label>
 							<div class="input-group col-5 w-50">
-								<input class="form-control" type="file" id="boardUpload-file1" name="upload_files" multiple>
-								<button class="btn btn-outline-secondary" type="button" id="boardUpload-button1">Upload</button>
+								<input class="form-control" type="file" id="boardUpload-file1" name="upload_files">
+								<button class="btn btn-outline-secondary" type="button" id="uploadCancel-button1">Cancel</button>
 							</div>
 						</div>
-						<!-- <div class="mb-3 row">
+						<div class="mb-3 row">
 							<label for="boardUpload-file2" class="col-1 col-form-label">파일 2</label>
 							<div class="col-5 input-group w-50">
 								<input class="form-control" type="file" id="boardUpload-file2" name="upload_files">
-								<button class="btn btn-outline-secondary" type="button" id="boardUpload-button2">Upload</button>
+								<button class="btn btn-outline-secondary" type="button" id="uploadCancel-button2">Cancel</button>
 							</div>
 						</div>
 						<div class="mb-3 row">
 							<label for="boardUpload-file3" class="col-1 col-form-label">파일 3</label>
 							<div class="col-5 input-group w-50">
 								<input class="form-control" type="file" id="boardUpload-file3" name="upload_files">
-								<button class="btn btn-outline-secondary" type="button" id="boardUpload-button3">Upload</button>
+								<button class="btn btn-outline-secondary" type="button" id="uploadCancel-button3">Cancel</button>
 							</div>
-						</div> -->
+						</div>
 					</div>
 					<div id="password-container" class="container-xxl">
 						<div class="mb-3 row">
@@ -125,7 +133,7 @@
 								<button type="button" class="btn btn-light" id="boardCancel-button">취소</button>
 							</div>
 							<div class="col-6 text-start">
-								<input type="submit" class="btn btn-secondary" id="boardSubmit-button" value="작성"/>
+								<button type="button" class="btn btn-secondary" id="boardSubmit-button">작성</button>
 							</div>
 						</div>
 					</div>

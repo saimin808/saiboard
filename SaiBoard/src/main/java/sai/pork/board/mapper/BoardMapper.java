@@ -11,6 +11,8 @@ public interface BoardMapper {
 
 	List<BoardDTO> getAllBoards();
 	
+	List<FileDTO> getAllFiles();
+	
 	List<BoardDTO> getSpecificBoards(Map<String, String> parameters);
 	
 	List<BoardDTO> getTotalSpecificBoards(Map<String, String> parameters);
@@ -21,9 +23,13 @@ public interface BoardMapper {
 	
 	Integer writeBoard(BoardDTO board);
 	
-	Integer uploadFiles(List<FileDTO> files);
+	Integer uploadFiles(FileDTO uploadFile);
+	
+	Integer deleteFile(String file_name);
 	
 	BoardDTO getBoard(Integer board_seq);
+	
+	List<FileDTO> getFiles(Integer board_seq);
 	
 	void updateView(Integer board_seq);
 	

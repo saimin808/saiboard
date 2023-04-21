@@ -218,8 +218,15 @@
 								<div id="content-container" class="container-xxl">
 									${board.board_content}
 								</div>
-								<div id="files-container" class="container-xxl">
-									
+								<div id="file-container" class="container-xxl">
+									<c:forEach items="${files}" var="file">
+										<div class="card w-25 mb-3">
+										  <div class="card-body">
+										  	<i class="fa-solid fa-paperclip"></i>
+										    <a href="#" class="link-primary">${file.file_name}</a>
+										  </div>
+										</div>
+									</c:forEach>
 								</div>
 							</td>
 						</tr>
@@ -422,7 +429,7 @@
 						</c:when>
 						<c:otherwise>
 							<div class="row row-cols-1 container-lg w-100 pb-0">
-								<div class="col-12">댓글이 없습니다.</div>
+								<div class="col-12 text-center">댓글이 없습니다.</div>
 							</div>
 						</c:otherwise>
 					</c:choose>

@@ -2,6 +2,10 @@ package sai.pork.board.service.impl;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +29,11 @@ public class BoardServiceImpl implements BoardService {
 	BoardMapper boardMapper;
 	
 	@Override
+	public List<BoardDTO> getAllBoards() {
+		return boardMapper.getAllBoards();
+	}
+	
+	@Override
 	public void showBoards(HttpServletRequest req, Map<String, String> parameters) {
 		// 선택한 페이지 숫자를 불러옴
 		String pageStr = req.getParameter("page");
@@ -32,6 +41,7 @@ public class BoardServiceImpl implements BoardService {
 		System.out.println("getAllBoard");
 		System.out.println(parameters);
 		List<BoardDTO> boards = boardMapper.getAllBoards();
+		List<FileDTO> files = boardMapper.getAllFiles();
 		
 		// page : 총 게시글 수
 		int page;
@@ -128,6 +138,7 @@ public class BoardServiceImpl implements BoardService {
 
 		req.setAttribute("page", page);
 		req.setAttribute("boards", boards.subList(startIndex, endIndex));
+		req.setAttribute("files", files);
 		req.setAttribute("paginationStart", paginationStart);
 		req.setAttribute("paginationEnd", paginationEnd);
 		req.setAttribute("nextPage", nextPage);
@@ -196,7 +207,7 @@ public class BoardServiceImpl implements BoardService {
 		int previousPage = paginationStart - 1;
 
 		System.out.printf("현재 페이지는 %d페이지고, 페이지네이션 시작은 %d, 마지막 숫자는 %d 입니다. \n", page, paginationStart, paginationEnd);
-
+		
 		req.setAttribute("page", page);
 		req.setAttribute("boards", boards.subList(startIndex, endIndex));
 		req.setAttribute("paginationStart", paginationStart);
@@ -211,46 +222,57 @@ public class BoardServiceImpl implements BoardService {
 
 		System.out.println("uploadFiles : " + files);
 		
-		List<FileDTO> uploadfiles = new ArrayList<FileDTO>();
+		List<FileDTO> uploadFiles = new ArrayList<FileDTO>();
 		
-		// 서버 경로
-		String uploadPath = "C:/Users/east/git/saiboard/SaiBoard/src/main/webapp/resources/files";
-
+		// 파일 저장 경로
+		String uploadPath = "C:/Users/east/git/saiboard/SaiBoard/src/main/webapp/resources/upload_files";
+		
+		Path directoryPath = Paths.get(uploadPath + File.separator + board_seq);
+		// 새롭게 업로드한 파일을 저장할 board_seq 이름으로 새로운 폴더 생성
+		Files.createDirectory(directoryPath);
+		System.out.println(directoryPath + " 디렉토리가 생성되었습니다.");
+		
+		// 파일 이름 저장할 배열
 		String[] fileName = new String[3];
 
 		for (int i = 0; i < files.size(); i++) {
+			// getOriginalFilename()으로 원래 파일 이름 받아오기 
 			fileName[i] = files.get(i).getOriginalFilename();
-			File saveFile = new File(uploadPath, fileName[i]);
+			// 파일을 uploadPath에 fileName[i]으로 저장
+			File saveFile = new File(directoryPath.toString(), fileName[i]);
 
 			if (i == 0 && !files.get(i).isEmpty()) {
 				FileDTO file1 = new FileDTO();
 				files.get(i).transferTo(saveFile);
 				file1.setBoard_seq(board_seq);
 				file1.setFile_name(files.get(i).getOriginalFilename());
-				file1.setFile_src(uploadPath);
-				uploadfiles.add(file1);
+				file1.setFile_src(directoryPath.toString() + File.separator + fileName[i]);
+				uploadFiles.add(file1);
 
 			} else if (i == 1 && !files.get(i).isEmpty()) {
 				FileDTO file2 = new FileDTO();
 				files.get(i).transferTo(saveFile);
 				file2.setBoard_seq(board_seq);
 				file2.setFile_name(files.get(i).getOriginalFilename());
-				file2.setFile_src(uploadPath);
-				uploadfiles.add(file2);
+				file2.setFile_src(directoryPath.toString() + File.separator + fileName[i]);
+				uploadFiles.add(file2);
 
 			} else if (i == 2 && !files.get(i).isEmpty()) {
 				FileDTO file3 = new FileDTO();
 				files.get(i).transferTo(saveFile);
 				file3.setBoard_seq(board_seq);
 				file3.setFile_name(files.get(i).getOriginalFilename());
-				file3.setFile_src(uploadPath);
-				uploadfiles.add(file3);
+				file3.setFile_src(directoryPath.toString() + File.separator + fileName[i]);
+				uploadFiles.add(file3);
 			}
 		}
 		
-		Integer row = boardMapper.uploadFiles(uploadfiles);
+		Integer row = 0;
+		for(int i = 0; i < uploadFiles.size(); i++) {
+			row += boardMapper.uploadFiles(uploadFiles.get(i));
+		}
 			
-		if(row > 0) {			
+		if(row >= 3) {			
 			return "file_uploaded";
 		} else {
 			return "upload_failed";
@@ -258,18 +280,62 @@ public class BoardServiceImpl implements BoardService {
 	}
 	
 	@Override
-	public BoardDTO readBoard(Integer board_seq) {
+	public void readBoard(HttpServletRequest req, Integer board_seq) {
 		
+		// 1. 조회수 +1
 		boardMapper.updateView(board_seq);
-		
-		return boardMapper.getBoard(board_seq);
+		// 2. board_seq로 게시판 가져오기
+		req.setAttribute("board", boardMapper.getBoard(board_seq));
+		// 3. board_seq로 업로드한 파일 가져오기
+		req.setAttribute("files", boardMapper.getFiles(board_seq));
 	}
 	
 	@Override
 	public String deleteBoard(Map<String, String> parameters) {
 		
 		if(parameters.get("input_pw").equals(boardMapper.boardPasswordCheck(Integer.parseInt(parameters.get("board_seq"))))) {
-			Integer row = boardMapper.deleteBoard(Integer.parseInt(parameters.get("board_seq")));
+			
+			// 1. 우선 업로드한 파일 먼저 지운다.
+			//  - 지우려는 게시판에 업로드 했던 파일들 불러오기
+			List<FileDTO> files = boardMapper.getFiles(Integer.parseInt(parameters.get("board_seq")));
+			
+			//  업로드한 파일이 저장되어있는 폴더 지움 유무
+			boolean dir_result = false;
+			// 업로드한 파일을 지우기 위해 만들 File 객체
+			File uploaded_file = null;
+			// 파일을 제거할 때마다 1씩 증가시킬 cnt
+			Integer file_delete_cnt = 0;
+			for(int i = 0; i < files.size(); i++) {
+				// 2. 파일 먼저 하나씩 지운다
+				//  - DB에 저장했던 파일 경로를 가지고 하나의 File객체로 만들어준다.
+				uploaded_file = new File(files.get(i).getFile_src());
+				
+				// file.delete() - 파일을 제거하는 메소드 (boolean 타입 반환)
+				boolean file_result = uploaded_file.delete();
+				//  - 하나씩 지울 때마다 cnt를 1씩 증가 시킨다.
+				if(file_result) {
+					file_delete_cnt += 1;
+				}
+			}
+			
+			System.out.println("file_delete_cnt : " + file_delete_cnt);
+			// 3. 업로드 했던 파일을 다 지우면 저장했던 폴더도 지운다.
+			if(file_delete_cnt >= files.size()) {
+				File dir = new File(uploaded_file.getParent());
+				
+				System.out.println("isDirectory : " + dir.isDirectory());
+				if(dir.isDirectory()) {
+					dir_result = dir.delete();
+				}
+			}
+			
+			System.out.println("dir_result : " + dir_result);
+			
+			Integer row = 0;
+			// 4. 폴더도 지우게 되면 마지막으로 게시판을 지운다.
+			if(dir_result == true) {
+				row = boardMapper.deleteBoard(Integer.parseInt(parameters.get("board_seq")));
+			}
 			
 			if(row > 0) {
 				return "delete_success";
@@ -385,5 +451,11 @@ public class BoardServiceImpl implements BoardService {
 		} else {
 			return "delete_comment_failed";
 		}
+	}
+	
+	public static void main(String[] args) {
+		File file = new File("C:/Users/east/git/saiboard/SaiBoard/src/main/webapp/resources/upload_files/194/yes.png");
+		File file2 = new File(file.getParent());
+		System.out.println(file2.isDirectory());
 	}
 }
