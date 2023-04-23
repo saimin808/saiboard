@@ -14,7 +14,7 @@ public class CommentDTO {
 	Integer comment_seq;
 	Integer board_seq;
 	String comment_id;
-	String commnet_pw;
+	String comment_pw;
 	String comment_content;
 	Date comment_date;
 	

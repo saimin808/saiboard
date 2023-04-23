@@ -20,8 +20,10 @@ public interface BoardService {
 	
 	void writeBoard(HttpServletRequest req, BoardDTO board);
 	
-	String uploadFiles(Integer board_seq, List<MultipartFile> files) throws IllegalStateException, IOException;
-		
+	String uploadFiles(HttpServletRequest req, Integer board_seq, List<MultipartFile> files) throws IllegalStateException, IOException;
+	
+	FileDTO getSingleFile(Integer file_seq);
+	
 	void readBoard(HttpServletRequest req, Integer board_seq);
 	
 	String deleteBoard(Map<String, String> parameters);

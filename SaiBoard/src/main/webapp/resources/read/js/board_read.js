@@ -30,7 +30,7 @@ $('#delete_submit-button').click(function() {
 	}
 });
 
-// 모달의 
+// 모달의 확인 버튼 action
 $('#edit_submit-button').click(function() {
 	if($('#editPassword').val() == null || $('#editPassword').val() == "") {
 		$('#editWarningMsg').text('영문, 숫자, 기호 포함 4~16자로 입력해 주세요!');
@@ -45,6 +45,11 @@ $('#home-button').click(function() {
 	location.href = contextPath + '/board';
 });
 
+// file
+function file_download(num) {
+	let url = contextPath + '/board/file_download/' + num;
+	window.open(url);
+}
 
 // comment
 
@@ -101,8 +106,13 @@ function edit_content_checkText(obj) {
 }
 
 // 댓글 '쓰기' 버튼 action (팝오버)
+
+// 글쓴이 정규식 : 2 ~ 8자 한글, 영문 허용
+const writerRegExp = /^[a-zA-Zㄱ-힣][a-zA-Zㄱ-힣 ]{2,8}$/;
+// 비밀번호 정규식 : 4 ~ 6자 영문, 숫자, 특수문자 허용
+const pwRegExp = /^[a-zA-z][0-9][$`~!@$!%*#^?&\\(\\)\-_=+]{4,6}$/;
 $('#writeCommentSubmit-button').click(function() {
-	if($('#commentId-text').val().length < 4) {
+	if($('#commentId-text').val().length < 2 && writerRegExp.test($('#commentId-text')) == false) {
 	
 		$('input[id=commentId-text]').popover('show');
 		$('input[id=commentId-text]').focus();
@@ -112,7 +122,7 @@ $('#writeCommentSubmit-button').click(function() {
 
 	$('input[id=commentId-text]').popover('hide');
 		
-	if($('#commentPw-text').val().length < 4) {
+	if($('#commentPw-text').val().length < 4 && pwRegExp.test($('#commentPw-text')) == false) {
 	
 		$('input[id=commentPw-text]').popover('show');
 		$('input[id=commentPw-text]').focus();
@@ -140,9 +150,10 @@ $('#writeCommentSubmit-button').click(function() {
 });
 
 
-for(let i = 1; i < commentSize; i++) {
-	// 수정 링크 action
+for(let i = 1; i <= commentSize; i++) {
+	// 수정 버튼 action
 	$('button[id=editComment' + i + ']').click(function() {
+		console.log('edit click');
 		$('dialog').removeAttr('open');
 		
 		$('h5[id=commentPwCheck-title' + i + ']').text('댓글 수정');
@@ -151,8 +162,9 @@ for(let i = 1; i < commentSize; i++) {
 		
 		$('dialog[id=commentPwCheck-dialog' + i + ']').attr('open', 'open');	
 	});
-	// 삭제 링크 action
+	// 삭제 버튼 action
 	$('button[id=deleteComment' + i + ']').click(function() {
+		console.log('delete click');
 		$('dialog').removeAttr('open');
 		
 		$('h5[id=commentPwCheck-title' + i + ']').text('댓글 삭제');
@@ -211,9 +223,6 @@ for(let i = 1; i < commentSize; i++) {
 		$('form[id=editComment-form' + i + ']').submit();			
 	});
 }
-
-// 댓글 수정 창 표시
-
 
 // comment 페이지네이션 action
 if(urlParams != null) {

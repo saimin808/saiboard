@@ -218,14 +218,16 @@ public class BoardServiceImpl implements BoardService {
 	}
 	
 	@Override
-	public String uploadFiles(Integer board_seq, List<MultipartFile> files) throws IllegalStateException, IOException {
+	public String uploadFiles(HttpServletRequest req, Integer board_seq, List<MultipartFile> files) throws IllegalStateException, IOException {
 
 		System.out.println("uploadFiles : " + files);
 		
 		List<FileDTO> uploadFiles = new ArrayList<FileDTO>();
 		
 		// 파일 저장 경로
-		String uploadPath = "C:/Users/east/git/saiboard/SaiBoard/src/main/webapp/resources/upload_files";
+		// 나중에 밑의 경로로 바꿔야된다.
+		// "C:/Users/east/git/saiboard/SaiBoard/src/main/webapp/resources/upload_files";		
+		String uploadPath = req.getSession().getServletContext().getRealPath("/resources/upload_files");
 		
 		Path directoryPath = Paths.get(uploadPath + File.separator + board_seq);
 		// 새롭게 업로드한 파일을 저장할 board_seq 이름으로 새로운 폴더 생성
@@ -240,7 +242,7 @@ public class BoardServiceImpl implements BoardService {
 			fileName[i] = files.get(i).getOriginalFilename();
 			// 파일을 uploadPath에 fileName[i]으로 저장
 			File saveFile = new File(directoryPath.toString(), fileName[i]);
-
+			
 			if (i == 0 && !files.get(i).isEmpty()) {
 				FileDTO file1 = new FileDTO();
 				files.get(i).transferTo(saveFile);
@@ -277,6 +279,12 @@ public class BoardServiceImpl implements BoardService {
 		} else {
 			return "upload_failed";
 		}
+	}
+	
+	@Override
+	public FileDTO getSingleFile(Integer file_seq) {
+		
+		return boardMapper.getFile(file_seq);
 	}
 	
 	@Override
@@ -320,7 +328,7 @@ public class BoardServiceImpl implements BoardService {
 			
 			System.out.println("file_delete_cnt : " + file_delete_cnt);
 			// 3. 업로드 했던 파일을 다 지우면 저장했던 폴더도 지운다.
-			if(file_delete_cnt >= files.size()) {
+			if(file_delete_cnt >= files.size() && files.size() > 0) {
 				File dir = new File(uploaded_file.getParent());
 				
 				System.out.println("isDirectory : " + dir.isDirectory());
@@ -333,9 +341,7 @@ public class BoardServiceImpl implements BoardService {
 			
 			Integer row = 0;
 			// 4. 폴더도 지우게 되면 마지막으로 게시판을 지운다.
-			if(dir_result == true) {
-				row = boardMapper.deleteBoard(Integer.parseInt(parameters.get("board_seq")));
-			}
+			row = boardMapper.deleteBoard(Integer.parseInt(parameters.get("board_seq")));
 			
 			if(row > 0) {
 				return "delete_success";

@@ -219,11 +219,11 @@
 									${board.board_content}
 								</div>
 								<div id="file-container" class="container-xxl">
-									<c:forEach items="${files}" var="file">
+									<c:forEach items="${files}" var="file" varStatus="i">
 										<div class="card w-25 mb-3">
 										  <div class="card-body">
 										  	<i class="fa-solid fa-paperclip"></i>
-										    <a href="#" class="link-primary">${file.file_name}</a>
+										    <a class="link-primary" href="#" onclick="file_download(${file.file_seq})">${file.file_name}</a>
 										  </div>
 										</div>
 									</c:forEach>
@@ -283,6 +283,7 @@
 					        		<p class="text-info">비밀번호를 입력하세요</p>
 					        	</div>
 					        	<form id="editForm" class="row justify-content-center" action="<%= request.getContextPath()%>/board/edit" method="POST">
+					        		<input type="hidden" name="board_seq" value="${board.board_seq}"/>
 					        		<input id="editPassword" type="password" class="form-control text-center w-75">
 					        	</form>
 					        	<c:if test="${not empty status && status eq 'edit_wrong_pw'}">
@@ -320,7 +321,7 @@
 						</div>
 						<div class="col-4">
 							<input type="text" class="form-control" id="commentId-text" name="comment_id"
-									form="writeComment-form" maxlength="8" placeholder="영어, 숫자 포함 4 ~ 8자"
+									form="writeComment-form" maxlength="8" placeholder="한글, 영어 포함 2 ~ 8자"
 									data-bs-container="body" data-bs-toggle="popover" data-bs-placement="top"
 									data-bs-custom-class="warning-popover" data-bs-content="아이디를 제대로 입력해주세요!">
 						</div>

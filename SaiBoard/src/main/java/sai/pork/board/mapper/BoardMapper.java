@@ -31,6 +31,8 @@ public interface BoardMapper {
 	
 	List<FileDTO> getFiles(Integer board_seq);
 	
+	FileDTO getFile(Integer file_seq);
+	
 	void updateView(Integer board_seq);
 	
 	String boardPasswordCheck(Integer board_seq);

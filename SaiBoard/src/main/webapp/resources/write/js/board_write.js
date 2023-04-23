@@ -84,9 +84,17 @@ $('#boardCancel-button').click(function() {
 
 // 작성 버튼 action
 // 모든 text들이 입력조건을 만족하지 못하면 버튼 클릭시 각 텍스트의 popover 활성화
-// 만족하면 form submit 
+// 만족하면 form submit
+
+// 비밀번호 정규식 : 4 ~ 16자 영문, 숫자, 특수문자를 최소 한가지씩 조합
+let pwRegExp = /^(?=.*[a-zA-z])(?=.*[0-9])(?=.*[$`~!@$!%*#^?&\\(\\)\-_=+]).{3,16}$/;
+// 글쓴이 정규식 : 2 ~ 10자 한글, 영문 허용
+let writerRegExp = /^[a-zA-Zㄱ-힣][a-zA-Zㄱ-힣 ]{1,10}$/;
 $('#boardSubmit-button').click(function() {
-	if($('#boardWriter-text').val() < 2) {
+	console.log('writer : ' + writerRegExp.test($('#boardWriter-text').val()));
+	console.log('pass : ' + pwRegExp.test($('#boardPassword-text').val()));
+	
+	if($('#boardWriter-text').val() < 2 || writerRegExp.test($('#boardWriter-text').val()) == false) {
 		$('#boardWriter-text').popover('show');
 		$('#boardWriter-text').focus();
 		return;
@@ -111,7 +119,7 @@ $('#boardSubmit-button').click(function() {
 		$('#boardContent-text').popover('dispose');
 	}
 	
-	if($('#boardPassword-text').val() < 2) {
+	if($('#boardPassword-text').val() < 2 || pwRegExp.test($('#boardPassword-text').val()) == false) {
 		$('#boardPassword-text').popover('show');
 		$('#boardPassword-text').focus();
 		return;

@@ -1,16 +1,21 @@
 package sai.pork.board.controller;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import sai.pork.board.model.BoardDTO;
 import sai.pork.board.model.CommentDTO;
+import sai.pork.board.model.FileDTO;
 import sai.pork.board.service.BoardService;
 
 @Controller
@@ -68,8 +74,8 @@ public class BoardController {
 		}
 	}
 	
-	@GetMapping("/edit")
-	public String editBoard(Model model, HttpServletRequest req, @ModelAttribute Integer board_seq) {
+	@PostMapping("/edit")
+	public String editBoard(Model model, HttpServletRequest req, Integer board_seq) {
 		
 		model.addAttribute("purpose", "edit");
 		boardService.readBoard(req, board_seq);
@@ -98,7 +104,7 @@ public class BoardController {
 		if(upload_files.size() > 0) {
 			List<BoardDTO> boards = boardService.getAllBoards();
 			Integer newBoard_seq = boards.get(0).getBoard_seq();		
-			boardService.uploadFiles(newBoard_seq, upload_files);
+			boardService.uploadFiles(req, newBoard_seq, upload_files);
 		}
 		
 		return "redirect:/board";
@@ -123,7 +129,7 @@ public class BoardController {
 		boardService.showComments(req, comment.getBoard_seq());
 		String comment_pw = boardService.commentPasswordCheck(comment.getComment_seq());
 		
-		if(comment_pw.equals(comment.getCommnet_pw())) {
+		if(comment_pw.equals(comment.getComment_pw())) {
 			model.addAttribute("board_seq", comment.getComment_seq());
 			model.addAttribute("status", "edit_comment_pw_checked" + comment.getComment_seq());
 			return "redirect:/board/edit";
@@ -141,7 +147,7 @@ public class BoardController {
 		boardService.showComments(req, comment.getBoard_seq());
 		String comment_pw = boardService.commentPasswordCheck(comment.getComment_seq());
 		
-		if(comment_pw.equals(comment.getCommnet_pw())) {
+		if(comment_pw.equals(comment.getComment_pw())) {
 			String result = boardService.deleteComment(comment.getComment_seq());
 			model.addAttribute("board_seq", comment.getComment_seq());
 			model.addAttribute("status", result);
@@ -162,5 +168,41 @@ public class BoardController {
 		model.addAttribute("board_seq", comment.getBoard_seq());
 		model.addAttribute("status", result);
 		return "redirect:/board/read";
+	}
+	
+	@GetMapping("/file_download/{file_seq:[0-9]{1,6}}")
+	public void fileDownload(@PathVariable(name="file_seq") Integer file_seq, HttpServletResponse resp) throws Exception {
+		
+		// service를 통해 첨부파일 가져오기
+		FileDTO file = boardService.getSingleFile(file_seq);
+		// 파일명에 한글이 있는경우 처리 (header에 들어갈수 있는 type으로 변환)
+		String originalName = new String(file.getFile_name().getBytes("utf-8"), "iso-8859-1");
+		
+		// 경로에 있는 파일 찾기
+		File f = new File(file.getFile_src());
+		
+		// 파일이 존재하지 않는 경우 
+		if(!f.isFile()) {
+			throw new FileNotFoundException("해당 첨부파일이 존재하지 않습니다.");
+		}
+		
+		// 다운로드를 위한 헤더 생성
+		// application/octet-stream : 8비트 단위의 binary data이다. 파일이기때문에 byte단위로 전송된다.
+		resp.setHeader("Content-Type", "application/octet-stream;");
+		// Content-Disposition : attachment;filename=\"" + originalName + "\";"
+		// 다운로드 시 무조건 파일 다운로드 대화상자가 뜨도록 하는 속성. filename= 은 대화상자의 이름이 된다.
+		resp.setHeader("Content-Disposition", "attachment;filename=\"" + originalName + "\";");
+		// Content-Transfer-Encoding : binary;
+		// 이 헤더는 디코더가 메시지의 body를 원래의 포맷으로 바꾸기 위해 사용하는 디코딩방식이다.
+		resp.setHeader("Content-Transfer-Encoding", "binary;");
+		resp.setContentLength((int) f.length()); // 진행율
+		// Pragma : no-cache;  HTTP 1.0 이전 버전의 클라이언트를 위한 헤더,
+        // 캐시가 캐시 복사본을 릴리즈 하기전에 원격 서버로 요청을 날려 유효성 검사를 강제하도록 함
+		resp.setHeader("Pragma", "no-cache;");
+		// Expires : -1  (만료일: -1이면 다운로드의 제한시간 없음.  요즘엔 크게 중요하지않음)
+		resp.setHeader("Expires", "-1;");
+		// 저장된 파일을 응답객체의 스트림으로 내보내기, resp의 outputStream에 해당파일을 복사
+		FileUtils.copyFile(f, resp.getOutputStream());
+		resp.getOutputStream().close();
 	}
 }

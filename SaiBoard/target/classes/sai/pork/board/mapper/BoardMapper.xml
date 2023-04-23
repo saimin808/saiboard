@@ -49,6 +49,11 @@
 		WHERE board_seq = #{board_seq}
 	</select>
 	
+	<select id="getFile" parameterType="Integer" resultType="sai.pork.board.model.FileDTO">
+		SELECT * FROM files
+		WHERE file_seq = #{file_seq}
+	</select>
+	
 	<select id="getComments" parameterType="Integer" resultType="sai.pork.board.model.CommentDTO">
 		SELECT * FROM comments WHERE board_seq=#{board_seq} ORDER BY comment_seq DESC
 	</select>
