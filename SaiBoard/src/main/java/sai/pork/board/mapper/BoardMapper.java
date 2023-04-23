@@ -37,6 +37,10 @@ public interface BoardMapper {
 	
 	String boardPasswordCheck(Integer board_seq);
 	
+	Integer editBoard(BoardDTO board);
+	
+	Integer editFile(FileDTO file);
+	
 	Integer deleteBoard(Integer board_seq);
 	
 	List<CommentDTO> getComments(Integer board_seq);

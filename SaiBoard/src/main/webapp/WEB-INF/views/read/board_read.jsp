@@ -252,7 +252,7 @@
 					        		<input type="hidden" name="board_seq" value="${board.board_seq}"/>
 					        		<input id="deletePassword" name="input_pw" type="password" class="form-control text-center w-75">
 					        	</form>
-					        	<c:if test="${not empty status && status eq 'delete_wrong_pw'}">
+					        	<c:if test="${not empty param.status && param.status eq 'delete_wrong_pw'}">
 						        	<div class="row text-center">
 						        		<p id="deleteWarningMsg" class="text-danger">잘못된 비밀번호입니다!</p>
 						        	</div>
@@ -284,9 +284,9 @@
 					        	</div>
 					        	<form id="editForm" class="row justify-content-center" action="<%= request.getContextPath()%>/board/edit" method="POST">
 					        		<input type="hidden" name="board_seq" value="${board.board_seq}"/>
-					        		<input id="editPassword" type="password" class="form-control text-center w-75">
+					        		<input id="editPassword" type="password" class="form-control text-center w-75" name="input_pw">
 					        	</form>
-					        	<c:if test="${not empty status && status eq 'edit_wrong_pw'}">
+					        	<c:if test="${not empty param.status && param.status eq 'edit_wrong_pw'}">
 						        	<div class="row text-center">
 						        		<p id="editWarningMsg" class="text-danger">잘못된 비밀번호입니다!</p>
 						        	</div>
@@ -495,9 +495,9 @@
 <!-- bootstrap script -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
 <!-- fontawesome : 아이콘 사용을 위한 script -->
-<script src="https://kit.fontawesome.com/8fdf7187c9.js" crossorigin="anonymous"></script>
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
+<script src="https://kit.fontawesome.com/8fdf7187c9.js" crossorigin="anonymous"></script>
 <!-- contextPath 변수 선언을 위한 script -->
 <script>
 	const contextPath = '<%=request.getContextPath()%>';

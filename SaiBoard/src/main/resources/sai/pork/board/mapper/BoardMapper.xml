@@ -89,6 +89,12 @@
 		WHERE board_seq = #{board_seq}
 	</update>
 	
+	<update id="editFile" parameterType="sai.pork.board.model.FileDTO">
+		UPDATE files
+		SET file_name = #{file_name} ,file_src = #{file_src}
+		WHERE file_seq = #{file_seq} 
+	</update> 
+	
 	<update id="updateView" parameterType="Integer">
 		UPDATE boards SET board_view = board_view + 1 WHERE board_seq = #{board_seq}
 	</update>

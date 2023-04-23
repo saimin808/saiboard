@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,9 +23,13 @@ public interface BoardService {
 	
 	String uploadFiles(HttpServletRequest req, Integer board_seq, List<MultipartFile> files) throws IllegalStateException, IOException;
 	
-	FileDTO getSingleFile(Integer file_seq);
+	void downloadFile(HttpServletResponse resp, Integer file_seq) throws Exception;
 	
 	void readBoard(HttpServletRequest req, Integer board_seq);
+	
+	String boardPasswordCheck(Map<String, String> parameters);
+	
+	String editBoard(BoardDTO board, List<FileDTO> files);
 	
 	String deleteBoard(Map<String, String> parameters);
 	

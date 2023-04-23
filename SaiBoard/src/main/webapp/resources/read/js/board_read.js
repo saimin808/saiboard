@@ -2,13 +2,22 @@
 const urlParams = new URLSearchParams(location.search);
 
 // url parameter에서 받아온 값(status)으로 모달의 경고 메세지 표시
-if(urlParams.get('status') != null && urlParams.get('status') == 'delete_wrong_pw') {
-	$('#deleteWarningMsg').text('잘못된 비밀번호입니다!');
+if(urlParams.get('status') == 'delete_wrong_pw') {
+	
+	// alert로 대체
+	alert('글 삭제 실패 : 잘못된 비밀번호');
+	
+	// 왠지 모를 오류로 구현 못함
+	//$('#deleteModal').show();	
 }
 
 // url parameter에서 받아온 값(status)으로 모달의 경고 메세지 표시
-if(urlParams.get('status') != null && urlParams.get('status') == 'edit_wrong_pw') {
-	$('#editWarningMsg').text('잘못된 비밀번호입니다!');
+if(urlParams.get('status') == 'edit_wrong_pw') {
+	// alert으로 대체
+	alert('글 수정 실패 : 잘못된 비밀번호');
+	
+	// 왠지 모를 오류로 구현 못함
+	//$('#editModal').show();
 }
 
 // 모달의 버튼들 action
