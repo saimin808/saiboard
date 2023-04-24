@@ -3,6 +3,7 @@ package sai.pork.board.controller;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +38,7 @@ public class BoardController {
 	
 	// 게시판 (board_main)
 	@GetMapping(value= {"", "/"})
-	public String showMainBoard(Model model, HttpServletRequest req, @RequestParam Map<String, String> parameters) {
+	public String showMainBoard(Model model, HttpServletRequest req, @RequestParam Map<String, String> parameters) throws ParseException {
 		// parameter를 Map으로 받을 때 만약 null값이 들어오게 된다면 value가 비어있는게 아닌 String값인 "null"이 들어있는 것이다.
 		System.out.println("Controller parameters : " + parameters);
 		
@@ -60,6 +61,7 @@ public class BoardController {
 	public String writeBoard(Model model, HttpServletRequest req, BoardDTO board,
 						List<MultipartFile> upload_files) throws IllegalStateException, IOException {
 		
+		// 파라미터 확인용 
 		System.out.println("board : " + board);
 		System.out.println("files : " + upload_files);
 		System.out.println("files : " + upload_files.toString());
@@ -77,8 +79,9 @@ public class BoardController {
 	
 	// 게시글 보기
 	@GetMapping("/read")
-	public String readBoard(Model model, HttpServletRequest req, @RequestParam Integer board_seq) {
+	public String readBoard(Model model, HttpServletRequest req, @RequestParam Integer board_seq) throws ParseException {
 		
+		// 파라미터 확인용
 		System.out.println("parameters : " + board_seq);
 		
 		boardService.readBoard(req, board_seq); 
@@ -90,7 +93,8 @@ public class BoardController {
 	// 게시글 삭제
 	@PostMapping("/delete")
 	public String deleteBoard(Model model, @RequestParam Map<String,String> parameters) {
-
+		
+		// 파라미터 확인용
 		System.out.println("delete_board: " + parameters);
 		
 		String result = boardService.boardPasswordCheck(parameters);
@@ -109,7 +113,7 @@ public class BoardController {
 	
 	// 게시글 수정 페이지로 이동
 	@PostMapping("/edit")
-	public String editPasswordCheck(Model model, HttpServletRequest req, @RequestParam Map<String,String> parameters) {
+	public String editPasswordCheck(Model model, HttpServletRequest req, @RequestParam Map<String,String> parameters) throws NumberFormatException, ParseException {
 		
 		String result = boardService.boardPasswordCheck(parameters);
 		
@@ -152,16 +156,18 @@ public class BoardController {
 	@PostMapping("/edit_comment_pw_check")
 	public String editCommentPasswordCheck(Model model, HttpServletRequest req, @ModelAttribute CommentDTO comment) {
 		
+		// 파라미터 확인용
 		System.out.println("editCommentPwCheck : " + comment);
-		boardService.showComments(req, comment.getBoard_seq());
+		// 1. 댓글의 비밀번호 확인
 		String comment_pw = boardService.commentPasswordCheck(comment.getComment_seq());
 		
+		// 2. 비밀번호 확인 후  
 		if(comment_pw.equals(comment.getComment_pw())) {
-			model.addAttribute("board_seq", comment.getComment_seq());
+			model.addAttribute("board_seq", comment.getBoard_seq());
 			model.addAttribute("status", "edit_comment_pw_checked" + comment.getComment_seq());
-			return "redirect:/board/edit";
+			return "redirect:/board/read";
 		} else {
-			model.addAttribute("board_seq", comment.getComment_seq());
+			model.addAttribute("board_seq", comment.getBoard_seq());
 			model.addAttribute("status", "edit_comment_wrong_pw");
 			return "redirect:/board/read";
 		}

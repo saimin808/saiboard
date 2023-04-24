@@ -206,7 +206,7 @@
 						<tr>
 							<td class="fs-5">
 								${board.board_writer} &nbsp;
-								<i class="fa-regular fa-clock"></i> ${board.getCreationDateTime()} &nbsp; 
+								<i class="fa-regular fa-clock"></i> ${write_date} &nbsp; 
 								<i class="fa-solid fa-eye"></i> ${board.board_view} &nbsp;
 							</td>
 							<td class="fs-5 text-end">

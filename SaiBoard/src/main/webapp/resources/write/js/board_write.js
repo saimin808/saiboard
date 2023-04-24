@@ -88,8 +88,10 @@ $('#boardCancel-button').click(function() {
 
 // 비밀번호 정규식 : 4 ~ 16자 영문, 숫자, 특수문자를 최소 한가지씩 조합
 let pwRegExp = /^(?=.*[a-zA-z])(?=.*[0-9])(?=.*[$`~!@$!%*#^?&\\(\\)\-_=+]).{3,16}$/;
+
 // 글쓴이 정규식 : 2 ~ 10자 한글, 영문 허용
 let writerRegExp = /^[a-zA-Zㄱ-힣][a-zA-Zㄱ-힣 ]{1,10}$/;
+
 $('#boardSubmit-button').click(function() {
 	console.log('writer : ' + writerRegExp.test($('#boardWriter-text').val()));
 	console.log('pass : ' + pwRegExp.test($('#boardPassword-text').val()));

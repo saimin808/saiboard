@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri ="http://java.sun.com/jsp/jstl/core"%>
+<%@ page import="sai.pork.board.model.PaginationVO" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -94,7 +95,7 @@
 					<tbody>
 						<c:choose>
 							<c:when test="${not empty boards}">
-								<c:forEach items="${boards}" var="board">
+								<c:forEach items="${boards}" var="board" varStatus="i">
 									<tr>
 										<td>${board.board_seq}</td>
 										<td>${board.board_category}</td>
@@ -112,7 +113,7 @@
 										</td>
 										<td>${board.board_writer}</td>
 										<td>${board.board_view}</td>
-										<td>${board.getCreationDateTime()}</td>
+										<td>${write_date.get(i.index)}</td>
 									</tr>
 								</c:forEach>
 							</c:when>
@@ -131,8 +132,8 @@
 					<ul class="pagination justify-content-center">
 						<li class="page-item">
 							<c:choose>
-								<c:when test="${paginationStart > 5}">
-									<a id="prev-link" class="page-link" href="<%=request.getContextPath()%>/board?page=${previousPage}" aria-label="Previous">
+								<c:when test="${pagination.getPaginationStart() > 5}">
+									<a id="prev-link" class="page-link" href="<%=request.getContextPath()%>/board?page=${pagination.getPreviousPage()}" aria-label="Previous">
 										<span aria-hidden="true">&laquo;</span>
 									</a>
 								</c:when>
@@ -144,10 +145,10 @@
 								</c:otherwise>
 							</c:choose>
 						</li>
-						<c:forEach begin="${paginationStart}" end="${paginationEnd}" var="i">
+						<c:forEach begin="${pagination.getPaginationStart()}" end="${pagination.getPaginationEnd()}" var="i">
 							<li class="page-item">
 								<c:choose>
-									<c:when test="${page == i}">
+									<c:when test="${pagination.getCurrentPage() == i}">
 										<a id="${i}page" class="page-link" style="color: white; background-color: #6c757d;
 																	pointer-event: none; cursor: default;">${i}</a>
 									</c:when>
@@ -159,8 +160,8 @@
 						</c:forEach>
 						<li class="page-item">
 							<c:choose>
-								<c:when test="${paginationEnd % 5 == 0 && boardSize > paginationEnd * 10}">
-									<a id="next-link" class="page-link" href="<%=request.getContextPath()%>/board?page=${nextPage}" aria-label="Next">
+								<c:when test="${pagination.getPaginationEnd() % 5 == 0 && pagination.getTotlBoardSize() > pagination.getPaginationEnd() * 10}">
+									<a id="next-link" class="page-link" href="<%=request.getContextPath()%>/board?page=${pagination.getNextPage()}" aria-label="Next">
 										<span aria-hidden="true">&raquo;</span>
 									</a>
 								</c:when>
@@ -185,18 +186,20 @@
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
 <!-- contextPath 변수 선언과 pagenation 구현을 위한 script -->
+<% PaginationVO pagination = (PaginationVO)request.getAttribute("pagination"); %>
 <script>
 	const contextPath = '<%=request.getContextPath()%>';
 	
 	// 페이지네이션 기능을 위한 변수들
-	const paginationStart = '<%=request.getAttribute("paginationStart")%>';
-	const paginationEnd = '<%=request.getAttribute("paginationEnd")%>';
+	
+	const paginationStart = '<%=pagination.getPaginationStart()%>';
+	const paginationEnd = '<%=pagination.getPaginationEnd()%>';
 	let pageNum = [];
 	for(i = paginationStart; i <= paginationEnd; i++) {
 		pageNum[i-1] = i;
 	}
-	const nextPage = '<%=request.getAttribute("nextPage")%>';
-	const previousPage = '<%=request.getAttribute("previousPage")%>';
+	const nextPage = '<%=pagination.getNextPage()%>';
+	const previousPage = '<%=pagination.getPrevPage()%>';
 </script>
 <!-- board_main.js -->
 <script src="<%=request.getContextPath()%>/resources/main/js/board_main.js"></script>

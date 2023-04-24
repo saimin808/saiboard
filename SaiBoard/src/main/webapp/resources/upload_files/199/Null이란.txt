@@ -1,0 +1,18 @@
+Null이란?
+  > 빠진 데이터를 나타내는 수단 (E. F. Codd, FDT Bulletin of ACM-SIGMOD(1975)에서)
+ 
+ 0. 데이터베이스
+   Oracle하고 MySQL에서는 Null을 가장 큰 값으로 간주
+   SQL SERVER는 Null을 가장 작은 값으로 간주
+
+ 1. 수학적 연산
+   - 데이터 값이 아닌 미지의 값에 대한 표시
+
+ 2. 문자열 연속
+   - '생선' || NULL || '김치'  -- 결과는 NULL
+   - Oracle에서는 Null == "" (empty string) 그래서 결과는 '생선 김치'
+
+ 3. 프로그래밍 언어
+   - 아무것도 없음을 표현 (empty)
+   - 하지만 공백 ""(empty) 또는 " "(space)와는 다르다.
+   - 하지만 비교 연산자 사용 시에는 공백과 같은 것으로 간주

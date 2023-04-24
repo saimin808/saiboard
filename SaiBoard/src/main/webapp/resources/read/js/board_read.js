@@ -198,6 +198,7 @@ for(let i = 1; i <= commentSize; i++) {
 	// 댓글 수정 dialog 켜기
 	let hidden_value = 'edit_comment_pw_checked' + i;
 	if($('input[id=editCommentStatus-hidden' + i +']').val() == hidden_value) {
+		console.log(hidden_value);
 		$('dialog[id=editComment-dialog' + i + ']').attr('open', 'open');
 	}
 	

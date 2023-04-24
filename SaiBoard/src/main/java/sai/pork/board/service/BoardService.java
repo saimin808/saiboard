@@ -1,6 +1,7 @@
 package sai.pork.board.service;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -17,7 +18,7 @@ public interface BoardService {
 
 	List<BoardDTO> getAllBoards();
 	
-	void showBoards(HttpServletRequest req, Map<String, String> parameters);
+	void showBoards(HttpServletRequest req, Map<String, String> parameters) throws ParseException;
 	
 	void writeBoard(HttpServletRequest req, BoardDTO board);
 	
@@ -25,7 +26,7 @@ public interface BoardService {
 	
 	void downloadFile(HttpServletResponse resp, Integer file_seq) throws Exception;
 	
-	void readBoard(HttpServletRequest req, Integer board_seq);
+	void readBoard(HttpServletRequest req, Integer board_seq) throws ParseException;
 	
 	String boardPasswordCheck(Map<String, String> parameters);
 	
