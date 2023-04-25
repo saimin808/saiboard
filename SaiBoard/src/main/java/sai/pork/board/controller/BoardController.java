@@ -29,7 +29,6 @@ import sai.pork.board.model.FileDTO;
 import sai.pork.board.service.BoardService;
 
 @Controller
-@RequestMapping("/board")
 public class BoardController {
 
 	// BoardService
@@ -37,9 +36,9 @@ public class BoardController {
 	BoardService boardService;
 	
 	// 게시판 (board_main)
-	@GetMapping(value= {"", "/"})
+	@GetMapping(value= {"/board", "/board/"})
 	public String showMainBoard(Model model, HttpServletRequest req, @RequestParam Map<String, String> parameters) throws ParseException {
-		// parameter를 Map으로 받을 때 만약 null값이 들어오게 된다면 value가 비어있는게 아닌 String값인 "null"이 들어있는 것이다.
+		// parameter를 Map으로 받을 때 만약 null이 들어오게 된다면 value가 비어있는게 아닌 String값인 "null"이 들어있는 것이다.
 		System.out.println("Controller parameters : " + parameters);
 		
 		boardService.showBoards(req, parameters);
@@ -48,7 +47,7 @@ public class BoardController {
 	}
 	
 	// 게시글 쓰기 페이지로 이동
-	@GetMapping("/write")
+	@GetMapping("/board/write")
 	public String openWriteBoardPage(Model model) {
 		
 		model.addAttribute("purpose", "write");
@@ -57,7 +56,7 @@ public class BoardController {
 	}
 	
 	// 게시글 쓰기
-	@PostMapping("/write/write_board")
+	@PostMapping("/board/write/write_board")
 	public String writeBoard(Model model, HttpServletRequest req, BoardDTO board,
 						List<MultipartFile> upload_files) throws IllegalStateException, IOException {
 		
@@ -78,7 +77,7 @@ public class BoardController {
 	}
 	
 	// 게시글 보기
-	@GetMapping("/read")
+	@GetMapping("/board/read")
 	public String readBoard(Model model, HttpServletRequest req, @RequestParam Integer board_seq) throws ParseException {
 		
 		// 파라미터 확인용
@@ -91,7 +90,7 @@ public class BoardController {
 	}
 	
 	// 게시글 삭제
-	@PostMapping("/delete")
+	@PostMapping("/board/delete")
 	public String deleteBoard(Model model, @RequestParam Map<String,String> parameters) {
 		
 		// 파라미터 확인용
@@ -112,7 +111,7 @@ public class BoardController {
 	}
 	
 	// 게시글 수정 페이지로 이동
-	@PostMapping("/edit")
+	@PostMapping("/board/edit")
 	public String editPasswordCheck(Model model, HttpServletRequest req, @RequestParam Map<String,String> parameters) throws NumberFormatException, ParseException {
 		
 		String result = boardService.boardPasswordCheck(parameters);
@@ -129,7 +128,7 @@ public class BoardController {
 	}
 	
 	// 게시글 수정
-	@PostMapping("/edit/do")
+	@PostMapping("/board/edit/do")
 	public String editBoard(Model model, HttpServletRequest req, BoardDTO board, List<FileDTO> files) {
 		
 		String result = boardService.editBoard(board, files);
@@ -140,7 +139,7 @@ public class BoardController {
 	}
 	
 	// 댓글 작성
-	@PostMapping("/write_comment")
+	@PostMapping("/board/write_comment")
 	public String writeComment(Model model, HttpServletRequest req, @ModelAttribute CommentDTO comment) {
 		
 		boardService.showComments(req, comment.getBoard_seq());
@@ -153,7 +152,7 @@ public class BoardController {
 	}
 	
 	// 댓글 수정 전 비밀번호 확인
-	@PostMapping("/edit_comment_pw_check")
+	@PostMapping("/board/edit_comment_pw_check")
 	public String editCommentPasswordCheck(Model model, HttpServletRequest req, @ModelAttribute CommentDTO comment) {
 		
 		// 파라미터 확인용
@@ -174,7 +173,7 @@ public class BoardController {
 	}
 	
 	// 댓글 삭제
-	@PostMapping("/delete_comment")
+	@PostMapping("/board/delete_comment")
 	public String deleteComment(Model model, HttpServletRequest req, @ModelAttribute CommentDTO comment) {
 		
 		System.out.println("deleteCommentPwCheck : " + comment);
@@ -197,7 +196,7 @@ public class BoardController {
 	}
 	
 	// 댓글 수정
-	@PostMapping("/edit_comment")
+	@PostMapping("/board/edit_comment")
 	public String editComment(Model model, HttpServletRequest req, @ModelAttribute CommentDTO comment) {
 		
 		System.out.println("editComment : " + comment);
@@ -210,7 +209,7 @@ public class BoardController {
 	}
 	
 	// 파일 다운로드
-	@GetMapping("/file_download/{file_seq:[0-9]{1,6}}")
+	@GetMapping("/board/file_download/{file_seq:[0-9]{1,6}}")
 	public void fileDownload(HttpServletResponse resp, @PathVariable(name="file_seq") Integer file_seq) throws Exception {
 		boardService.downloadFile(resp, file_seq);
 	}

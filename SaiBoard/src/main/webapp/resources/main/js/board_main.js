@@ -89,33 +89,71 @@ $("#search-button").click(function() {
 	
 });
 
+// 페이지네이션 action 때마다 내용이 바뀔 td들
+const board_seq = document.getElementsByClassName('boardSeq-td');
+const board_category = document.getElementsByClassName('boardCategory-td');
+const board_title = document.getElementsByClassName('boardTitle-link');
+const board_writer = document.getElementsByClassName('boardWriter-td');
+const board_view = document.getElementsByClassName('boardView-td');
+const board_writeDate = document.getElementsByClassName('boardWriteDate-td');
+
 // 페이지네이션 action
-// 위에 select, 검색 기능과 상호작용을 위해 페이지네이션 링크의 href를 parameter를 추가하여 구성함
 if(urlParams != null) {
 	// '>>' 링크
-	$('#next-link').attr('href', contextPath + '/board?page=' + nextPage +
-											   '&category=' + category_selected +
-											   '&orderBy=' + orderBy_selected +
-											   '&searchCategory=' + searchCategory_selected +
-											   '&searchKeyword=' + searchKeyword_text);
+	$('#next-link').click(function() {
+		// ajax 데이터 생성
+		const parameters = {
+			currentPage : $('#currentPage').val(),
+			totalBoardSize : $('#totalBoardSize').val()
+		}	
+		// ajax로 데이터 전송
+		$.ajax({
+	        type: "POST",
+	        url: contextPath + "/board/page",
+	        contentType : "application/json;charset=UTF-8",
+	        data : JSON.stringify(parameters),
+			dataType : "json",
+	        error: function() {
+	          alert("통신 오류 error");
+	        },
+	        success: function(data) {
+	        	alert("통신");
+	        //innerHTML 작업 필요
+        }
+      });
+	});
+	
+	
 	// '<<' 링크				   
-	$('#prev-link').attr('href', contextPath + '/board?page=' + previousPage +
-											   '&category=' + category_selected +
-											   '&orderBy=' + orderBy_selected +
-											   '&searchCategory=' + searchCategory_selected +
-											   '&searchKeyword=' + searchKeyword_text);
+	//$('#prev-link').attr('href', contextPath + '/board?page=' + previousPage +
+		//									   '&category=' + category_selected +
+			//								   '&orderBy=' + orderBy_selected +
+				//							   '&searchCategory=' + searchCategory_selected +
+					//						   '&searchKeyword=' + searchKeyword_text);
 		
 	// 번호 링크
-	for(let i = paginationStart; i <= paginationEnd; i++) {
-		$('a[id=' + i + 'page]').attr('href', contextPath + '/board?page=' + pageNum[i-1] +
-												    '&category=' + category_selected +
-												    '&orderBy=' + orderBy_selected +
-												    '&searchCategory=' + searchCategory_selected +
-												    '&searchKeyword=' + searchKeyword_text);
-	}
+	//for(let i = paginationStart; i <= paginationEnd; i++) {
+		//$('a[id=' + i + 'page]').attr('href', contextPath + '/board?page=' + pageNum[i-1] +
+			//									    '&category=' + category_selected +
+				//								    '&orderBy=' + orderBy_selected +
+						//						    '&searchCategory=' + searchCategory_selected +
+					//							    '&searchKeyword=' + searchKeyword_text);
+	//}
 }
 
 // 글 쓰기 버튼 action
 $('#write-button').click(function() {
 	location.href = contextPath + "/board/write";
 });
+
+// 페이지네이션
+
+// 현재 페이지 hidden value
+currPage = $('#currPage').val();
+
+// 페이지 번호 링크
+const pageLink = document.querySelector('.page');
+if(currPage != null) {
+	 
+}
+

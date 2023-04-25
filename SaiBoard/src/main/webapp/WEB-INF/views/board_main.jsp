@@ -2,6 +2,8 @@
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri ="http://java.sun.com/jsp/jstl/core"%>
 <%@ page import="sai.pork.board.model.PaginationVO" %>
+<%@ page import="sai.pork.board.model.BoardDTO" %>
+<%@ page import="java.util.List" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -82,7 +84,6 @@
 						<col style="width:10%;">
 						<col style="width:20%;">
 					</colgroup>
-					<thead>
 						<tr>
 							<th scope="col">No.</th>
 							<th scope="col">카테고리</th>
@@ -91,29 +92,27 @@
 							<th scope="col">조회수</th>
 							<th scope="col">작성일</th>
 						</tr>
-					</thead>
-					<tbody>
 						<c:choose>
 							<c:when test="${not empty boards}">
-								<c:forEach items="${boards}" var="board" varStatus="i">
+								<c:forEach begin="0" end="9" var="i">
 									<tr>
-										<td>${board.board_seq}</td>
-										<td>${board.board_category}</td>
+										<td class="boardSeq-td">${boards.get(i).board_seq}</td>
+										<td class="boardCategory-td">${boards.get(i).board_category}</td>
 										<td>
-											<a href="<%=request.getContextPath()%>/board/read?board_seq=${board.board_seq}&page=1">${board.board_title}</a>
+											<a class="boardTitle-link" href="<%=request.getContextPath()%>/board/read?board_seq=${boards.get(i).board_seq}&page=1">${boards.get(i).board_title}</a>
 											<c:set var="loop_flag" value="false" />
 											<c:forEach items="${files}" var="file">
 												<c:if test="${not loop_flag}">
-													<c:if test="${file.board_seq eq board.board_seq}">
+													<c:if test="${file.board_seq eq boards.get(i).board_seq}">
 														<i class="fa-solid fa-paperclip"></i>
 														<c:set var="loop_flag" value="true" />
 													</c:if>
 												</c:if>
 											</c:forEach>
 										</td>
-										<td>${board.board_writer}</td>
-										<td>${board.board_view}</td>
-										<td>${write_date.get(i.index)}</td>
+										<td class="boardWriter-td">${boards.get(i).board_writer}</td>
+										<td class="boardView-td">${boards.get(i).board_view}</td>
+										<td class="boardWriteDate-td">${write_date.get(i)}</td>
 									</tr>
 								</c:forEach>
 							</c:when>
@@ -121,19 +120,20 @@
 								<td colspan="6">게시글이 없습니다.</td>
 							</c:otherwise>
 						</c:choose>
-					</tbody>
 				</table>
 			</div>
 			<div id="button-container" class="container-xxl d-flex justify-content-end">
 				<button id="write-button" type="button" class="btn btn-secondary">글 쓰기</button>
 			</div>
 			<div id="pagination-container" class="container-xxl">
+				<input type="hidden" id="currentPage-hidden" value="${page}"/>
+				<input type="hidden" id="totalBoardSize-hidden" value="${totalBoardSize}"/>
 				<nav>
 					<ul class="pagination justify-content-center">
 						<li class="page-item">
 							<c:choose>
-								<c:when test="${pagination.getPaginationStart() > 5}">
-									<a id="prev-link" class="page-link" href="<%=request.getContextPath()%>/board?page=${pagination.getPreviousPage()}" aria-label="Previous">
+								<c:when test="${paginationStart > 5}">
+									<a id="prev-link" class="page-link" aria-label="Previous">
 										<span aria-hidden="true">&laquo;</span>
 									</a>
 								</c:when>
@@ -145,23 +145,23 @@
 								</c:otherwise>
 							</c:choose>
 						</li>
-						<c:forEach begin="${pagination.getPaginationStart()}" end="${pagination.getPaginationEnd()}" var="i">
+						<c:forEach begin="${paginationStart}" end="${paginationEnd}" var="i">
 							<li class="page-item">
 								<c:choose>
-									<c:when test="${pagination.getCurrentPage() == i}">
-										<a id="${i}page" class="page-link" style="color: white; background-color: #6c757d;
+									<c:when test="${page == i}">
+										<a id="${i}page" class="page page-link" style="color: white; background-color: #6c757d;
 																	pointer-event: none; cursor: default;">${i}</a>
 									</c:when>
 									<c:otherwise>
-										<a id="${i}page" class="page-link">${i}</a>
+										<a id="${i}page" class="page page-link">${i}</a>
 									</c:otherwise>
 								</c:choose>
 							</li>
 						</c:forEach>
 						<li class="page-item">
 							<c:choose>
-								<c:when test="${pagination.getPaginationEnd() % 5 == 0 && pagination.getTotlBoardSize() > pagination.getPaginationEnd() * 10}">
-									<a id="next-link" class="page-link" href="<%=request.getContextPath()%>/board?page=${pagination.getNextPage()}" aria-label="Next">
+								<c:when test="${paginationEnd % 5 == 0 && totalBoardSize > paginationEnd * 10}">
+									<a id="next-link" class="page-link" aria-label="Next" style="cursor: pointer;">
 										<span aria-hidden="true">&raquo;</span>
 									</a>
 								</c:when>
@@ -186,20 +186,38 @@
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
 <!-- contextPath 변수 선언과 pagenation 구현을 위한 script -->
-<% PaginationVO pagination = (PaginationVO)request.getAttribute("pagination"); %>
 <script>
 	const contextPath = '<%=request.getContextPath()%>';
 	
 	// 페이지네이션 기능을 위한 변수들
-	
-	const paginationStart = '<%=pagination.getPaginationStart()%>';
-	const paginationEnd = '<%=pagination.getPaginationEnd()%>';
+	const boardSeq_list = [];
+	const boardCategory_list = [];
+	const boardTitle_list = [];
+	const boardWriter_list = [];
+	const boardView_list = [];
+	const boardWriteDate_list = [];
+	let loop = 0;
+	<%
+	List<BoardDTO> boardList = (List<BoardDTO>)request.getAttribute("boards");
+	List<String> writeDate = (List<String>)request.getAttribute("write_date");
+	for(int i = 0; i < boardList.size(); i++) { %>
+		boardSeq_list[loop] = '<%=boardList.get(i).getBoard_seq()%>'
+		boardCategory_list[loop] = '<%=boardList.get(i).getBoard_category()%>'
+		boardTitle_list[loop] = '<%=boardList.get(i).getBoard_title()%>'
+		boardWriter_list[loop] = '<%=boardList.get(i).getBoard_writer()%>'
+		boardView_list[loop] = '<%=boardList.get(i).getBoard_view()%>'
+		boardWriteDate_list[loop] = '<%=writeDate.get(i)%>'
+		loop++;
+	<%}%>
+	console.log(boardSeq_list);
+	const paginationStart = '<%=request.getAttribute("paginationStart")%>';
+	const paginationEnd = '<%=request.getAttribute("paginationEnd")%>';
 	let pageNum = [];
 	for(i = paginationStart; i <= paginationEnd; i++) {
 		pageNum[i-1] = i;
 	}
-	const nextPage = '<%=pagination.getNextPage()%>';
-	const previousPage = '<%=pagination.getPrevPage()%>';
+	const nextPage = '<%=request.getAttribute("nextPage")%>';
+	const previousPage = '<%=request.getAttribute("previousPage")%>';
 </script>
 <!-- board_main.js -->
 <script src="<%=request.getContextPath()%>/resources/main/js/board_main.js"></script>

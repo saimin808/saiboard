@@ -92,11 +92,11 @@ public class BoardServiceImpl implements BoardService {
 		// ***지적 받은 지점 : 한번의 작업으로 DB가 여러번 건드리는건 별로 좋지 않다.
 		// 					DB를 최소한으로 건드리는 코드를 짜야한다.
 		// 카테고리와 검색 관련 파라미터가 아무것도 없다면 아무 조건없이 모든 게시판을 조회를 한다. 
-		if(parameters.size() == 0) {
+		if(parameters.get("boards") == null) {
 			boards = boardMapper.getAllBoards();
 		// 들어온 파라미터 중 searchKeyword값(검색어)이 없으면 getSpecificBoards(검색어 없이 board 조회) 메서드로
 		// searchKeyword값이 있으면 getSearchedBoards(검색한 제목의 board만 조회) 메서드로 파라미터를 전달한다.
-		} else if (parameters.size() > 0 && parameters.get("category") != null && parameters.get("orderBy") != null
+		} else if (parameters.get("category") != null && parameters.get("orderBy") != null
 				&& parameters.get("searchCategory") != null) {
 			String category = parameters.get("category");
 			String searchKeyword = parameters.get("searchKeyword");
@@ -147,11 +147,11 @@ public class BoardServiceImpl implements BoardService {
 		if(pageStr == null) {
 			currentPage = 1;
 		} else {
-			currentPage = Integer.parseInt(parameters.get("currentPage"));
+			currentPage = Integer.parseInt(parameters.get("page"));
 		}
 		
 		// 페이징 처리
-		PaginationVO page = new PaginationVO(currentPage, Integer.parseInt(parameters.get("totalBoardSize")));
+		PaginationVO page = new PaginationVO(currentPage, boards.size());
 		
 		System.out.printf("현재 페이지는 %d페이지고, 시작 인덱스는 %d, 마지막 인덱스는 %d 입니다.\n",
 				currentPage, page.getStartIndex(), page.getEndIndex());
@@ -159,16 +159,18 @@ public class BoardServiceImpl implements BoardService {
 		System.out.printf("현재 페이지는 %d페이지고, 페이지네이션 시작은 %d, 마지막 숫자는 %d 입니다. \n",
 				currentPage, page.getPaginationStart(), page.getPaginationEnd());
 
-		req.setAttribute("boards", boards.subList(page.getStartIndex(), page.getEndIndex()));
-		req.setAttribute("write_date", creationDateTimeList.subList(page.getStartIndex(), page.getEndIndex()));
+		req.setAttribute("boards", boards);
+		req.setAttribute("write_date", creationDateTimeList);
 		req.setAttribute("files", files);
 		// 페이지네이션 전달
-		req.setAttribute("pagination", page);
-//		req.setAttribute("paginationStart", page.getPaginationStart());
-//		req.setAttribute("paginationEnd", page.getPaginationEnd());
-//		req.setAttribute("nextPage", page.getNextPage());
-//		req.setAttribute("previousPage", page.getPrevPage());
-//		req.setAttribute("boardSize", page.getTotalBoardSize());
+		req.setAttribute("page", page.getCurrentPage());
+		req.setAttribute("startIndex", page.getStartIndex());
+		req.setAttribute("endIndex", page.getEndIndex());
+		req.setAttribute("paginationStart", page.getPaginationStart());
+		req.setAttribute("paginationEnd", page.getPaginationEnd());
+		req.setAttribute("nextPage", page.getNextPage());
+		req.setAttribute("previousPage", page.getPrevPage());
+		req.setAttribute("totalBoardSize", page.getTotalBoardSize());
 	}
 	
 	@Override
