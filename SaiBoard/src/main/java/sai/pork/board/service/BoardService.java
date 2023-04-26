@@ -13,12 +13,19 @@ import org.springframework.web.multipart.MultipartFile;
 import sai.pork.board.model.BoardDTO;
 import sai.pork.board.model.CommentDTO;
 import sai.pork.board.model.FileDTO;
+import sai.pork.board.model.PaginationVO;
 
 public interface BoardService {
 
 	List<BoardDTO> getAllBoards();
 	
-	void showBoards(HttpServletRequest req, Map<String, String> parameters) throws ParseException;
+	List<BoardDTO> showBoards(Map<String, String> parameters);
+	
+	List<String> getCreationDateTimeList(List<BoardDTO> boards) throws ParseException;
+	
+	PaginationVO getPaginationVO(Integer currentPage, Integer totalBoardSize);
+	
+	List<Boolean> getBoardsWithFiles(List<BoardDTO> boards);
 	
 	void writeBoard(HttpServletRequest req, BoardDTO board);
 	

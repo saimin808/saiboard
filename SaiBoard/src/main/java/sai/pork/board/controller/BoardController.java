@@ -1,7 +1,5 @@
 package sai.pork.board.controller;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
@@ -10,7 +8,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,14 +15,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
 import sai.pork.board.model.BoardDTO;
 import sai.pork.board.model.CommentDTO;
 import sai.pork.board.model.FileDTO;
+import sai.pork.board.model.PaginationVO;
 import sai.pork.board.service.BoardService;
 
 @Controller
@@ -37,12 +34,28 @@ public class BoardController {
 	
 	// 게시판 (board_main)
 	@GetMapping(value= {"/board", "/board/"})
-	public String showMainBoard(Model model, HttpServletRequest req, @RequestParam Map<String, String> parameters) throws ParseException {
-		// parameter를 Map으로 받을 때 만약 null이 들어오게 된다면 value가 비어있는게 아닌 String값인 "null"이 들어있는 것이다.
+	public String showMainBoard(Model model, @RequestParam Map<String, String> parameters) throws ParseException, IOException {
+		// parameter를 Map으로 받았을때 key값은 있고 value값이 null이라면
+		// value가 비어있는게 아닌 String값인 "null"이 들어있는 것이다.
 		System.out.println("Controller parameters : " + parameters);
 		
-		boardService.showBoards(req, parameters);
+		List<BoardDTO> boards = boardService.showBoards(parameters);
+		List<String> creationDateTimeList = boardService.getCreationDateTimeList(boards);
+		List<Boolean> isBoardWithFiles = boardService.getBoardsWithFiles(boards);
+		PaginationVO page = boardService.getPaginationVO(null, boards.size());
 				
+		model.addAttribute("boards", boards);
+		model.addAttribute("boardWriteDate", creationDateTimeList);
+		model.addAttribute("isBoardWithFiles", isBoardWithFiles);
+		// 페이지네이션 전달
+		model.addAttribute("currentPage", page.getCurrentPage());
+		model.addAttribute("startIndex", page.getStartIndex());
+		model.addAttribute("endIndex", page.getEndIndex());
+		model.addAttribute("paginationStart", page.getPaginationStart());
+		model.addAttribute("paginationEnd", page.getPaginationEnd());
+		model.addAttribute("nextPage", page.getNextPage());
+		model.addAttribute("previousPage", page.getPrevPage());
+		
 		return "board_main";
 	}
 	

@@ -89,71 +89,133 @@ $("#search-button").click(function() {
 	
 });
 
-// 페이지네이션 action 때마다 내용이 바뀔 td들
-const board_seq = document.getElementsByClassName('boardSeq-td');
-const board_category = document.getElementsByClassName('boardCategory-td');
-const board_title = document.getElementsByClassName('boardTitle-link');
-const board_writer = document.getElementsByClassName('boardWriter-td');
-const board_view = document.getElementsByClassName('boardView-td');
-const board_writeDate = document.getElementsByClassName('boardWriteDate-td');
+// 게시판 내용들 (td)
+const boardSeq_td = document.getElementsByClassName('boardSeq-td');
+const boardCategory_td = document.getElementsByClassName('boardCategory-td');
+const boardTitle_td = document.getElementsByClassName('boardTitle-td');
+const boardWriter_td = document.getElementsByClassName('boardWriter-td');
+const boardView_td = document.getElementsByClassName('boardView-td');
+const boardWriteDate_td = document.getElementsByClassName('boardWriteDate-td');
+
+// 페이지네이션 틀 (ul)
+const pagination_ul = document.getElementById('pagination-ul');
+
+// 게시판 조회 function
+function getBoard(page) {
+	console.log('page : ' + page);
+	// ajax 데이터 생성
+	const parameters = {
+		category : category_selected,
+		orderBy : orderBy_selected,
+		searchCategory : searchCategory_selected,
+		searchKeyword : searchKeyword_text
+	}
+	// ajax로 데이터 전송
+	$.ajax({
+		type: 'POST',
+	    url: contextPath + "/board/" + page,
+	    contentType: 'application/json;charset=UTF-8',
+	    data : JSON.stringify(parameters),
+	    dataType : 'json',
+	    progress : true
+	 })
+	    .fail( function(e) {
+	    	console.log(e);
+	    	alert("통신 오류 error");
+	    })
+	    .done(function(data) {
+	    	console.log('통신 성공!');
+	    	
+	    	let boards = new Array;
+	    	let writeDate = new Array;
+	    	let files = new Array;
+	    	boards = data.boards;
+	    	writeDate = data.boardWriteDate;
+	    	files = data.isBoardWithFiles;
+	    	
+	    	let currentPage = data.currentPage;
+	    	paginationStart = data.paginationStart;
+	    	paginationEnd = data.paginationEnd;
+	    	
+	    	for(let i = 0; i < boards.length; i++) {
+	    		boardSeq_td.item(i).innerHTML = boards[i].board_seq;
+	    		boardCategory_td.item(i).innerHTML = boards[i].board_category;
+	    		let content = '';
+	    		content += '<a href="' + contextPath + '/board/read?board_seq=' + boards[i].board_seq + '&page=1">' + boards[i].board_title + '</a>';
+	    		if(files[i] == true) {
+					content += '<i class="fa-solid fa-paperclip"></i>';								
+				}
+				boardTitle_td.item(i).innerHTML = content;
+	    		boardWriter_td.item(i).innerHTML = boards[i].board_writer;
+	    		boardView_td.item(i).innerHTML = boards[i].board_view;
+	    		boardWriteDate_td.item(i).innerHTML = writeDate[i];
+	    	}
+	    	
+	    	let content2 = '';
+				content2 +=	'	<li class="page-item">';
+				
+			
+			if(parseInt(paginationStart) > 5) {
+				content2 +=	'				<a id="prev-link" class="page-link" aria-label="Previous">';
+				content2 +=	'					<span aria-hidden="true">&laquo;</span>';
+				content2 +=	'				</a>';
+			} else {
+				content2 += '				<a class="page-link" aria-label="Previous"';
+				content2 += '				  style="pointer-event: none; cursor: default;">';
+				content2 += '					<span aria-hidden="true">&laquo;</span>';
+				content2 += '				</a>';
+			}
+				
+				content2 +=	'	</li>';
+				
+	    	for(let i = parseInt(paginationStart); i <= parseInt(paginationEnd); i++) {
+				content2 += '<li class="page-item">';
+	    		if(currentPage == i) {	    			
+					content2 += '	<a class="page page-link" style="color: white; background-color: #6c757d;';
+					content2 += '			pointer-event: none; cursor: default;">' + i + '</a>';
+				} else {
+					content2 += '	<a class="page page-link">' + i + '</a>';
+				}
+				content2 += '</li>';
+	    	}
+	    	
+	    		content2 += '<li class="page-item">';
+				
+			if(parseInt(paginationEnd) % 5 == 0 && boards.length > parseInt(paginationEnd) * 10) {
+				content2 +=	'			<a id="next-link" class="page-link" aria-label="Next" style="cursor: pointer;">';
+				content2 += '				<span aria-hidden="true">&raquo;</span>';
+				content2 += '			</a>';
+			} else {
+				content2 += '			<a class="page-link" aria-label="Next"';
+				content2 += '				style="pointer-event: none; cursor: default;">';
+				content2 += '				<span aria-hidden="true">&raquo;</span>';
+				content2 += '			</a>';
+			}
+												
+				content2 += '</li>';
+			
+			pagination_ul.innerHTML = '';
+			pagination_ul.innerHTML += content2;
+			console.log(content2);			
+       	})
+}
 
 // 페이지네이션 action
-if(urlParams != null) {
-	// '>>' 링크
-	$('#next-link').click(function() {
-		// ajax 데이터 생성
-		const parameters = {
-			currentPage : $('#currentPage').val(),
-			totalBoardSize : $('#totalBoardSize').val()
-		}	
-		// ajax로 데이터 전송
-		$.ajax({
-	        type: "POST",
-	        url: contextPath + "/board/page",
-	        contentType : "application/json;charset=UTF-8",
-	        data : JSON.stringify(parameters),
-			dataType : "json",
-	        error: function() {
-	          alert("통신 오류 error");
-	        },
-	        success: function(data) {
-	        	alert("통신");
-	        //innerHTML 작업 필요
-        }
-      });
-	});
+
+// '>>' 링크
+let nextPage = parseInt(paginationEnd) + 1;
+$('#next-link').click(function() {
+	getBoard(nextPage);
+});
 	
-	
-	// '<<' 링크				   
-	//$('#prev-link').attr('href', contextPath + '/board?page=' + previousPage +
-		//									   '&category=' + category_selected +
-			//								   '&orderBy=' + orderBy_selected +
-				//							   '&searchCategory=' + searchCategory_selected +
-					//						   '&searchKeyword=' + searchKeyword_text);
-		
-	// 번호 링크
-	//for(let i = paginationStart; i <= paginationEnd; i++) {
-		//$('a[id=' + i + 'page]').attr('href', contextPath + '/board?page=' + pageNum[i-1] +
-			//									    '&category=' + category_selected +
-				//								    '&orderBy=' + orderBy_selected +
-						//						    '&searchCategory=' + searchCategory_selected +
-					//							    '&searchKeyword=' + searchKeyword_text);
-	//}
-}
+// '<<' 링크
+let prevPage = parseInt(paginationStart) + 1;
+$('#prev-link').click(function() {
+	getBoard(prevPage);
+});
 
 // 글 쓰기 버튼 action
 $('#write-button').click(function() {
 	location.href = contextPath + "/board/write";
 });
-
-// 페이지네이션
-
-// 현재 페이지 hidden value
-currPage = $('#currPage').val();
-
-// 페이지 번호 링크
-const pageLink = document.querySelector('.page');
-if(currPage != null) {
-	 
-}
 

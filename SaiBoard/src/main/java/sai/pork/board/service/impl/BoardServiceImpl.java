@@ -13,6 +13,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -79,12 +80,13 @@ public class BoardServiceImpl implements BoardService {
 	}
 	
 	@Override
-	public void showBoards(HttpServletRequest req, Map<String, String> parameters) throws ParseException {
+	public List<BoardDTO> showBoards(Map<String, String> parameters) {
 		// 선택한 페이지 숫자를 불러옴
-		String pageStr = req.getParameter("page");
+		// Map.get(key) : 입력한 key값이 존재하면 key에 해당하는 value값을, 없으면 null값을 준다.
+		String pageStr = parameters.get("page");
 
 		System.out.println("getAllBoard");
-		System.out.println(parameters);
+		System.out.println("Service parameters : " + parameters);
 		
 		List<BoardDTO> boards = null;
 		List<FileDTO> files = boardMapper.getAllFiles();
@@ -92,7 +94,9 @@ public class BoardServiceImpl implements BoardService {
 		// ***지적 받은 지점 : 한번의 작업으로 DB가 여러번 건드리는건 별로 좋지 않다.
 		// 					DB를 최소한으로 건드리는 코드를 짜야한다.
 		// 카테고리와 검색 관련 파라미터가 아무것도 없다면 아무 조건없이 모든 게시판을 조회를 한다. 
-		if(parameters.get("boards") == null) {
+		if(parameters.get("category") == null && parameters.get("orderBy") == null
+				&& parameters.get("searchCategory") == null) {
+			System.out.println("getAllBoards");
 			boards = boardMapper.getAllBoards();
 		// 들어온 파라미터 중 searchKeyword값(검색어)이 없으면 getSpecificBoards(검색어 없이 board 조회) 메서드로
 		// searchKeyword값이 있으면 getSearchedBoards(검색한 제목의 board만 조회) 메서드로 파라미터를 전달한다.
@@ -101,76 +105,104 @@ public class BoardServiceImpl implements BoardService {
 			String category = parameters.get("category");
 			String searchKeyword = parameters.get("searchKeyword");
 			if (searchKeyword.equals("null") || searchKeyword.equals("")) {
-				System.out.println("getSpecificBoards");
 				if (category.equals("news")) {
+					System.out.println("getSpecificBoards - 공지");
 					parameters.remove("category");
 					parameters.put("category", "공지");
 					boards = boardMapper.getSpecificBoards(parameters);
 				} else if (category.equals("free")) {
+					System.out.println("getSpecificBoards - 자유");
 					parameters.remove("category");
 					parameters.put("category", "자유");
 					boards = boardMapper.getSpecificBoards(parameters);
 				} else if (category.equals("total")) {
+					System.out.println("getSpecificBoards - 전체");
 					// 들어온 파라미터 중 category(카테고리)값이 total(전체)이면 Query문에서 board_category 조건을 빼야하기 때문에
 					// 그 조건을 제거한 Mapper로 연결해 준다.
 					boards = boardMapper.getTotalSpecificBoards(parameters);
 				} else {
+					System.out.println("getAllBoards");
 					boards = boardMapper.getAllBoards();
 				}
 			} else if (!searchKeyword.equals("null") || searchKeyword.equals("")) {
 				System.out.println("searchKeyword : " + searchKeyword);
-				System.out.println("getSearchedBoards");
 				if (category.equals("news")) {
+					System.out.println("getSearchedBoards - 공지");
 					parameters.remove("category");
 					parameters.put("category", "공지");
 					boards = boardMapper.getSearchedBoards(parameters);
 				} else if (category.equals("free")) {
+					System.out.println("getSearchedBoards - 자유");
 					parameters.remove("category");
 					parameters.put("category", "자유");
 					boards = boardMapper.getSearchedBoards(parameters);
 				} else if (category.equals("total")) {
+					System.out.println("getSearchedBoards - 전체");
 					// 들어온 파라미터 중 category(카테고리)값이 total(전체)이면 Query문에서 board_category 조건을 빼야하기 때문에
 					// 그 조건을 제거한 Mapper로 연결해 준다.
 					boards = boardMapper.getTotalSearchedBoards(parameters);
 				} else {
+					System.out.println("getAllBoards");
 					boards = boardMapper.getAllBoards();
 				}
 			}
 		}
 		
+		return boards;
+	}
+	
+	@Override
+	public List<String> getCreationDateTimeList(List<BoardDTO> boards) throws ParseException {
+		
 		// 오늘 날짜 기준으로 게시글이 생성된 날짜 표시 변경
+		// board_write_date가 Date타입이라
+		// 변환한 작성일 표시를 새로운 List인 creationDateTimeList에 담아준다.
 		List<String> creationDateTimeList = new ArrayList<String>();
-		for(int i = 0; i < boards.size(); i++) {
+		for (int i = 0; i < boards.size(); i++) {
 			creationDateTimeList.add(getCreationDateTime(boards.get(i).getBoard_write_date()));
 		}
-		Integer currentPage = null;
-		if(pageStr == null) {
+		
+		return creationDateTimeList;
+	}
+	
+	@Override
+	public PaginationVO getPaginationVO(Integer currentPage, Integer totalBoardSize) {
+		
+		if (currentPage == null) {
 			currentPage = 1;
-		} else {
-			currentPage = Integer.parseInt(parameters.get("page"));
+		}
+
+		// 페이징 처리
+		PaginationVO page = new PaginationVO(currentPage, totalBoardSize);
+
+		System.out.printf("현재 페이지는 %d페이지고, 시작 인덱스는 %d, 마지막 인덱스는 %d 입니다.\n", currentPage, page.getStartIndex(),
+				page.getEndIndex());
+
+		System.out.printf("현재 페이지는 %d페이지고, 페이지네이션 시작은 %d, 마지막 숫자는 %d 입니다. \n", currentPage, page.getPaginationStart(),
+				page.getPaginationEnd());
+		
+		return page;
+	}
+	
+	@Override
+	public List<Boolean> getBoardsWithFiles(List<BoardDTO> boards) {
+		List<Boolean> isBoardWithFiles = new ArrayList<Boolean>();
+		List<FileDTO> files = boardMapper.getAllFiles();
+		List<Integer> boardSeqWithFiles = new ArrayList<Integer>(); 
+		for(int i = 0; i < files.size(); i++) {
+			boardSeqWithFiles.add(files.get(i).getBoard_seq());
 		}
 		
-		// 페이징 처리
-		PaginationVO page = new PaginationVO(currentPage, boards.size());
+		for(int i = 0; i < boards.size(); i++) {
+			if(boardSeqWithFiles.contains(boards.get(i).getBoard_seq())) {
+				isBoardWithFiles.add(true);
+			} else {
+				isBoardWithFiles.add(false);
+			}
+		}
+		System.out.println("isBoardWithFiles : " + isBoardWithFiles);
 		
-		System.out.printf("현재 페이지는 %d페이지고, 시작 인덱스는 %d, 마지막 인덱스는 %d 입니다.\n",
-				currentPage, page.getStartIndex(), page.getEndIndex());
-		
-		System.out.printf("현재 페이지는 %d페이지고, 페이지네이션 시작은 %d, 마지막 숫자는 %d 입니다. \n",
-				currentPage, page.getPaginationStart(), page.getPaginationEnd());
-
-		req.setAttribute("boards", boards);
-		req.setAttribute("write_date", creationDateTimeList);
-		req.setAttribute("files", files);
-		// 페이지네이션 전달
-		req.setAttribute("page", page.getCurrentPage());
-		req.setAttribute("startIndex", page.getStartIndex());
-		req.setAttribute("endIndex", page.getEndIndex());
-		req.setAttribute("paginationStart", page.getPaginationStart());
-		req.setAttribute("paginationEnd", page.getPaginationEnd());
-		req.setAttribute("nextPage", page.getNextPage());
-		req.setAttribute("previousPage", page.getPrevPage());
-		req.setAttribute("totalBoardSize", page.getTotalBoardSize());
+		return isBoardWithFiles;
 	}
 	
 	@Override
@@ -261,9 +293,6 @@ public class BoardServiceImpl implements BoardService {
 		List<FileDTO> uploadFiles = new ArrayList<FileDTO>();
 		
 		// 파일 저장 경로
-		// 나중에 밑의 경로로 바꿔야된다.
-		// "C:/Users/east/git/saiboard/SaiBoard/src/main/webapp/resources/upload_files";		
-//		String uploadPath = req.getSession().getServletContext().getRealPath("/resources/upload_files");
 		String uploadPath = "C:/Users/east/git/saiboard/SaiBoard/src/main/webapp/resources/upload_files";
 		
 		Path directoryPath = Paths.get(uploadPath + File.separator + board_seq);
@@ -562,5 +591,17 @@ public class BoardServiceImpl implements BoardService {
 		} else {
 			return "delete_comment_failed";
 		}
+	}
+	
+	public static void main(String[] args) {
+		List<String> test = new ArrayList<String>();
+		List<Integer> test2 = new ArrayList<Integer>();
+		test.add("123");
+		test.add("456");
+		test2.add(12);
+		test2.add(34);
+		
+		System.out.println(test.contains("12"));
+		System.out.println(test2.contains(12));
 	}
 }

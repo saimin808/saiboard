@@ -46,12 +46,12 @@
 	
 	<select id="getFiles" parameterType="Integer" resultType="sai.pork.board.model.FileDTO">
 		SELECT * FROM files
-		WHERE board_seq = #{board_seq}
+		WHERE board_seq = #{board_seq} ORDER BY board_seq DESC
 	</select>
 	
 	<select id="getFile" parameterType="Integer" resultType="sai.pork.board.model.FileDTO">
 		SELECT * FROM files
-		WHERE file_seq = #{file_seq}
+		WHERE file_seq = #{file_seq} ORDER BY board_seq DESC
 	</select>
 	
 	<select id="getComments" parameterType="Integer" resultType="sai.pork.board.model.CommentDTO">
