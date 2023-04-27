@@ -40,15 +40,16 @@ public class BoardController {
 		System.out.println("Controller parameters : " + parameters);
 		
 		List<BoardDTO> boards = boardService.showBoards(parameters);
-		List<String> creationDateTimeList = boardService.getCreationDateTimeList(boards);
+		List<String> creationDateTimeList = boardService.getBoardsCreationDateTimeList(boards);
 		List<Boolean> isBoardWithFiles = boardService.getBoardsWithFiles(boards);
-		PaginationVO page = boardService.getPaginationVO(null, boards.size());
+		PaginationVO page = boardService.getPaginationVO(null, 10, boards.size());
 				
 		model.addAttribute("boards", boards);
 		model.addAttribute("boardWriteDate", creationDateTimeList);
 		model.addAttribute("isBoardWithFiles", isBoardWithFiles);
 		// 페이지네이션 전달
 		model.addAttribute("currentPage", page.getCurrentPage());
+		model.addAttribute("totalBoardSize", page.getTotalSize());
 		model.addAttribute("startIndex", page.getStartIndex());
 		model.addAttribute("endIndex", page.getEndIndex());
 		model.addAttribute("paginationStart", page.getPaginationStart());
@@ -90,14 +91,28 @@ public class BoardController {
 	}
 	
 	// 게시글 보기
-	@GetMapping("/board/read")
-	public String readBoard(Model model, HttpServletRequest req, @RequestParam Integer board_seq) throws ParseException {
+	@GetMapping("/board/read/{board_seq}")
+	public String readBoard(Model model, HttpServletRequest req, @PathVariable("board_seq") Integer board_seq) throws ParseException {
 		
 		// 파라미터 확인용
 		System.out.println("parameters : " + board_seq);
 		
 		boardService.readBoard(req, board_seq); 
-		boardService.showComments(req, board_seq);
+		List<CommentDTO> comments = boardService.showComments(board_seq);
+		List<String> creationDateTimeList = boardService.getCommentsCreationDateTimeList(comments);
+		PaginationVO page = boardService.getPaginationVO(null, 5, comments.size());
+		
+		model.addAttribute("comments", comments.subList(page.getStartIndex(), page.getEndIndex()));
+		model.addAttribute("commentWriteDate", creationDateTimeList.subList(page.getStartIndex(), page.getEndIndex()));
+		// 페이지네이션 전달
+		model.addAttribute("currentPage", page.getCurrentPage());
+		model.addAttribute("totalCommentSize", page.getTotalSize());
+		model.addAttribute("startIndex", page.getStartIndex());
+		model.addAttribute("endIndex", page.getEndIndex());
+		model.addAttribute("paginationStart", page.getPaginationStart());
+		model.addAttribute("paginationEnd", page.getPaginationEnd());
+		model.addAttribute("nextPage", page.getNextPage());
+		model.addAttribute("previousPage", page.getPrevPage());
 		
 		return "read/board_read";
 	}
@@ -153,33 +168,33 @@ public class BoardController {
 	
 	// 댓글 작성
 	@PostMapping("/board/write_comment")
-	public String writeComment(Model model, HttpServletRequest req, @ModelAttribute CommentDTO comment) {
+	public String writeComment(Model model, CommentDTO comment) {
 		
-		boardService.showComments(req, comment.getBoard_seq());
 		String result = boardService.writeComment(comment);
+		List<CommentDTO> comments = boardService.showComments(comment.getBoard_seq());
 		
 		model.addAttribute("board_seq", comment.getBoard_seq());
-		model.addAttribute("page", 1);
 		model.addAttribute("status", result);
+		model.addAttribute("comments", comments);
 		return "redirect:/board/read";
 	}
 	
 	// 댓글 수정 전 비밀번호 확인
 	@PostMapping("/board/edit_comment_pw_check")
-	public String editCommentPasswordCheck(Model model, HttpServletRequest req, @ModelAttribute CommentDTO comment) {
+	public String editCommentPasswordCheck(Model model, String input_pw, Integer comment_seq, Integer board_seq) {
 		
 		// 파라미터 확인용
-		System.out.println("editCommentPwCheck : " + comment);
+		System.out.println("editCommentPwCheck : " + input_pw + "" + comment_seq);
 		// 1. 댓글의 비밀번호 확인
-		String comment_pw = boardService.commentPasswordCheck(comment.getComment_seq());
+		Boolean isCorrect = boardService.commentPasswordCheck(input_pw, comment_seq);
 		
 		// 2. 비밀번호 확인 후  
-		if(comment_pw.equals(comment.getComment_pw())) {
-			model.addAttribute("board_seq", comment.getBoard_seq());
-			model.addAttribute("status", "edit_comment_pw_checked" + comment.getComment_seq());
+		if(isCorrect == true) {
+			model.addAttribute("board_seq", board_seq);
+			model.addAttribute("status", "edit_comment_pw_checked" + comment_seq);
 			return "redirect:/board/read";
 		} else {
-			model.addAttribute("board_seq", comment.getBoard_seq());
+			model.addAttribute("board_seq", board_seq);
 			model.addAttribute("status", "edit_comment_wrong_pw");
 			return "redirect:/board/read";
 		}
@@ -187,35 +202,38 @@ public class BoardController {
 	
 	// 댓글 삭제
 	@PostMapping("/board/delete_comment")
-	public String deleteComment(Model model, HttpServletRequest req, @ModelAttribute CommentDTO comment) {
+	public String deleteComment(Model model, String input_pw, Integer comment_seq, Integer board_seq) {
 		
-		System.out.println("deleteCommentPwCheck : " + comment);
+		System.out.println("deleteCommentPwCheck : " + input_pw + " " + comment_seq);
 		// 1. 댓글의 비밀번호를 가져온다.
-		String comment_pw = boardService.commentPasswordCheck(comment.getComment_seq());
+		Boolean isCorrect = boardService.commentPasswordCheck(input_pw, comment_seq);
 		
 		// 2. 댓글의 비밀번호와 입력한 비밀번호를 비교한 뒤 결과에 맞게 처리해 준다.
-		if(comment_pw.equals(comment.getComment_pw())) {
+		if(isCorrect == true) {
 			// 3-1. 비밀번호가 같다면 댓글을 지운다
-			String result = boardService.deleteComment(comment.getComment_seq());
+			String result = boardService.deleteComment(comment_seq);
 			model.addAttribute("status", result);
 		} else {
 			// 3-2. 비밀번호가 틀리다면 지우지 않는다.
 			model.addAttribute("status", "delete_comment_wrong_pw");
 		}
 		// 4. 다시 게시글 보기 페이지로 돌아가기 위해 댓글과 게시글 번호를 readBoard()에 파라미터로 전달한다.
-		model.addAttribute("board_seq", comment.getComment_seq());
-		boardService.showComments(req, comment.getBoard_seq());
+		model.addAttribute("board_seq", board_seq);
+		model.addAttribute("comments", boardService.showComments(board_seq));
+		
 		return "redirect:/board/read";
 	}
 	
 	// 댓글 수정
 	@PostMapping("/board/edit_comment")
-	public String editComment(Model model, HttpServletRequest req, @ModelAttribute CommentDTO comment) {
+	public String editComment(Model model, CommentDTO comment) {
 		
 		System.out.println("editComment : " + comment);
-		boardService.showComments(req, comment.getBoard_seq());
+		
+		List<CommentDTO> comments = boardService.showComments(comment.getBoard_seq());
 		String result = boardService.editComment(comment);
 		
+		model.addAttribute("comments", comments);
 		model.addAttribute("board_seq", comment.getBoard_seq());
 		model.addAttribute("status", result);
 		return "redirect:/board/read";

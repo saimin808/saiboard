@@ -362,7 +362,7 @@
 										<p class="fs-6">${comment.comment_id}</p>
 									</div>
 									<div class="col-7">
-										<p class="fs-6">${comment.getCreationDateTime()}</p>
+										<p class="fs-6">${commentWriteDate.get(i.index)}</p>
 									</div>
 									<div class="col-3 text-end">
 										<button id="editComment${i.count}" class="btn btn-white">수정</button>
@@ -439,39 +439,34 @@
 				<div class="row row-cols-1 container-lg w-100">
 					<div id="pagination-container" class="container-xxl">
 						<nav>
-							<ul class="pagination justify-content-center">
+							<ul id="pagination-ul" class="pagination justify-content-center">
 								<li class="page-item">
-									<c:choose>
-										<c:when test="${paginationStart > 5}">
-											<a id="prev-link" class="page-link" href="<%=request.getContextPath()%>/board/read?board_seq=${board.board_seq}&page=${previousPage}" aria-label="Previous">
-												<span aria-hidden="true">&laquo;</span>
-											</a>
-										</c:when>
-										<c:otherwise>
-											<a class="page-link" aria-label="Previous"
-												style="pointer-event: none; cursor: default;">
-												<span aria-hidden="true">&laquo;</span>
-											</a>
-										</c:otherwise>
-									</c:choose>
+									<a class="page-link" aria-label="Previous"
+										style="pointer-event: none; cursor: default;">
+										<span aria-hidden="true">&laquo;</span>
+									</a>
 								</li>
 								<c:forEach begin="${paginationStart}" end="${paginationEnd}" var="i">
 									<li class="page-item">
 										<c:choose>
+											<c:when test="${i == 1}">
+												<a id="page1" class="page page-link" style="color: white; background-color: #6c757d;
+																	pointer-event: none; cursor: default;">1</a>
+											</c:when>
 											<c:when test="${page == i}">
-												<a id="${i}page" class="page-link" style="color: white; background-color: #6c757d;
-																			pointer-event: none; cursor: default;">${i}</a>
+												<a id="page${i}" class="page page-link" style="color: white; background-color: #6c757d;
+																	pointer-event: none; cursor: default;">${i}</a>
 											</c:when>
 											<c:otherwise>
-												<a id="${i}page" class="page-link">${i}</a>
+												<a id="page${i}" class="page page-link" style="cursor: pointer;" onclick="getComments(${board.board_seq},${i})">${i}</a>
 											</c:otherwise>
 										</c:choose>
 									</li>
 								</c:forEach>
 								<li class="page-item">
 									<c:choose>
-										<c:when test="${paginationEnd % 5 == 0 && commentSize > paginationEnd * 5}">
-											<a id="next-link" class="page-link" href="<%=request.getContextPath()%>/board/read?board_seq=${board.board_seq}&page=${nextPage}" aria-label="Next">
+										<c:when test="${paginationEnd % 5 == 0 && totalCommentSize > paginationEnd * 5}">
+											<a id="next-link" class="page-link" aria-label="Next" onclick="getComments(6)">
 												<span aria-hidden="true">&raquo;</span>
 											</a>
 										</c:when>
@@ -502,14 +497,9 @@
 <script>
 	const contextPath = '<%=request.getContextPath()%>';
 	
-	const commentSize = '<%=request.getAttribute("commentSize")%>';
-	console.log(commentSize);
-	const paginationStart = '<%=request.getAttribute("paginationStart")%>';
-	const paginationEnd = '<%=request.getAttribute("paginationEnd")%>';
-	let pageNum = [];
-	for(i = paginationStart; i <= paginationEnd; i++) {
-		pageNum[i-1] = i;
-	}
+	const commentSize = parseInt('<%=request.getAttribute("commentTotalSize")%>');
+	let paginationStart = '<%=request.getAttribute("paginationStart")%>';
+	let paginationEnd = '<%=request.getAttribute("paginationEnd")%>';
 </script>
 <!-- board_read.js -->
 <script src="<%=request.getContextPath()%>/resources/read/js/board_read.js"></script>

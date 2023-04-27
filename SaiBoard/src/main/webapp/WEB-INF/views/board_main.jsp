@@ -23,57 +23,53 @@
 		<!-- Board -->
 		<div id="board-container" class="container-xxl">
 			<div id="category-container" class="container-xxl">
-				<form id="board-form" action="<%= request.getContextPath()%>/board" method="GET">
-					<div class="row">
-						<!-- col-12(max) -->
-						<!-- 리스팅 요소 컨테이너 -->
-						<input type="hidden" id="category" name="category" value="total"/>
-						<input type="hidden" id="orderBy" name="orderBy" value="board_seq"/>
-						<input type="hidden" id="searchCategory" name="searchCategory" value="board_title"/>
-						<div id="listing-container" class="col-3">
-							<div class="row">
-								<div class="col-4">
-									<select id="category-select" class="form-select">
-									  <option value="total" selected>전체</option>
-									  <option value="news">공지</option>
-									  <option value="free">자유</option>
-									</select>
-								</div>
-								<div class="col">
-									<select id="orderBy-select" class="form-select">
-									  <option value="board_seq" selected>최신 글</option>
-									  <option value="board_view">조회 수</option>
-									</select>
-								</div>
+				<div class="row">
+					<!-- col-12(max) -->
+					<!-- 리스팅 요소 컨테이너 -->
+					<div id="listing-container" class="col-3">
+						<div class="row">
+							<div class="col-4">
+								<select id="category-select" class="form-select">
+									<option value="total" selected>전체</option>
+									<option value="news">공지</option>
+									<option value="free">자유</option>
+								</select>
+							</div>
+							<div class="col">
+								<select id="orderBy-select" class="form-select">
+									<option value="board_seq" selected>최신 글</option>
+									<option value="board_view">조회 수</option>
+								</select>
 							</div>
 						</div>
-						<div class="col-5">
-						</div>
-						<!-- 검색 요소 컨테이너 -->
-						<div id="search-container" class="col-4">
-							<div class="row">
-								<div class="col-3">
-									<select id="searchCategory-select" class="form-select">
-									  <option value="board_title" selected>제목</option>
-									  <option value="board_writer">글쓴이</option>
-									</select>
-								</div>
-								<div class="col-9">
-									<div class="input-group mb-3">
-									  <button id="search-button" class="btn btn-outline-secondary" type="button">
-									  	<i class="fa-solid fa-magnifying-glass"></i>
-									  </button>
-									  <input type="text" id="search-text" name="searchKeyword" class="form-control"
-									   aria-describedby="search-button">
-									</div>
+					</div>
+					<div class="col-5"></div>
+					<!-- 검색 요소 컨테이너 -->
+					<div id="search-container" class="col-4">
+						<div class="row">
+							<div class="col-3">
+								<select id="searchCategory-select" class="form-select">
+									<option value="board_title" selected>제목</option>
+									<option value="board_writer">글쓴이</option>
+								</select>
+							</div>
+							<div class="col-9">
+								<div class="input-group mb-3">
+									<button id="search-button" class="btn btn-outline-secondary"
+										type="button" onclick="getBoard(1)">
+										<i class="fa-solid fa-magnifying-glass"></i>
+									</button>
+									<input type="text" id="search-text" name="searchKeyword"
+										class="form-control" aria-describedby="search-button"
+										onKeypress="if (window.event.keyCode == 13) {getBoard(1)}">
 								</div>
 							</div>
 						</div>
 					</div>
-				</form>
+				</div>
 			</div>
 			<div id="table-container" class="container-xxl">
-				<table class="table w-100">
+				<table id="board-table" class="table w-100">
 					<colgroup>
 						<col style="width:10%;">
 						<col style="width:15%;">
@@ -82,22 +78,22 @@
 						<col style="width:10%;">
 						<col style="width:20%;">
 					</colgroup>
-						<tr>
-							<th scope="col">No.</th>
-							<th scope="col">카테고리</th>
-							<th scope="col">제목</th>
-							<th scope="col">글쓴이</th>
-							<th scope="col">조회수</th>
-							<th scope="col">작성일</th>
-						</tr>
-						<c:choose>
+					<tr>
+						<th scope="col">No.</th>
+						<th scope="col">카테고리</th>
+						<th scope="col">제목</th>
+						<th scope="col">글쓴이</th>
+						<th scope="col">조회수</th>
+						<th scope="col">작성일</th>
+					</tr>
+					<c:choose>
 							<c:when test="${not empty boards}">
 								<c:forEach begin="0" end="9" var="i">
 									<tr>
 										<td class="boardSeq-td">${boards.get(i).board_seq}</td>
 										<td class="boardCategory-td">${boards.get(i).board_category}</td>
 										<td class="boardTitle-td">
-											<a href="<%=request.getContextPath()%>/board/read?board_seq=${boards.get(i).board_seq}&page=1">${boards.get(i).board_title}</a>
+											<a href="<%=request.getContextPath()%>/board/read/${boards.get(i).board_seq}">${boards.get(i).board_title}</a>
 											<c:if test="${isBoardWithFiles.get(i) == true}">										
 												<i class="fa-solid fa-paperclip"></i>
 											</c:if>
@@ -121,36 +117,31 @@
 				<nav>
 					<ul id="pagination-ul" class="pagination justify-content-center">
 						<li class="page-item">
-							<c:choose>
-								<c:when test="${paginationStart > 5}">
-									<a id="prev-link" class="page-link" aria-label="Previous">
-										<span aria-hidden="true">&laquo;</span>
-									</a>
-								</c:when>
-								<c:otherwise>
-									<a class="page-link" aria-label="Previous"
-										style="pointer-event: none; cursor: default;">
-										<span aria-hidden="true">&laquo;</span>
-									</a>
-								</c:otherwise>
-							</c:choose>
+							<a class="page-link" aria-label="Previous"
+								style="pointer-event: none; cursor: default;">
+								<span aria-hidden="true">&laquo;</span>
+							</a>
 						</li>
 						<c:forEach begin="${paginationStart}" end="${paginationEnd}" var="i">
 							<li class="page-item">
 								<c:choose>
+									<c:when test="${i == 1}">
+										<a id="page1" class="page page-link" style="color: white; background-color: #6c757d;
+															pointer-event: none; cursor: default;">1</a>
+									</c:when>
 									<c:when test="${page == i}">
-										<a id="${i}page" class="page page-link" style="color: white; background-color: #6c757d;
-																	pointer-event: none; cursor: default;">${i}</a>
+										<a id="page${i}" class="page page-link" style="color: white; background-color: #6c757d;
+															pointer-event: none; cursor: default;">${i}</a>
 									</c:when>
 									<c:otherwise>
-										<a id="${i}page" class="page page-link">${i}</a>
+										<a id="page${i}" class="page page-link" style="cursor: pointer;" onclick="getBoard(${i})">${i}</a>
 									</c:otherwise>
 								</c:choose>
 							</li>
 						</c:forEach>
 						<li class="page-item">
 							<c:choose>
-								<c:when test="${paginationEnd % 5 == 0 && fn:length(boards) > paginationEnd * 10}">
+								<c:when test="${paginationEnd % 5 == 0 && totalBoardSize > paginationEnd * 10}">
 									<a id="next-link" class="page-link" aria-label="Next" style="cursor: pointer;">
 										<span aria-hidden="true">&raquo;</span>
 									</a>

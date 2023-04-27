@@ -40,80 +40,36 @@ if(urlParams.get('searchKeyword') != null) {
 	$('input[name=searchKeyword]').attr('value', searchKeyword);
 }
 
-// form으로 넘겨주기 위한 Hidden들의 value 값
-let category_hidden = $('input[name=category]').val();
-let orderBy_hidden = $('input[name=orderBy]').val();
-let searchCategory_hidden = $('input[name=searchCategory]').val();
-
-// select 선택한 값 받는 변수들
-let category_selected = $('#category-select option:selected').val();
-let orderBy_selected = $('#orderBy-select option:selected').val();
-let searchCategory_selected = $('#searchCategory-select option:selected').val();
-
-// 검색어 받는 변수
-let searchKeyword_text = $('input[name=searchKeyword]').val();
-
-// 카테고리 선택 action
+// 카테고리 select action
 $("#category-select").change(function() {
-    category_selected = $('#category-select option:selected').val();
-    
-    // form으로 넘겨주기 위해 Hidden에다가 select value 대입
-    $('input[name=category]').attr('value', category_selected);
- 	
- 	// form submit
- 	$('#board-form').submit();
+	getBoard(1);
 });
 
-// 정렬(orderBy) 선택 action
 $("#orderBy-select").change(function() {
-	orderBy_selected = $('#orderBy-select option:selected').val();
-	
-	// form으로 넘겨주기 위해 Hidden에다가 select value 대입
-    $('input[name=orderBy]').attr('value', orderBy_selected);
-	
-	// form submit
- 	$('#board-form').submit();
-});
-
-$("#searchCategory-select").change(function() {
-	searchCategory_selected = $('#searchCategory-select option:selected').val();
-	
-	// form으로 넘겨주기 위해 Hidden에다가 select value 대입
-    $('input[name=searchCategory]').attr('value', searchCategory_selected);	
-});
-
-$("#search-button").click(function() {
-	
-	// form submit
-	$('#board-form').submit();
-	
+	getBoard(1);
 });
 
 // 게시판 내용들 (td)
-const boardSeq_td = document.getElementsByClassName('boardSeq-td');
-const boardCategory_td = document.getElementsByClassName('boardCategory-td');
-const boardTitle_td = document.getElementsByClassName('boardTitle-td');
-const boardWriter_td = document.getElementsByClassName('boardWriter-td');
-const boardView_td = document.getElementsByClassName('boardView-td');
-const boardWriteDate_td = document.getElementsByClassName('boardWriteDate-td');
+const board_table = document.getElementById('#board_table');
 
 // 페이지네이션 틀 (ul)
 const pagination_ul = document.getElementById('pagination-ul');
 
-// 게시판 조회 function
+// 페이지네이션 function
 function getBoard(page) {
 	console.log('page : ' + page);
 	// ajax 데이터 생성
 	const parameters = {
-		category : category_selected,
-		orderBy : orderBy_selected,
-		searchCategory : searchCategory_selected,
-		searchKeyword : searchKeyword_text
+		category : $('#category-select option:selected').val(), // 선택한 카테고리
+		orderBy : $('#orderBy-select option:selected').val(), // 선택한 정렬 기준
+		searchCategory : $('#searchCategory-select option:selected').val(), // 선택한 검색 주제
+		searchKeyword : $('input[name=searchKeyword]').val() // 선택한 검색어
 	}
+	console.log(parameters);
 	// ajax로 데이터 전송
 	$.ajax({
 		type: 'POST',
-	    url: contextPath + "/board/" + page,
+	    url: contextPath + "/board/page/" + page,
 	    contentType: 'application/json;charset=UTF-8',
 	    data : JSON.stringify(parameters),
 	    dataType : 'json',
@@ -129,34 +85,81 @@ function getBoard(page) {
 	    	let boards = new Array;
 	    	let writeDate = new Array;
 	    	let files = new Array;
-	    	boards = data.boards;
-	    	writeDate = data.boardWriteDate;
-	    	files = data.isBoardWithFiles;
+	    	boards = data.boards; // 가져온 게시글 리스트
+	    	writeDate = data.boardWriteDate; // 가져온 게시글 작성일 리스트
+	    	files = data.isBoardWithFiles; // 가져온 첨부파일 리스트
 	    	
-	    	let currentPage = data.currentPage;
-	    	paginationStart = data.paginationStart;
-	    	paginationEnd = data.paginationEnd;
-	    	
-	    	for(let i = 0; i < boards.length; i++) {
-	    		boardSeq_td.item(i).innerHTML = boards[i].board_seq;
-	    		boardCategory_td.item(i).innerHTML = boards[i].board_category;
-	    		let content = '';
-	    		content += '<a href="' + contextPath + '/board/read?board_seq=' + boards[i].board_seq + '&page=1">' + boards[i].board_title + '</a>';
-	    		if(files[i] == true) {
-					content += '<i class="fa-solid fa-paperclip"></i>';								
+	    	let currentPage = parseInt(data.currentPage); // 현재 페이지
+	    	paginationStart = parseInt(data.paginationStart); // 페이지네이션 시작 번호
+	    	paginationEnd = parseInt(data.paginationEnd); // 페이지네이션 마지막 번호
+	    	let totalBoardSize = parseInt(data.totalBoardSize); // 가져온 게시글 총 갯수
+		    
+		    let content = '';
+	    	if(boards.length > 0) {
+		    		content += '<colgroup>';
+					content += '	<col style="width:10%;">';
+					content += '	<col style="width:15%;">';
+					content += '		<col style="width:40%;">';
+					content += '		<col style="width:15%;">';
+					content += '		<col style="width:10%;">';
+					content += '		<col style="width:20%;">';
+					content += '	</colgroup>';
+					content += '	<tr>';
+					content += '		<th scope="col">No.</th>';
+					content += '		<th scope="col">카테고리</th>';
+					content += '		<th scope="col">제목</th>';
+					content += '		<th scope="col">글쓴이</th>';
+					content += '		<th scope="col">조회수</th>';
+					content += '		<th scope="col">작성일</th>';
+					content += '	</tr>';
+		    	for(let i = 0; i < boards.length; i++) {
+					content += '	<tr>';
+					content += '		<td>' + boards[i].board_seq + '</td>';
+					content += '		<td>' + boards[i].board_category + '</td>';
+					content += '		<td>';
+					content += '<a href="' + contextPath + '/board/read/' + boards[i].board_seq + '">' + boards[i].board_title + '</a>';
+		    		if(files[i] == true) {
+						content += '<i class="fa-solid fa-paperclip"></i>';								
+					}
+					content += '		</td>';
+					content += '		<td>' + boards[i].board_writer + '</td>';
+					content += '		<td>' + boards[i].board_view + '</td>';
+					content += '		<td>' + writeDate[i] + '</td>';
+					content += '	</tr>';
 				}
-				boardTitle_td.item(i).innerHTML = content;
-	    		boardWriter_td.item(i).innerHTML = boards[i].board_writer;
-	    		boardView_td.item(i).innerHTML = boards[i].board_view;
-	    		boardWriteDate_td.item(i).innerHTML = writeDate[i];
+	    	} else {
+	    		content += '<colgroup>';
+				content += '	<col style="width:10%;">';
+				content += '	<col style="width:15%;">';
+				content += '		<col style="width:40%;">';
+				content += '		<col style="width:15%;">';
+				content += '		<col style="width:10%;">';
+				content += '		<col style="width:20%;">';
+				content += '	</colgroup>';
+				content += '	<tr>';
+				content += '		<th scope="col">No.</th>';
+				content += '		<th scope="col">카테고리</th>';
+				content += '		<th scope="col">제목</th>';
+				content += '		<th scope="col">글쓴이</th>';
+				content += '		<th scope="col">조회수</th>';
+				content += '		<th scope="col">작성일</th>';
+				content += '	</tr>';
+				content += '	<tr>';
+				content += '		<td colspan="6">게시물이 없습니다.</td>';
+				content += '	</tr>';
 	    	}
+	    	
+	    	// content에 새로운 게시물들을 다 담았으면 table을 content로 채워준다
+	    	$('#board-table').html(content);
 	    	
 	    	let content2 = '';
 				content2 +=	'	<li class="page-item">';
 				
+			let prevPage = paginationStart - 1;
 			
-			if(parseInt(paginationStart) > 5) {
-				content2 +=	'				<a id="prev-link" class="page-link" aria-label="Previous">';
+			if(paginationStart > 5) {
+				content2 +=	'				<a id="prev-link" class="page-link" aria-label="Previous"';
+				content2 += '					style="cursor: pointer;" onclick="getBoard(' + prevPage + ')">';
 				content2 +=	'					<span aria-hidden="true">&laquo;</span>';
 				content2 +=	'				</a>';
 			} else {
@@ -168,21 +171,27 @@ function getBoard(page) {
 				
 				content2 +=	'	</li>';
 				
-	    	for(let i = parseInt(paginationStart); i <= parseInt(paginationEnd); i++) {
+	    	for(let i = paginationStart; i <= paginationEnd; i++) {
 				content2 += '<li class="page-item">';
 	    		if(currentPage == i) {	    			
-					content2 += '	<a class="page page-link" style="color: white; background-color: #6c757d;';
-					content2 += '			pointer-event: none; cursor: default;">' + i + '</a>';
+					content2 += '	<a class="page-link" style="color: white; background-color: #6c757d;';
+					content2 += '		pointer-event: none; cursor: default;">' + i + '</a>';
 				} else {
-					content2 += '	<a class="page page-link">' + i + '</a>';
+					if(i * 10 > totalBoardSize) {
+						break;
+					}
+					content2 += '	<a class="page-link" style="cursor: pointer;" onclick="getBoard('+i+')">' + i + '</a>';
 				}
 				content2 += '</li>';
 	    	}
 	    	
 	    		content2 += '<li class="page-item">';
 				
-			if(parseInt(paginationEnd) % 5 == 0 && boards.length > parseInt(paginationEnd) * 10) {
-				content2 +=	'			<a id="next-link" class="page-link" aria-label="Next" style="cursor: pointer;">';
+			let nextPage = paginationEnd + 1;
+			
+			if(paginationEnd % 5 == 0 && totalBoardSize > paginationEnd * 10) {
+				content2 +=	'			<a id="next-link" class="page-link" aria-label="Next"';
+				content2 +=	'				style="cursor: pointer;" onclick="getBoard(' + nextPage + ')">';
 				content2 += '				<span aria-hidden="true">&raquo;</span>';
 				content2 += '			</a>';
 			} else {
@@ -194,25 +203,9 @@ function getBoard(page) {
 												
 				content2 += '</li>';
 			
-			pagination_ul.innerHTML = '';
-			pagination_ul.innerHTML += content2;
-			console.log(content2);			
+			pagination_ul.innerHTML = content2;
        	})
 }
-
-// 페이지네이션 action
-
-// '>>' 링크
-let nextPage = parseInt(paginationEnd) + 1;
-$('#next-link').click(function() {
-	getBoard(nextPage);
-});
-	
-// '<<' 링크
-let prevPage = parseInt(paginationStart) + 1;
-$('#prev-link').click(function() {
-	getBoard(prevPage);
-});
 
 // 글 쓰기 버튼 action
 $('#write-button').click(function() {

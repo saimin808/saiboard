@@ -120,6 +120,7 @@ function edit_content_checkText(obj) {
 const writerRegExp = /^[a-zA-Zㄱ-힣][a-zA-Zㄱ-힣 ]{2,8}$/;
 // 비밀번호 정규식 : 4 ~ 6자 영문, 숫자, 특수문자 허용
 const pwRegExp = /^[a-zA-z][0-9][$`~!@$!%*#^?&\\(\\)\-_=+]{4,6}$/;
+
 $('#writeCommentSubmit-button').click(function() {
 	if($('#commentId-text').val().length < 2 && writerRegExp.test($('#commentId-text')) == false) {
 	
@@ -235,10 +236,94 @@ for(let i = 1; i <= commentSize; i++) {
 }
 
 // comment 페이지네이션 action
-if(urlParams != null) {
-	// 번호 링크
-	for(let i = paginationStart; i <= paginationEnd; i++) {
-		$('a[id=' + i + 'page]').attr('href', contextPath + '/board/read?board_seq=' + urlParams.get('board_seq') +
-															'&page='+ pageNum[i-1]);
+// ajax로 데이터 전송
+function getComments(seq, page) {
+	const parameters = {
+		board_seq : seq
 	}
+	
+	$.ajax({
+		type: 'POST',
+	    url: contextPath + "/board/read/" + seq + "/"+ page,
+	    contentType: 'application/json;charset=UTF-8',
+	    data : JSON.stringify(parameters),
+	    dataType : 'json',
+	    progress : true
+	 })
+	    .fail( function(e) {
+	    	console.log(e);
+	    	alert("통신 오류 error");
+	    })
+	    .done(function(data) {
+	    
+	    let boards = new Array;
+	    	console.log('통신 성공!');
+	    	
+	    	let comments = new Array;
+	    	let writeDate = new Array;
+	    	
+	    	comments = data.comments; // 가져온 게시글 리스트
+	    	writeDate = data.commentWriteDate; // 가져온 게시글 작성일 리스트
+	    	
+	    	let currentPage = parseInt(data.currentPage); // 현재 페이지
+	    	paginationStart = parseInt(data.paginationStart); // 페이지네이션 시작 번호
+	    	paginationEnd = parseInt(data.paginationEnd); // 페이지네이션 마지막 번호
+	    	let totalCommentSize = parseInt(data.totalCommentSize); // 가져온 게시글 총 갯수
+	    	
+			
+			
+	    	
+	    	let content2 = '';
+				content2 +=	'	<li class="page-item">';
+				
+			let prevPage = paginationStart - 1;
+			
+			if(paginationStart > 5) {
+				content2 +=	'				<a id="prev-link" class="page-link" aria-label="Previous"';
+				content2 += '					style="cursor: pointer;" onclick="getBoard(' + prevPage + ')">';
+				content2 +=	'					<span aria-hidden="true">&laquo;</span>';
+				content2 +=	'				</a>';
+			} else {
+				content2 += '				<a class="page-link" aria-label="Previous"';
+				content2 += '				  style="pointer-event: none; cursor: default;">';
+				content2 += '					<span aria-hidden="true">&laquo;</span>';
+				content2 += '				</a>';
+			}
+				
+				content2 +=	'	</li>';
+				
+	    	for(let i = paginationStart; i <= paginationEnd; i++) {
+				content2 += '<li class="page-item">';
+	    		if(currentPage == i) {	    			
+					content2 += '	<a class="page-link" style="color: white; background-color: #6c757d;';
+					content2 += '		pointer-event: none; cursor: default;">' + i + '</a>';
+				} else {
+					if(i * 10 > totalBoardSize) {
+						break;
+					}
+					content2 += '	<a class="page-link" style="cursor: pointer;" onclick="getBoard('+i+')">' + i + '</a>';
+				}
+				content2 += '</li>';
+	    	}
+	    	
+	    		content2 += '<li class="page-item">';
+				
+			let nextPage = paginationEnd + 1;
+			
+			if(paginationEnd % 5 == 0 && totalBoardSize > paginationEnd * 10) {
+				content2 +=	'			<a id="next-link" class="page-link" aria-label="Next"';
+				content2 +=	'				style="cursor: pointer;" onclick="getBoard(' + nextPage + ')">';
+				content2 += '				<span aria-hidden="true">&raquo;</span>';
+				content2 += '			</a>';
+			} else {
+				content2 += '			<a class="page-link" aria-label="Next"';
+				content2 += '				style="pointer-event: none; cursor: default;">';
+				content2 += '				<span aria-hidden="true">&raquo;</span>';
+				content2 += '			</a>';
+			}
+												
+				content2 += '</li>';
+			
+			pagination_ul.innerHTML = content2;
+	   	});
 }

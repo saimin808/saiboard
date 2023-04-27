@@ -42,22 +42,22 @@ public class BoardServiceImpl implements BoardService {
 	// getCreationDateTime
 	// 게시판의 작성일을 하루가 지나면 날짜(예: 2023/04/05)형태로, 하루가 지나기 전까지는 n시간전, n분전으로 표시하기 위해
 	// DB에 기록한 작성일을 받아와 원하는 형태로 변환하는 메소드 
-	public static String getCreationDateTime(Date board_write_date) throws ParseException {
+	public static String getCreationDateTime(Date write_date) throws ParseException {
 		// ParseException : 해석중에 예상외의 에러가 발생한 것을 나타내는 Exception입니다.
 		
 		SimpleDateFormat dayFormat = new SimpleDateFormat("yyyy-MM-dd");
 		SimpleDateFormat hourFormat = new SimpleDateFormat("HH");
 		SimpleDateFormat minFormat = new SimpleDateFormat("mm");
 		
-		LocalDate creationDate = LocalDate.ofInstant(board_write_date.toInstant(), ZoneId.systemDefault());
+		LocalDate creationDate = LocalDate.ofInstant(write_date.toInstant(), ZoneId.systemDefault());
 		LocalDate today = LocalDate.ofInstant(new Date().toInstant(), ZoneId.systemDefault());
 		
 		Calendar calendarToday = Calendar.getInstance();
 		Integer hour_of_today = calendarToday.get(Calendar.HOUR_OF_DAY);
 		Integer min_of_today = calendarToday.get(Calendar.MINUTE);
 		
-		Integer hour_of_creationDate = Integer.parseInt(hourFormat.format(board_write_date));
-		Integer min_of_creationDate = Integer.parseInt(minFormat.format(board_write_date));
+		Integer hour_of_creationDate = Integer.parseInt(hourFormat.format(write_date));
+		Integer min_of_creationDate = Integer.parseInt(minFormat.format(write_date));
 		
 		if(creationDate.isEqual(today)) {
 			if(hour_of_today == hour_of_creationDate) {
@@ -70,8 +70,27 @@ public class BoardServiceImpl implements BoardService {
 				return String.valueOf(hour_of_today - hour_of_creationDate) + "시간 전";
 			}
 		} else {
-			return dayFormat.format(board_write_date);
+			return dayFormat.format(write_date);
 		}
+	}
+	
+	@Override
+	public PaginationVO getPaginationVO(Integer currentPage, Integer boardSizePerPage, Integer totalBoardSize) {
+		
+		if (currentPage == null) {
+			currentPage = 1;
+		}
+
+		// 페이징 처리
+		PaginationVO page = new PaginationVO(currentPage, boardSizePerPage, totalBoardSize);
+
+		System.out.printf("현재 페이지는 %d페이지고, 시작 인덱스는 %d, 마지막 인덱스는 %d 입니다.\n", currentPage, page.getStartIndex(),
+				page.getEndIndex());
+
+		System.out.printf("현재 페이지는 %d페이지고, 페이지네이션 시작은 %d, 마지막 숫자는 %d 입니다. \n", currentPage, page.getPaginationStart(),
+				page.getPaginationEnd());
+		
+		return page;
 	}
 	
 	@Override
@@ -152,7 +171,7 @@ public class BoardServiceImpl implements BoardService {
 	}
 	
 	@Override
-	public List<String> getCreationDateTimeList(List<BoardDTO> boards) throws ParseException {
+	public List<String> getBoardsCreationDateTimeList(List<BoardDTO> boards) throws ParseException {
 		
 		// 오늘 날짜 기준으로 게시글이 생성된 날짜 표시 변경
 		// board_write_date가 Date타입이라
@@ -166,22 +185,17 @@ public class BoardServiceImpl implements BoardService {
 	}
 	
 	@Override
-	public PaginationVO getPaginationVO(Integer currentPage, Integer totalBoardSize) {
+	public List<String> getCommentsCreationDateTimeList(List<CommentDTO> comments) throws ParseException {
 		
-		if (currentPage == null) {
-			currentPage = 1;
+		// 오늘 날짜 기준으로 게시글이 생성된 날짜 표시 변경
+		// board_write_date가 Date타입이라
+		// 변환한 작성일 표시를 새로운 List인 creationDateTimeList에 담아준다.
+		List<String> creationDateTimeList = new ArrayList<String>();
+		for (int i = 0; i < comments.size(); i++) {
+			creationDateTimeList.add(getCreationDateTime(comments.get(i).getComment_date()));
 		}
-
-		// 페이징 처리
-		PaginationVO page = new PaginationVO(currentPage, totalBoardSize);
-
-		System.out.printf("현재 페이지는 %d페이지고, 시작 인덱스는 %d, 마지막 인덱스는 %d 입니다.\n", currentPage, page.getStartIndex(),
-				page.getEndIndex());
-
-		System.out.printf("현재 페이지는 %d페이지고, 페이지네이션 시작은 %d, 마지막 숫자는 %d 입니다. \n", currentPage, page.getPaginationStart(),
-				page.getPaginationEnd());
 		
-		return page;
+		return creationDateTimeList;
 	}
 	
 	@Override
@@ -488,73 +502,21 @@ public class BoardServiceImpl implements BoardService {
 	}
 	
 	@Override
-	public void showComments(HttpServletRequest req, Integer board_seq) {
+	public List<CommentDTO> showComments(Integer board_seq) {
 		
-		// 선택한 페이지 숫자를 불러옴
-		String pageStr = req.getParameter("page");
-		
-		// page : 총 댓글 수
-		int page;
-
-		if (pageStr == null) {
-			page = 1;
-		} else {
-			page = Integer.parseInt(pageStr);
-		}
-		
-		List<CommentDTO> comments = boardMapper.getComments(board_seq);
-		
-		// pageSize : 한 페이지에 한번에 출력할 댓글 갯수 
-		int pageSize = 5;
-		// boardSize : 전체 댓글 사이즈
-		int	commentSize = comments.size();
-		// startIndex : 출력할 5개의 댓글 중에서 첫 댓글의 순서
-		int startIndex = (page - 1) * pageSize;
-		// endIndex : 출력할 5개의 댓글 중에서 마지막 댓글의 순서
-		int endIndex = page * pageSize;
-		// 마지막 페이지에 표시되는 댓글들은 딱 5개로 떨어지지 않을 수도 있으니
-		// 전체 댓글 사이즈(boardSize)와 page * pageSize(endIndex)를 비교해서
-		// endIndex가 더 크면 boardSize로 boardSize가 더 크거나 같으면 endIndex 그대로 대입해준다.
-		endIndex = endIndex > commentSize ? commentSize : endIndex;
-
-		System.out.printf("현재 페이지는 %d페이지고, 시작 인덱스는 %d, 마지막 인덱스는 %d 입니다.\n", page, startIndex, endIndex);
-
-		// 전체 페이지 사이즈
-		int maxPage = commentSize % pageSize == 0 ? commentSize / pageSize : commentSize / pageSize + 1;
-
-		// paginationSize : 한번에 출력할 페이지네이션 사이즈
-		int paginationSize = 5;
-		// paginationStart : 전체 페이지네이션 시작 숫자
-		int paginationStart = (page / paginationSize) * paginationSize + 1;
-
-		paginationStart = page % paginationSize == 0 ? page - 4 : paginationStart;
-
-		// paginationEnd : 전체 페이지네이션 마지막 숫자
-		int paginationEnd = (page / paginationSize + 1) * paginationSize;
-		if (page % paginationSize == 0) {
-			paginationEnd = paginationEnd - paginationSize;
-		} else {
-			paginationEnd = paginationEnd > maxPage ? maxPage : paginationEnd;
-		}
-
-		int nextPage = paginationEnd + 1;
-		int previousPage = paginationStart - 1;
-
-		System.out.printf("현재 페이지는 %d페이지고, 페이지네이션 시작은 %d, 마지막 숫자는 %d 입니다. \n", page, paginationStart, paginationEnd);
-		
-		req.setAttribute("page", page);
-		req.setAttribute("comments", comments.subList(startIndex, endIndex));
-		req.setAttribute("paginationStart", paginationStart);
-		req.setAttribute("paginationEnd", paginationEnd);
-		req.setAttribute("nextPage", nextPage);
-		req.setAttribute("previousPage", previousPage);
-		req.setAttribute("commentSize", commentSize);
+		return boardMapper.getComments(board_seq);
 	}
 	
 	@Override
-	public String commentPasswordCheck(Integer comment_seq) {
+	public Boolean commentPasswordCheck(String input_pw, Integer comment_seq) {
 		
-		return	boardMapper.commentPasswordCheck(comment_seq);
+		String comment_pw = boardMapper.commentPasswordCheck(comment_seq);
+		
+		if(input_pw.equals(comment_pw)) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	@Override

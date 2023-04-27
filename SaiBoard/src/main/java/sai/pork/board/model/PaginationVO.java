@@ -4,13 +4,13 @@ public class PaginationVO {
 
 	// currentPage : 현재 페이지 번호
 	private Integer currentPage;
-	// boardCountPerPage : 한 페이지에 한번에 출력할 게시글 갯수
-	private final Integer boardSizePerPage = 10;
-	// totalBoardSize : 전체 게시글 수
-	private Integer totalBoardSize;
-	// startIndex : 출력할 10개의 게시글 중에서 첫 게시글 순서 번호
+	// boardCountPerPage : 한 페이지에 한번에 출력할 글 갯수
+	private Integer sizePerPage;
+	// totalSize : 전체 글 수
+	private Integer totalSize;
+	// startIndex : 출력할 10개의 게시글 중에서 첫 글 순서 번호
 	private Integer startIndex;
-	// endIndex : 출력할 10개의 게시글 중에서 마지막 게시글의 순서 번호
+	// endIndex : 출력할 10개의 게시글 중에서 마지막 글의 순서 번호
 	private Integer endIndex;
 	// paginationSize : 한번에 출력할 페이지네이션 사이즈
 	private final Integer paginationSize = 5;
@@ -27,37 +27,38 @@ public class PaginationVO {
 	// prevPage : 현재 페이지에서 이전 페이지
 	private Integer prevPage;
 	
-	public PaginationVO(Integer currentPage, Integer totalBoardSize) {
+	public PaginationVO(Integer currentPage, Integer sizePerPage, Integer totalSize) {
 		this.currentPage = currentPage;
-		this.totalBoardSize = totalBoardSize;
+		this.sizePerPage = sizePerPage;
+		this.totalSize = totalSize;
 	}
 	
 	public Integer getCurrentPage() {
 		return currentPage;
 	}
 	
-	public Integer getTotalBoardSize() {
-		return totalBoardSize;
+	public Integer getTotalSize() {
+		return totalSize;
 	}
 	
 	public Integer getStartIndex() {
-		startIndex = (currentPage - 1) * boardSizePerPage; 
+		startIndex = (currentPage - 1) * sizePerPage; 
 		return startIndex;
 	}
 	
 	public Integer getEndIndex() {
-		endIndex = currentPage * boardSizePerPage;
+		endIndex = currentPage * sizePerPage;
 		// 마지막 페이지에 표시되는 게시글들은 딱 10개로 떨어지지 않을 수도 있으니
 		// 전체 게시글 사이즈(boardSize)와 page * pageSize(endIndex)를 비교해서
 		// endIndex가 더 크면 boardSize로 boardSize가 더 크거나 같으면 endIndex 그대로 대입해준다.
-		endIndex = endIndex > totalBoardSize ? totalBoardSize : endIndex;		
+		endIndex = endIndex > totalSize ? totalSize : endIndex;		
 				
 		return endIndex;
 	}
 	
 	public Integer getMaxPagination() {
-		maxPagination = totalBoardSize % boardSizePerPage == 0 ?
-				totalBoardSize / boardSizePerPage : totalBoardSize / boardSizePerPage + 1;
+		maxPagination = totalSize % sizePerPage == 0 ?
+				totalSize / sizePerPage : totalSize / sizePerPage + 1;
 		return maxPagination;
 	}
 	
