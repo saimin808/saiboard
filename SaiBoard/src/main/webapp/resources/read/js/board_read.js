@@ -160,7 +160,9 @@ $('#writeCommentSubmit-button').click(function() {
 });
 
 
-for(let i = 1; i <= commentSize; i++) {
+console.log(commentSize);
+
+for(let i = 1; i <= 5; i++) {
 	// 수정 버튼 action
 	$('button[id=editComment' + i + ']').click(function() {
 		console.log('edit click');
@@ -179,6 +181,7 @@ for(let i = 1; i <= commentSize; i++) {
 		
 		$('h5[id=commentPwCheck-title' + i + ']').text('댓글 삭제');
 		$('form[id=commentPwCheck-form' + i + ']').attr('action', contextPath + '/board/delete_comment');
+		$('form[id=commentPwCheck-form' + i + ']').attr('method', 'POST');
 		$('input[id=commentPwCheckPassword-text' + i + ']').val('');
 		
 		$('dialog[id=commentPwCheck-dialog' + i + ']').attr('open', 'open');	
@@ -235,6 +238,12 @@ for(let i = 1; i <= commentSize; i++) {
 	});
 }
 
+// 게시판 내용들 (td)
+const comment_container = document.getElementById('comment_table-container');
+
+// 페이지네이션 틀 (ul)
+const pagination_ul = document.getElementById('pagination-ul');
+
 // comment 페이지네이션 action
 // ajax로 데이터 전송
 function getComments(seq, page) {
@@ -269,9 +278,85 @@ function getComments(seq, page) {
 	    	paginationStart = parseInt(data.paginationStart); // 페이지네이션 시작 번호
 	    	paginationEnd = parseInt(data.paginationEnd); // 페이지네이션 마지막 번호
 	    	let totalCommentSize = parseInt(data.totalCommentSize); // 가져온 게시글 총 갯수
-	    	
 			
+			// 댓글 노가다 작업 필요!!
 			
+			let content= '';
+			if(comments.length > 0) {
+				for(let i = 0; i < comments.length; i++) {
+					content += '	<div class="row row-cols-3 pb-0">';
+					content += '		<div class="col-2">';
+					content += '			<p class="fs-6">' + comments[i].comment_id + '</p>';
+					content += '				</div>';
+					content += '		<div class="col-7">';
+					content += '			<p class="fs-6">' + writeDate[i] + '</p>';
+					content += '			</div>';
+					content += '		<div class="col-3 text-end">';
+					content += '			<button id="editComment' + i + '" class="btn btn-white">수정</button>';
+					content += '			<button id="deleteComment' + i + '" class="btn btn-white">삭제</button>';
+					content += '		</div>';
+					content += '		<dialog id="commentPwCheck-dialog' + i + '" class="dialog">';
+					content += '			<div>';
+					content += '			<div style="display:inline-block; margin-right: 47px;">◀</div>';
+					content += '				<h5 id="commentPwCheck-title' + i + '" class="fw-semibold" style="display:inline-block;">댓글 수정</h5>';
+					content += '			</div>';
+					content += '			<div class="mb-3">';
+					content += '			<form id="commentPwCheck-form' + i + '" action="'+ contextPath +'/board/edit_comment_pw_check" method="POST">';
+					content += '				<input type="password" id="commentPwCheckPassword-text' + i + '" name="comment_input_pw"';
+					content += '						class="form-control text-center" placeholder="비밀번호를 입력해주세요.">';
+					content += '				<input type="hidden" name="comment_seq" value="' + comments[i].comment_seq + '"/>';
+					content += '				<input type="hidden" name="board_seq" value="' + comments[i].board_seq + '"/>';
+					content += '				<input type="hidden" name="dialog_seq" value="' + i + '"/>';
+					content += '			</form>';
+					content += '			</div>';
+					content += '			<div class="text-center">';
+					content += '				<button id="commentPwCheckCancel-button' + i + '" class="btn btn-light">취소</button>';
+					content += '				<button id="commentPwCheckSubmit-button' + i + '" class="btn btn-secondary">확인</button>';
+					content += '			</div>';
+					content += '		</dialog>';
+					content += '		<input type="hidden" id="editCommentStatus-hidden' + i + '" value="${param.status}"/>';
+					content += '		<dialog id="editComment-dialog' + i + '" class="editComment-dialog">';
+					content += '			<div>';
+					content += '				<div style="display:inline-block; margin-right: 170px;">◀</div>';
+					content += '				<h5 id="editComment-title' + i + '" class="fw-semibold" style="display:inline-block;">댓글 수정</h5>';
+					content += '			</div>';
+					content += '			<div class="mb-3">';
+					content += '				<form id="editComment-form' + i + '" action="' + contextPath + '/board/edit_comment" method="POST">';
+					content += '					<div class="w-25 m-2" style="display:inline-block;">';
+					content += '						<input type="text" id="editCommentId-text' + i + '" name="comment_id"';
+					content += '							value="' + comments[i].comment_id + '" maxlength="8" class="form-control" placeholder="ID"/>';
+					content += '					</div>';
+					content += '					<div class="w-25 m-2"style="display:inline-block;">';
+					content += '						<input type="password" id="editCommentPassword-text' + i + '" name="comment_pw"';
+					content += '							maxlength="6" class="form-control" placeholder="Password">';
+					content += '					</div>';
+					content += '					<div class="mb-0">';
+					content += '						<textarea id="commentContent-text' + i + '" class="form-control" rows="1" cols="40" wrap="hard"';
+					content += '							 name="comment_content" placeholder="내용을 입력해주세요. (4 ~ 40자)"';
+					content += '							 onkeyup="edit_content_checkText(this)">' + comments[i].comment_content + '</textarea>';
+					content += '					</div>';
+					content += '					<div class="w-100 mt-0">';
+					content += '						<div class="mt-0 text-end">(<span id="edit_nowLetter">0</span>/40자)</div>';
+					content += '					</div>';
+					content += '					<input type="hidden" name="comment_seq" value="' + comments[i].comment_seq + '"/>';
+					content += '					<input type="hidden" name="board_seq" value="' + comments[i].board_seq + '"/>';
+					content += '				</form>';
+					content += '			</div>';
+					content += '			<div class="text-center">';
+					content += '				<button id="editCommentCancel-button' + i + '" class="btn btn-light">취소</button>';
+					content += '				<button id="editCommentSubmit-button' + i + '" class="btn btn-secondary">확인</button>';
+					content += '			</div>';
+					content += '		</dialog>';
+					content += '	</div>';
+					content += '	<div class="row row-cols-1 container-lg w-100 pt-0">';
+					content += '		<div class="col-12">' + comments[i].comment_content + '</div>';
+					content += '	</div>';
+				}
+				
+				// comment_table_container(div) 안에 content 입력
+				comment_container.innerHTML = '';
+				comment_container.innerHTML = content;
+			}
 	    	
 	    	let content2 = '';
 				content2 +=	'	<li class="page-item">';
@@ -280,7 +365,7 @@ function getComments(seq, page) {
 			
 			if(paginationStart > 5) {
 				content2 +=	'				<a id="prev-link" class="page-link" aria-label="Previous"';
-				content2 += '					style="cursor: pointer;" onclick="getBoard(' + prevPage + ')">';
+				content2 += '					style="cursor: pointer;" onclick="getComments('+ seq + ', ' + prevPage + ')">';
 				content2 +=	'					<span aria-hidden="true">&laquo;</span>';
 				content2 +=	'				</a>';
 			} else {
@@ -298,10 +383,10 @@ function getComments(seq, page) {
 					content2 += '	<a class="page-link" style="color: white; background-color: #6c757d;';
 					content2 += '		pointer-event: none; cursor: default;">' + i + '</a>';
 				} else {
-					if(i * 10 > totalBoardSize) {
+					if(i * 5 > totalCommentSize) {
 						break;
 					}
-					content2 += '	<a class="page-link" style="cursor: pointer;" onclick="getBoard('+i+')">' + i + '</a>';
+					content2 += '	<a class="page-link" style="cursor: pointer;" onclick="getComments('+ seq + ', ' + i +')">' + i + '</a>';
 				}
 				content2 += '</li>';
 	    	}
@@ -310,9 +395,9 @@ function getComments(seq, page) {
 				
 			let nextPage = paginationEnd + 1;
 			
-			if(paginationEnd % 5 == 0 && totalBoardSize > paginationEnd * 10) {
+			if(paginationEnd % 5 == 0 && totalCommentSize > paginationEnd * 10) {
 				content2 +=	'			<a id="next-link" class="page-link" aria-label="Next"';
-				content2 +=	'				style="cursor: pointer;" onclick="getBoard(' + nextPage + ')">';
+				content2 +=	'				style="cursor: pointer;" onclick="getComments(' + seq + ', ' + nextPage + ')">';
 				content2 += '				<span aria-hidden="true">&raquo;</span>';
 				content2 += '			</a>';
 			} else {
@@ -326,4 +411,30 @@ function getComments(seq, page) {
 			
 			pagination_ul.innerHTML = content2;
 	   	});
+}
+
+function deleteBoard(seq) {
+	
+	const input_pw = $('#input_pw').val();
+	
+	$.ajax({
+		type: 'POST',
+	    url: contextPath + "/board/delete/"+ seq,
+	    data : input_pw,
+	 })
+	    .fail( function(e) {
+	    	console.log(e);
+	    	alert("통신 오류 error");
+	    })
+	    .done(function(data) {
+	    
+	    console.log('통신 성공!');
+	    	
+	    	if(data == 'true') {
+	    		location.href = contextPath + '/board?status=board_delete_success';
+	    	} else {
+	    		location.href = contextPath + '/board?status=board_delete_fail';
+	    	}
+		});
+	
 }

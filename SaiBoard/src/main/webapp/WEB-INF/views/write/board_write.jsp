@@ -81,7 +81,7 @@
 						</div>
 						<div class="row">
 							<div class="col-12">
-								<textarea id="commentContent-text" class="form-control" name="board_content" rows="10" cols="70" wrap="hard"
+								<textarea id="boardContent-text" class="form-control" name="board_content" rows="10" cols="70" wrap="hard"
 									  placeholder="내용을 입력해주세요. (4 ~ 1000자)" onkeyup="content_checkText(this)"
 									  data-bs-container="body" data-bs-toggle="popover" data-bs-placement="bottom"
 									  data-bs-custom-class="warning-popover" data-bs-content="내용을 제대로 입력해주세요!"></textarea>

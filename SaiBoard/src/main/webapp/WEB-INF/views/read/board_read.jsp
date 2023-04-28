@@ -141,7 +141,7 @@
 	}
 	
 	/* 댓글 수정 삭제 비밀번호 확인 dialog */
-	.dialog {
+	.pwCheck-dialog {
 		width: 250px;
 		background-color: rgb(235,235,235);
 		border: none;
@@ -248,10 +248,8 @@
 					      		<div class="row text-center">
 					        		<p class="text-info">비밀번호를 입력하세요</p>
 					        	</div>
-					        	<form id="deleteForm" class="row justify-content-center" action="<%= request.getContextPath()%>/board/delete" method="POST">
 					        		<input type="hidden" name="board_seq" value="${board.board_seq}"/>
 					        		<input id="deletePassword" name="input_pw" type="password" class="form-control text-center w-75">
-					        	</form>
 					        	<c:if test="${not empty param.status && param.status eq 'delete_wrong_pw'}">
 						        	<div class="row text-center">
 						        		<p id="deleteWarningMsg" class="text-danger">잘못된 비밀번호입니다!</p>
@@ -264,7 +262,7 @@
 					        			<button id="delete_cancel-button" type="button" class="btn btn-white fw-semibold text-secondary" data-bs-dismiss="modal">취소</button>
 					        		</div>
 					        		<div class="col-6">
-					        			<button id="delete_submit-button" type="button" class="btn btn-white fw-semibold text-info">확인</button>
+					        			<button id="delete_submit-button" type="button" class="btn btn-white fw-semibold text-info" onclick="deleteBoard(${board.board_seq})">확인</button>
 					        		</div>
 					        	</div>
 					      	</div>
@@ -278,13 +276,13 @@
 							<div class="modal-header justify-content-center">
 						       <h1 class="modal-title fs-4 fw-bold" id="modalTitle">글 수정 비밀번호 확인</h1>
 					      	</div>
-					      	<div class="modal-body container ">
+					      	<div class="modal-body container">
 					      		<div class="row text-center">
 					        		<p class="text-info">비밀번호를 입력하세요</p>
 					        	</div>
 					        	<form id="editForm" class="row justify-content-center" action="<%= request.getContextPath()%>/board/edit" method="POST">
 					        		<input type="hidden" name="board_seq" value="${board.board_seq}"/>
-					        		<input id="editPassword" type="password" class="form-control text-center w-75" name="input_pw">
+					        		<input id="editPassword" type="password" name="input_pw" class="form-control text-center w-75" />
 					        	</form>
 					        	<c:if test="${not empty param.status && param.status eq 'edit_wrong_pw'}">
 						        	<div class="row text-center">
@@ -368,14 +366,14 @@
 										<button id="editComment${i.count}" class="btn btn-white">수정</button>
 										<button id="deleteComment${i.count}" class="btn btn-white">삭제</button>
 									</div>
-									<dialog id="commentPwCheck-dialog${i.count}" class="dialog">
+									<dialog id="commentPwCheck-dialog${i.count}" class="pwCheck-dialog">
 										<div>
 											<div style="display:inline-block; margin-right: 47px;">◀</div>
 											<h5 id="commentPwCheck-title${i.count}" class="fw-semibold" style="display:inline-block;">댓글 수정</h5>
 										</div>
 										<div class="mb-3">
 											<form id="commentPwCheck-form${i.count}" action="<%=request.getContextPath()%>/board/edit_comment_pw_check" method="POST">
-												<input type="password" id="commentPwCheckPassword-text${i.count}" name="comment_pw"
+												<input type="password" id="commentPwCheckPassword-text${i.count}" name="comment_input_pw"
 														class="form-control text-center" placeholder="비밀번호를 입력해주세요.">
 												<input type="hidden" name="comment_seq" value="${comment.comment_seq}"/>
 												<input type="hidden" name="board_seq" value="${board.board_seq}"/>
@@ -407,8 +405,6 @@
 													<textarea id="commentContent-text${i.count}" class="form-control" rows="1" cols="40" wrap="hard"
 														 name="comment_content" placeholder="내용을 입력해주세요. (4 ~ 40자)"
 														 onkeyup="edit_content_checkText(this)">${comment.comment_content}</textarea>
-													<%-- <input type="hidden"id="commentContent-hidden${i.count}" name="comment_content"
-															value="${comment.comment_content}"/> --%>
 												</div>
 												<div class="w-100 mt-0">
 													<div class="mt-0 text-end">(<span id="edit_nowLetter">0</span>/40자)</div>
@@ -497,7 +493,7 @@
 <script>
 	const contextPath = '<%=request.getContextPath()%>';
 	
-	const commentSize = parseInt('<%=request.getAttribute("commentTotalSize")%>');
+	const commentSize = parseInt('<%=request.getAttribute("totalCommentSize")%>');
 	let paginationStart = '<%=request.getAttribute("paginationStart")%>';
 	let paginationEnd = '<%=request.getAttribute("paginationEnd")%>';
 </script>

@@ -220,9 +220,7 @@ public class BoardServiceImpl implements BoardService {
 	}
 	
 	@Override
-	public void writeBoard(HttpServletRequest req, BoardDTO board) {
-				
-		String pageStr = req.getParameter("page");
+	public Boolean writeBoard(BoardDTO board) {
 		
 		// 비밀번호를 암호화할 BCryptPasswordEncoder 객체 생성
 		BCryptPasswordEncoder encrypt = new BCryptPasswordEncoder();
@@ -236,71 +234,14 @@ public class BoardServiceImpl implements BoardService {
 		Integer row = boardMapper.writeBoard(board);
 		
 		if(row > 0) {
-			req.setAttribute("status", "board_write_success");
+			return true;
 		} else {
-			req.setAttribute("status", "board_write_failed");			
+			return false;			
 		}
-		
-		List<BoardDTO> boards = boardMapper.getAllBoards();
-		
-		// page : 총 게시글 수
-		int page;
-		
-		if(pageStr == null) {
-			page = 1;
-		} else {
-			page = Integer.parseInt(pageStr);
-		}
-		
-		// pageSize : 한 페이지에 한번에 출력할 게시글 갯수 
-		int pageSize = 10;
-		// boardSize : 전체 게시글 사이즈
-		int boardSize = boards.size();
-		// startIndex : 출력할 10개의 게시글 중에서 첫 게시글의 순서
-		int startIndex = (page - 1) * pageSize;
-		// endIndex : 출력할 10개의 게시글 중에서 마지막 게시글의 순서
-		int endIndex = page * pageSize;
-		// 마지막 페이지에 표시되는 게시글들은 딱 10개로 떨어지지 않을 수도 있으니
-		// 전체 게시글 사이즈(boardSize)와 page * pageSize(endIndex)를 비교해서
-		// endIndex가 더 크면 boardSize로 boardSize가 더 크거나 같으면 endIndex 그대로 대입해준다.
-		endIndex = endIndex > boardSize ? boardSize : endIndex;
-
-		System.out.printf("현재 페이지는 %d페이지고, 시작 인덱스는 %d, 마지막 인덱스는 %d 입니다.\n", page, startIndex, endIndex);
-
-		// 전체 페이지 사이즈
-		int maxPage = boardSize % pageSize == 0 ? boardSize / pageSize : boardSize / pageSize + 1;
-
-		// paginationSize : 한번에 출력할 페이지네이션 사이즈
-		int paginationSize = 5;
-		// paginationStart : 전체 페이지네이션 시작 숫자
-		int paginationStart = (page / paginationSize) * paginationSize + 1;
-
-		paginationStart = page % paginationSize == 0 ? page - 4 : paginationStart;
-
-		// paginationEnd : 전체 페이지네이션 마지막 숫자
-		int paginationEnd = (page / paginationSize + 1) * paginationSize;
-		if (page % paginationSize == 0) {
-			paginationEnd = paginationEnd - paginationSize;
-		} else {
-			paginationEnd = paginationEnd > maxPage ? maxPage : paginationEnd;
-		}
-
-		int nextPage = paginationEnd + 1;
-		int previousPage = paginationStart - 1;
-
-		System.out.printf("현재 페이지는 %d페이지고, 페이지네이션 시작은 %d, 마지막 숫자는 %d 입니다. \n", page, paginationStart, paginationEnd);
-		
-		req.setAttribute("page", page);
-		req.setAttribute("boards", boards.subList(startIndex, endIndex));
-		req.setAttribute("paginationStart", paginationStart);
-		req.setAttribute("paginationEnd", paginationEnd);
-		req.setAttribute("nextPage", nextPage);
-		req.setAttribute("previousPage", previousPage);
-		req.setAttribute("boardSize", boardSize);
 	}
 	
 	@Override
-	public String uploadFiles(HttpServletRequest req, Integer board_seq, List<MultipartFile> files) throws IllegalStateException, IOException {
+	public Boolean uploadFiles(Integer newBoard_seq, List<MultipartFile> files) throws IllegalStateException, IOException {
 
 		System.out.println("uploadFiles : " + files);
 		
@@ -309,7 +250,7 @@ public class BoardServiceImpl implements BoardService {
 		// 파일 저장 경로
 		String uploadPath = "C:/Users/east/git/saiboard/SaiBoard/src/main/webapp/resources/upload_files";
 		
-		Path directoryPath = Paths.get(uploadPath + File.separator + board_seq);
+		Path directoryPath = Paths.get(uploadPath + File.separator + newBoard_seq);
 		// 새롭게 업로드한 파일을 저장할 board_seq 이름으로 새로운 폴더 생성
 		Files.createDirectory(directoryPath);
 		System.out.println(directoryPath + " 디렉토리가 생성되었습니다.");
@@ -326,7 +267,7 @@ public class BoardServiceImpl implements BoardService {
 			if (i == 0 && !files.get(i).isEmpty()) {
 				FileDTO file1 = new FileDTO();
 				files.get(i).transferTo(saveFile);
-				file1.setBoard_seq(board_seq);
+				file1.setBoard_seq(newBoard_seq);
 				file1.setFile_name(files.get(i).getOriginalFilename());
 				file1.setFile_src(directoryPath.toString() + File.separator + fileName[i]);
 				uploadFiles.add(file1);
@@ -334,7 +275,7 @@ public class BoardServiceImpl implements BoardService {
 			} else if (i == 1 && !files.get(i).isEmpty()) {
 				FileDTO file2 = new FileDTO();
 				files.get(i).transferTo(saveFile);
-				file2.setBoard_seq(board_seq);
+				file2.setBoard_seq(newBoard_seq);
 				file2.setFile_name(files.get(i).getOriginalFilename());
 				file2.setFile_src(directoryPath.toString() + File.separator + fileName[i]);
 				uploadFiles.add(file2);
@@ -342,7 +283,7 @@ public class BoardServiceImpl implements BoardService {
 			} else if (i == 2 && !files.get(i).isEmpty()) {
 				FileDTO file3 = new FileDTO();
 				files.get(i).transferTo(saveFile);
-				file3.setBoard_seq(board_seq);
+				file3.setBoard_seq(newBoard_seq);
 				file3.setFile_name(files.get(i).getOriginalFilename());
 				file3.setFile_src(directoryPath.toString() + File.separator + fileName[i]);
 				uploadFiles.add(file3);
@@ -355,9 +296,9 @@ public class BoardServiceImpl implements BoardService {
 		}
 			
 		if(row >= 3) {			
-			return "file_uploaded";
+			return true;
 		} else {
-			return "upload_failed";
+			return false;
 		}
 	}
 	
@@ -452,7 +393,7 @@ public class BoardServiceImpl implements BoardService {
 	}
 	
 	@Override
-	public String deleteBoard(Map<String, String> parameters) {
+	public Boolean deleteBoard(Map<String, String> parameters) {
 
 		// 1. 우선 업로드한 파일 먼저 지운다.
 		// - 지우려는 게시판에 업로드 했던 파일들 불러오기
@@ -495,9 +436,9 @@ public class BoardServiceImpl implements BoardService {
 		row = boardMapper.deleteBoard(Integer.parseInt(parameters.get("board_seq")));
 
 		if (row > 0) {
-			return "delete_success";
+			return true;
 		} else {
-			return "delete_fail";
+			return false;
 		}
 	}
 	
@@ -508,11 +449,11 @@ public class BoardServiceImpl implements BoardService {
 	}
 	
 	@Override
-	public Boolean commentPasswordCheck(String input_pw, Integer comment_seq) {
+	public Boolean commentPasswordCheck(String comment_input_pw, Integer comment_seq) {
 		
 		String comment_pw = boardMapper.commentPasswordCheck(comment_seq);
 		
-		if(input_pw.equals(comment_pw)) {
+		if(comment_input_pw.equals(comment_pw)) {
 			return true;
 		} else {
 			return false;

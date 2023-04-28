@@ -10,11 +10,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import sai.pork.board.model.BoardDTO;
 import sai.pork.board.model.CommentDTO;
@@ -90,5 +93,58 @@ public class BoardRESTController {
 		
 		out.print(obj);
 		return null;
+	}
+	
+	// 게시글 쓰기
+	// 보통 Controller로 요청이 온 JSON을 DTO로 바인딩 할 때는 @RequestBody를 주로 사용한다.
+	//그리고 File을 받을 때는 MultipartFile 객체를 사용하고 @RequestParam을 사용한다.
+	//하지만 File과 Dto를 같이 받기 위해서는 @RequestPart라는 어노테이션을 사용한다.
+	@PostMapping("/board/write/write_board")
+	public String writeBoard(Model model, HttpServletResponse resp, @RequestPart(name = "board") BoardDTO board,
+							@RequestPart(name = "upload_files") List<MultipartFile> upload_files) throws IllegalStateException, IOException {
+			
+		// 파라미터 확인용 
+		System.out.println("board : " + board);
+		System.out.println("files : " + upload_files);
+			
+		Boolean result = boardService.writeBoard(board);
+		
+		// board_seq를 글쓰기에서는 못받아와 주니까 만든 다음에 board를 가져와서 seq를 전달해줘야됨
+		if(result == true) {
+			if(upload_files.size() > 0) {
+				List<BoardDTO> boards = boardService.getAllBoards();
+				Integer newBoard_seq = boards.get(0).getBoard_seq();		
+				boardService.uploadFiles(newBoard_seq, upload_files);
+			}
+			return "true";
+		} else {
+			return "false";
+		}
+	}
+	
+	// 게시글 삭제
+	// input_pw 일반 텍스트로 받을수 있는 파라미터로 바꾸고 Ajax도 수정처리 하기!!
+	@PostMapping("/board/delete/{seq}")
+	public String deleteBoard(Model model,@PathVariable("seq") String board_seq, @RequestParam Map<String,String> parameters) {
+			
+		// 파라미터 확인용
+		System.out.println("delete_board_seq: " + board_seq);
+		System.out.println("delete_board: " + parameters);
+		
+		parameters.put("board_seq", board_seq);
+		String result = boardService.boardPasswordCheck(parameters);
+			
+		if(result == "pw_checked") {
+			Boolean result2 = boardService.deleteBoard(parameters);
+			if(result2 == true) {
+				return "redirect:/board?status=delete_board_success";
+			} else {
+				model.addAttribute("status", "delete_" + result);
+				return "redirect:/board/read/" + board_seq;
+			}
+		} else {
+			model.addAttribute("status", "delete_" + result);
+			return "redirect:/board/read/" + board_seq;
+		}
 	}
 }

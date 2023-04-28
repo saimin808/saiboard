@@ -69,27 +69,6 @@ public class BoardController {
 		return "write/board_write";
 	}
 	
-	// 게시글 쓰기
-	@PostMapping("/board/write/write_board")
-	public String writeBoard(Model model, HttpServletRequest req, BoardDTO board,
-						List<MultipartFile> upload_files) throws IllegalStateException, IOException {
-		
-		// 파라미터 확인용 
-		System.out.println("board : " + board);
-		System.out.println("files : " + upload_files);
-		System.out.println("files : " + upload_files.toString());
-		
-		boardService.writeBoard(req, board);
-		// board_seq를 글쓰기에서는 못받아와 주니까 만든 다음에 board를 가져와서 seq를 전달해줘야됨 
-		if(upload_files.size() > 0) {
-			List<BoardDTO> boards = boardService.getAllBoards();
-			Integer newBoard_seq = boards.get(0).getBoard_seq();		
-			boardService.uploadFiles(req, newBoard_seq, upload_files);
-		}
-		
-		return "redirect:/board";
-	}
-	
 	// 게시글 보기
 	@GetMapping("/board/read/{board_seq}")
 	public String readBoard(Model model, HttpServletRequest req, @PathVariable("board_seq") Integer board_seq) throws ParseException {
@@ -115,27 +94,6 @@ public class BoardController {
 		model.addAttribute("previousPage", page.getPrevPage());
 		
 		return "read/board_read";
-	}
-	
-	// 게시글 삭제
-	@PostMapping("/board/delete")
-	public String deleteBoard(Model model, @RequestParam Map<String,String> parameters) {
-		
-		// 파라미터 확인용
-		System.out.println("delete_board: " + parameters);
-		
-		String result = boardService.boardPasswordCheck(parameters);
-		
-		if(result == "pw_checked") {
-			boardService.deleteBoard(parameters);
-			model.addAttribute("board_seq", parameters.get("board_seq"));
-			model.addAttribute("status", "delete_board_success");
-			return "redirect:/board";
-		} else {
-			model.addAttribute("board_seq", parameters.get("board_seq"));
-			model.addAttribute("status", "delete_" + result);
-			return "redirect:/board/read";
-		}
 	}
 	
 	// 게시글 수정 페이지로 이동
@@ -181,22 +139,20 @@ public class BoardController {
 	
 	// 댓글 수정 전 비밀번호 확인
 	@PostMapping("/board/edit_comment_pw_check")
-	public String editCommentPasswordCheck(Model model, String input_pw, Integer comment_seq, Integer board_seq) {
+	public String editCommentPasswordCheck(Model model, String comment_input_pw, Integer dialog_seq,  Integer comment_seq, Integer board_seq) {
 		
 		// 파라미터 확인용
-		System.out.println("editCommentPwCheck : " + input_pw + "" + comment_seq);
+		System.out.println("editCommentPwCheck : " + comment_input_pw + "" + comment_seq);
 		// 1. 댓글의 비밀번호 확인
-		Boolean isCorrect = boardService.commentPasswordCheck(input_pw, comment_seq);
+		Boolean isCorrect = boardService.commentPasswordCheck(comment_input_pw, comment_seq);
 		
 		// 2. 비밀번호 확인 후  
 		if(isCorrect == true) {
-			model.addAttribute("board_seq", board_seq);
-			model.addAttribute("status", "edit_comment_pw_checked" + comment_seq);
-			return "redirect:/board/read";
+			model.addAttribute("status", "edit_comment_pw_checked" + dialog_seq);
+			return "redirect:/board/read/" + board_seq;
 		} else {
-			model.addAttribute("board_seq", board_seq);
 			model.addAttribute("status", "edit_comment_wrong_pw");
-			return "redirect:/board/read";
+			return "redirect:/board/read/" + board_seq;
 		}
 	}
 	
@@ -218,10 +174,9 @@ public class BoardController {
 			model.addAttribute("status", "delete_comment_wrong_pw");
 		}
 		// 4. 다시 게시글 보기 페이지로 돌아가기 위해 댓글과 게시글 번호를 readBoard()에 파라미터로 전달한다.
-		model.addAttribute("board_seq", board_seq);
 		model.addAttribute("comments", boardService.showComments(board_seq));
 		
-		return "redirect:/board/read";
+		return "redirect:/board/read/" + board_seq;
 	}
 	
 	// 댓글 수정
@@ -234,9 +189,8 @@ public class BoardController {
 		String result = boardService.editComment(comment);
 		
 		model.addAttribute("comments", comments);
-		model.addAttribute("board_seq", comment.getBoard_seq());
 		model.addAttribute("status", result);
-		return "redirect:/board/read";
+		return "redirect:/board/read/" + comment.getBoard_seq();
 	}
 	
 	// 파일 다운로드

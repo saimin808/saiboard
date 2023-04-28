@@ -29,9 +29,9 @@ public interface BoardService {
 	
 	List<Boolean> getBoardsWithFiles(List<BoardDTO> boards);
 	
-	void writeBoard(HttpServletRequest req, BoardDTO board);
+	Boolean writeBoard(BoardDTO board);
 	
-	String uploadFiles(HttpServletRequest req, Integer board_seq, List<MultipartFile> files) throws IllegalStateException, IOException;
+	Boolean uploadFiles(Integer newBoard_seq, List<MultipartFile> files) throws IllegalStateException, IOException;
 	
 	void downloadFile(HttpServletResponse resp, Integer file_seq) throws Exception;
 	
@@ -41,7 +41,7 @@ public interface BoardService {
 	
 	String editBoard(BoardDTO board, List<FileDTO> files);
 	
-	String deleteBoard(Map<String, String> parameters);
+	Boolean deleteBoard(Map<String, String> parameters);
 	
 	List<CommentDTO> showComments(Integer board_seq);
 	
