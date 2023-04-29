@@ -88,7 +88,7 @@
 					</tr>
 					<c:choose>
 							<c:when test="${not empty boards}">
-								<c:forEach begin="0" end="9" var="i">
+								<c:forEach begin="0" end="${endIndex-1}" var="i">
 									<tr>
 										<td class="boardSeq-td">${boards.get(i).board_seq}</td>
 										<td class="boardCategory-td">${boards.get(i).board_category}</td>

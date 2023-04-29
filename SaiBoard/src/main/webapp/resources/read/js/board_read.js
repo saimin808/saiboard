@@ -5,10 +5,11 @@ const urlParams = new URLSearchParams(location.search);
 if(urlParams.get('status') == 'delete_wrong_pw') {
 	
 	// alert로 대체
-	alert('글 삭제 실패 : 잘못된 비밀번호');
-	
+	//alert('글 삭제 실패 : 잘못된 비밀번호');
+
 	// 왠지 모를 오류로 구현 못함
-	//$('#deleteModal').show();	
+	//$('#deleteModal').show();
+	
 }
 
 // url parameter에서 받아온 값(status)으로 모달의 경고 메세지 표시
@@ -27,16 +28,6 @@ $('#delete_cancel-button').click(function() {
 });
 $('#edit_cancel-button').click(function() {
 	urlParams.delete('status');
-});
-
-// 모달의 확인 버튼 action
-$('#delete_submit-button').click(function() {
-	const password = $('#deletePassword').val();
-	if(password == null || password == "") {
-		$('#deleteWarningMsg').text('영문, 숫자, 기호 포함 4~16자로 입력해 주세요!');
-	} else {
-		$('#deleteForm').submit();
-	}
 });
 
 // 모달의 확인 버튼 action
@@ -169,7 +160,6 @@ for(let i = 1; i <= 5; i++) {
 		$('dialog').removeAttr('open');
 		
 		$('h5[id=commentPwCheck-title' + i + ']').text('댓글 수정');
-		$('form[id=commentPwCheck-form' + i + ']').attr('action', contextPath + '/board/edit_comment_pw_check');
 		$('input[id=commentPwCheckPassword-text' + i + ']').val('');
 		
 		$('dialog[id=commentPwCheck-dialog' + i + ']').attr('open', 'open');	
@@ -180,9 +170,10 @@ for(let i = 1; i <= 5; i++) {
 		$('dialog').removeAttr('open');
 		
 		$('h5[id=commentPwCheck-title' + i + ']').text('댓글 삭제');
-		$('form[id=commentPwCheck-form' + i + ']').attr('action', contextPath + '/board/delete_comment');
-		$('form[id=commentPwCheck-form' + i + ']').attr('method', 'POST');
 		$('input[id=commentPwCheckPassword-text' + i + ']').val('');
+		
+		let seq = $('input[id=commentSeq' + i + ']').val();
+		$('button[id=commentPwCheckSubmit-button' + i + ']').attr('onclick', 'deleteComment(' + seq + ', ' + i + ')');
 		
 		$('dialog[id=commentPwCheck-dialog' + i + ']').attr('open', 'open');	
 	});
@@ -321,26 +312,24 @@ function getComments(seq, page) {
 					content += '				<h5 id="editComment-title' + i + '" class="fw-semibold" style="display:inline-block;">댓글 수정</h5>';
 					content += '			</div>';
 					content += '			<div class="mb-3">';
-					content += '				<form id="editComment-form' + i + '" action="' + contextPath + '/board/edit_comment" method="POST">';
-					content += '					<div class="w-25 m-2" style="display:inline-block;">';
-					content += '						<input type="text" id="editCommentId-text' + i + '" name="comment_id"';
-					content += '							value="' + comments[i].comment_id + '" maxlength="8" class="form-control" placeholder="ID"/>';
-					content += '					</div>';
-					content += '					<div class="w-25 m-2"style="display:inline-block;">';
-					content += '						<input type="password" id="editCommentPassword-text' + i + '" name="comment_pw"';
-					content += '							maxlength="6" class="form-control" placeholder="Password">';
-					content += '					</div>';
-					content += '					<div class="mb-0">';
-					content += '						<textarea id="commentContent-text' + i + '" class="form-control" rows="1" cols="40" wrap="hard"';
-					content += '							 name="comment_content" placeholder="내용을 입력해주세요. (4 ~ 40자)"';
-					content += '							 onkeyup="edit_content_checkText(this)">' + comments[i].comment_content + '</textarea>';
-					content += '					</div>';
-					content += '					<div class="w-100 mt-0">';
-					content += '						<div class="mt-0 text-end">(<span id="edit_nowLetter">0</span>/40자)</div>';
-					content += '					</div>';
-					content += '					<input type="hidden" name="comment_seq" value="' + comments[i].comment_seq + '"/>';
-					content += '					<input type="hidden" name="board_seq" value="' + comments[i].board_seq + '"/>';
-					content += '				</form>';
+					content += '				<div class="w-25 m-2" style="display:inline-block;">';
+					content += '					<input type="text" id="editCommentId-text' + i + '" name="comment_id"';
+					content += '						value="' + comments[i].comment_id + '" maxlength="8" class="form-control" placeholder="ID"/>';
+					content += '				</div>';
+					content += '				<div class="w-25 m-2"style="display:inline-block;">';
+					content += '					<input type="password" id="editCommentPassword-text' + i + '" name="comment_pw"';
+					content += '						maxlength="6" class="form-control" placeholder="Password">';
+					content += '				</div>';
+					content += '				<div class="mb-0">';
+					content += '					<textarea id="commentContent-text' + i + '" class="form-control" rows="1" cols="40" wrap="hard"';
+					content += '						 name="comment_content" placeholder="내용을 입력해주세요. (4 ~ 40자)"';
+					content += '						 onkeyup="edit_content_checkText(this)">' + comments[i].comment_content + '</textarea>';
+					content += '				</div>';
+					content += '				<div class="w-100 mt-0">';
+					content += '					<div class="mt-0 text-end">(<span id="edit_nowLetter">0</span>/40자)</div>';
+					content += '				</div>';
+					content += '				<input type="hidden" name="comment_seq" value="' + comments[i].comment_seq + '"/>';
+					content += '				<input type="hidden" name="board_seq" value="' + comments[i].board_seq + '"/>';
 					content += '			</div>';
 					content += '			<div class="text-center">';
 					content += '				<button id="editCommentCancel-button' + i + '" class="btn btn-light">취소</button>';
@@ -413,14 +402,21 @@ function getComments(seq, page) {
 	   	});
 }
 
+// 게시글 삭제 function
 function deleteBoard(seq) {
 	
-	const input_pw = $('#input_pw').val();
+	let pw = $('#deletePassword').val();
+	
+	if(pw == null || pw == "") {
+		$('#deleteWarningMsg').html('비밀번호를 입력해 주세요!');
+		return;
+	}
 	
 	$.ajax({
 		type: 'POST',
 	    url: contextPath + "/board/delete/"+ seq,
-	    data : input_pw,
+		// String data를 넘길 때는 data 항목에 직접 {}로 입력해준다. 
+	    data : { input_pw : pw },
 	 })
 	    .fail( function(e) {
 	    	console.log(e);
@@ -430,11 +426,58 @@ function deleteBoard(seq) {
 	    
 	    console.log('통신 성공!');
 	    	
-	    	if(data == 'true') {
-	    		location.href = contextPath + '/board?status=board_delete_success';
+	    console.log(data);	
+	    	
+	    	if(data == 'board_deletion_success') {
+	    		location.href = contextPath + '/board?status=' + data;
+	    	} else if (data == 'delete_wrong_pw') {
+	    		$('#deleteWarningMsg').html('잘못된 비밀번호입니다!');
 	    	} else {
-	    		location.href = contextPath + '/board?status=board_delete_fail';
+	    		location.href = contextPath + '/board?status=' + data;
 	    	}
 		});
+}
+
+// 댓글 삭제 function
+function deleteComment(seq, cnt) {
+
+	let pw = $('input[id=commentPwCheckPassword-text' + cnt + ']').val();
+	let bseq = $('input[id=boardSeq' + cnt + ']').val();
+	let dseq = $('input[id=dialogSeq' + cnt + ']').val();
 	
+	console.log(pw);
+	console.log(bseq);
+	console.log(dseq);
+	
+	if(pw == null || pw == "") {
+		$('#commentWarning' + seq + '').html('비밀번호를 입력해 주세요!');
+		return;
+	}
+	
+	// String data를 넘길 때는 data 항목에 직접 {}로 입력해준다. 
+	$.ajax({
+		type: 'POST',
+	    url: contextPath + '/board/delete_comment/'+ seq,
+	    data : { board_seq : bseq,
+	    		 dialog_seq : dseq,  
+	    		 input_pw : pw },
+	 })
+	    .fail( function(e) {
+	    	console.log(e);
+	    	alert("통신 오류 error");
+	    })
+	    .done(function(data) {
+	    
+	    console.log('통신 성공!');
+	    	
+	    console.log(data);	
+	    	
+	    	if(data == 'comment_deletion_success') {
+	    		location.href = contextPath + '/board/read/' + bseq + '?status=' + data;
+	    	} else if (data == 'comment_delete_wrong_pw') {
+	    		$('#commentWarning' + dseq + '').html('잘못된 비밀번호입니다!');
+	    	} else {
+	    		location.href = contextPath + '/board/read/' + bseq + '?status=' + data;
+	    	}
+		});
 }

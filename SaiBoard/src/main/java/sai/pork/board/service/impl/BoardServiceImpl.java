@@ -13,7 +13,6 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -102,13 +101,11 @@ public class BoardServiceImpl implements BoardService {
 	public List<BoardDTO> showBoards(Map<String, String> parameters) {
 		// 선택한 페이지 숫자를 불러옴
 		// Map.get(key) : 입력한 key값이 존재하면 key에 해당하는 value값을, 없으면 null값을 준다.
-		String pageStr = parameters.get("page");
 
 		System.out.println("getAllBoard");
 		System.out.println("Service parameters : " + parameters);
 		
 		List<BoardDTO> boards = null;
-		List<FileDTO> files = boardMapper.getAllFiles();
 		
 		// ***지적 받은 지점 : 한번의 작업으로 DB가 여러번 건드리는건 별로 좋지 않다.
 		// 					DB를 최소한으로 건드리는 코드를 짜야한다.
@@ -346,6 +343,8 @@ public class BoardServiceImpl implements BoardService {
 		// 2. board_seq로 게시판 가져오기
 		
 		BoardDTO board = boardMapper.getBoard(board_seq);
+		
+		System.out.println("readBoard : " + board);
 		// 오늘 날짜 기준으로 게시글이 생성된 날짜 표시 변경
 		String creationDateTime = getCreationDateTime(board.getBoard_write_date());
 		
@@ -356,19 +355,19 @@ public class BoardServiceImpl implements BoardService {
 	}
 	
 	@Override
-	public String boardPasswordCheck(Map<String, String> parameters) {
+	public Boolean boardPasswordCheck(Integer board_seq, String input_pw) {
 		
 		// 비밀번호를 decode해서 비교할 BCryptPasswordEncoder 객체 생성
 		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 				
 		// DB에 기록했던 암호화된 비밀번호를 불러와주고
-		String password = boardMapper.boardPasswordCheck(Integer.parseInt(parameters.get("board_seq")));
+		String password = boardMapper.boardPasswordCheck(board_seq);
 				
 		// 암호화된 비밀번호를 복호화하여 입력받은 비밀번호와 비교하여 같은지 확인한다. 
-		if(encoder.matches(parameters.get("input_pw"), password)) {
-			return "pw_checked";
+		if(encoder.matches(input_pw, password)) {
+			return true;
 		} else {
-			return "wrong_pw";
+			return false;
 		}
 	}
 	
@@ -393,11 +392,11 @@ public class BoardServiceImpl implements BoardService {
 	}
 	
 	@Override
-	public Boolean deleteBoard(Map<String, String> parameters) {
+	public Boolean deleteBoard(Integer board_seq) {
 
 		// 1. 우선 업로드한 파일 먼저 지운다.
 		// - 지우려는 게시판에 업로드 했던 파일들 불러오기
-		List<FileDTO> files = boardMapper.getFiles(Integer.parseInt(parameters.get("board_seq")));
+		List<FileDTO> files = boardMapper.getFiles(board_seq);
 
 		// 업로드한 파일이 저장되어있는 폴더 지움 유무
 		boolean dir_result = false;
@@ -405,27 +404,30 @@ public class BoardServiceImpl implements BoardService {
 		File uploaded_file = null;
 		// 파일을 제거할 때마다 1씩 증가시킬 cnt
 		Integer file_delete_cnt = 0;
-		for (int i = 0; i < files.size(); i++) {
-			// 2. 파일 먼저 하나씩 지운다
-			// - DB에 저장했던 파일 경로를 가지고 하나의 File객체로 만들어준다.
-			uploaded_file = new File(files.get(i).getFile_src());
-
-			// file.delete() - 파일을 제거하는 메소드 (boolean 타입 반환)
-			boolean file_result = uploaded_file.delete();
-			// - 하나씩 지울 때마다 cnt를 1씩 증가 시킨다.
-			if (file_result) {
-				file_delete_cnt += 1;
+		// 업로드한 파일이 있을 경우 파일 삭제를 실행한다.
+		if(files.size() > 0 || files != null) {
+			for (int i = 0; i < files.size(); i++) {
+				// 2. 파일 먼저 하나씩 지운다
+				// - DB에 저장했던 파일 경로를 가지고 하나의 File객체로 만들어준다.
+				uploaded_file = new File(files.get(i).getFile_src());
+	
+				// file.delete() - 파일을 제거하는 메소드 (boolean 타입 반환)
+				boolean file_result = uploaded_file.delete();
+				// - 하나씩 지울 때마다 cnt를 1씩 증가 시킨다.
+				if (file_result) {
+					file_delete_cnt += 1;
+				}
 			}
-		}
-
-		System.out.println("file_delete_cnt : " + file_delete_cnt);
-		// 3. 업로드 했던 파일을 다 지우면 저장했던 폴더도 지운다.
-		if (file_delete_cnt >= files.size() && files.size() > 0) {
-			File dir = new File(uploaded_file.getParent());
-
-			System.out.println("isDirectory : " + dir.isDirectory());
-			if (dir.isDirectory()) {
-				dir_result = dir.delete();
+	
+			System.out.println("file_delete_cnt : " + file_delete_cnt);
+			// 3. 업로드 했던 파일을 다 지우면 저장했던 폴더도 지운다.
+			if (file_delete_cnt >= files.size() && files.size() > 0) {
+				File dir = new File(uploaded_file.getParent());
+	
+				System.out.println("isDirectory : " + dir.isDirectory());
+				if (dir.isDirectory()) {
+					dir_result = dir.delete();
+				}
 			}
 		}
 
@@ -433,8 +435,8 @@ public class BoardServiceImpl implements BoardService {
 
 		Integer row = 0;
 		// 4. 폴더도 지우게 되면 마지막으로 게시판을 지운다.
-		row = boardMapper.deleteBoard(Integer.parseInt(parameters.get("board_seq")));
-
+		row = boardMapper.deleteBoard(board_seq);
+		System.out.println("is deleted? : " + row);
 		if (row > 0) {
 			return true;
 		} else {
@@ -485,14 +487,14 @@ public class BoardServiceImpl implements BoardService {
 	}
 	
 	@Override
-	public String deleteComment(Integer comment_seq) {
+	public Boolean deleteComment(Integer comment_seq) {
 		
 		Integer result = boardMapper.deleteComment(comment_seq);
 		
 		if(result > 0) {
-			return "delete_comment_success";
+			return true;
 		} else {
-			return "delete_comment_failed";
+			return false;
 		}
 	}
 	

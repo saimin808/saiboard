@@ -248,13 +248,12 @@
 					      		<div class="row text-center">
 					        		<p class="text-info">비밀번호를 입력하세요</p>
 					        	</div>
-					        		<input type="hidden" name="board_seq" value="${board.board_seq}"/>
+					        	<div class="row d-flex justify-content-center">
 					        		<input id="deletePassword" name="input_pw" type="password" class="form-control text-center w-75">
-					        	<c:if test="${not empty param.status && param.status eq 'delete_wrong_pw'}">
-						        	<div class="row text-center">
-						        		<p id="deleteWarningMsg" class="text-danger">잘못된 비밀번호입니다!</p>
-						        	</div>
-					        	</c:if>
+					        	</div>
+						        <div class="row text-center">
+						        	<p id="deleteWarningMsg" class="text-danger"></p>
+						        </div>
 					      	</div>
 					      	<div class="modal-footer container justify-content-center">
 					      		<div class="row w-100 h-100 text-center">
@@ -372,13 +371,16 @@
 											<h5 id="commentPwCheck-title${i.count}" class="fw-semibold" style="display:inline-block;">댓글 수정</h5>
 										</div>
 										<div class="mb-3">
-											<form id="commentPwCheck-form${i.count}" action="<%=request.getContextPath()%>/board/edit_comment_pw_check" method="POST">
+											<div>
 												<input type="password" id="commentPwCheckPassword-text${i.count}" name="comment_input_pw"
 														class="form-control text-center" placeholder="비밀번호를 입력해주세요.">
-												<input type="hidden" name="comment_seq" value="${comment.comment_seq}"/>
-												<input type="hidden" name="board_seq" value="${board.board_seq}"/>
-												<input type="hidden" name="dialog_seq" value="${i.count}"/>
-											</form>
+												<input type="hidden" id="commentSeq${i.count}" value="${comment.comment_seq}"/>
+												<input type="hidden" id="boardSeq${i.count}" value="${board.board_seq}"/>
+												<input type="hidden" id="dialogSeq${i.count}" value="${i.count}"/>
+											</div>
+											<div>
+												<p id="commentWarning${i.count}" class="text-center text-danger"></p>
+											</div>
 										</div>
 										<div class="text-center">
 											<button id="commentPwCheckCancel-button${i.count}" class="btn btn-light">취소</button>
@@ -392,26 +394,24 @@
 											<h5 id="editComment-title${i.count}" class="fw-semibold" style="display:inline-block;">댓글 수정</h5>
 										</div>
 										<div class="mb-3">
-											<form id="editComment-form${i.count}" action="<%=request.getContextPath()%>/board/edit_comment" method="POST">
-												<div class="w-25 m-2" style="display:inline-block;">
-													<input type="text" id="editCommentId-text${i.count}" name="comment_id"
-															value="${comment.comment_id}" maxlength="8" class="form-control" placeholder="ID"/>
-												</div>
-												<div class="w-25 m-2"style="display:inline-block;">
-													<input type="password" id="editCommentPassword-text${i.count}" name="comment_pw"
-															maxlength="6" class="form-control" placeholder="Password">
-												</div>
-												<div class="mb-0">
-													<textarea id="commentContent-text${i.count}" class="form-control" rows="1" cols="40" wrap="hard"
-														 name="comment_content" placeholder="내용을 입력해주세요. (4 ~ 40자)"
-														 onkeyup="edit_content_checkText(this)">${comment.comment_content}</textarea>
-												</div>
-												<div class="w-100 mt-0">
-													<div class="mt-0 text-end">(<span id="edit_nowLetter">0</span>/40자)</div>
-												</div>
-												<input type="hidden" name="comment_seq" value="${comment.comment_seq}"/>
-												<input type="hidden" name="board_seq" value="${board.board_seq}"/>
-											</form>
+											<div class="w-25 m-2" style="display:inline-block;">
+												<input type="text" id="editCommentId-text${i.count}" name="comment_id"
+														value="${comment.comment_id}" maxlength="8" class="form-control" placeholder="ID"/>
+											</div>
+											<div class="w-25 m-2"style="display:inline-block;">
+												<input type="password" id="editCommentPassword-text${i.count}" name="comment_pw"
+														maxlength="6" class="form-control" placeholder="Password">
+											</div>
+											<div class="mb-0">
+												<textarea id="commentContent-text${i.count}" class="form-control" rows="1" cols="40" wrap="hard"
+													 name="comment_content" placeholder="내용을 입력해주세요. (4 ~ 40자)"
+													 onkeyup="edit_content_checkText(this)">${comment.comment_content}</textarea>
+											</div>
+											<div class="w-100 mt-0">
+												<div class="mt-0 text-end">(<span id="edit_nowLetter">0</span>/40자)</div>
+											</div>
+											<input type="hidden" name="comment_seq" value="${comment.comment_seq}"/>
+											<input type="hidden" name="board_seq" value="${board.board_seq}"/>
 										</div>
 										<div class="text-center">
 											<button id="editCommentCancel-button${i.count}" class="btn btn-light">취소</button>

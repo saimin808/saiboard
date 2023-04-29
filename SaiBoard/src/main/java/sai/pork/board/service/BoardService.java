@@ -21,6 +21,8 @@ public interface BoardService {
 	
 	List<BoardDTO> showBoards(Map<String, String> parameters);
 	
+	void readBoard(HttpServletRequest req, Integer board_seq) throws ParseException;
+	
 	List<String> getBoardsCreationDateTimeList(List<BoardDTO> boards) throws ParseException;
 	
 	List<String> getCommentsCreationDateTimeList(List<CommentDTO> comments) throws ParseException;
@@ -35,13 +37,11 @@ public interface BoardService {
 	
 	void downloadFile(HttpServletResponse resp, Integer file_seq) throws Exception;
 	
-	void readBoard(HttpServletRequest req, Integer board_seq) throws ParseException;
-	
-	String boardPasswordCheck(Map<String, String> parameters);
+	Boolean boardPasswordCheck(Integer board_seq, String input_pw);
 	
 	String editBoard(BoardDTO board, List<FileDTO> files);
 	
-	Boolean deleteBoard(Map<String, String> parameters);
+	Boolean deleteBoard(Integer board_seq);
 	
 	List<CommentDTO> showComments(Integer board_seq);
 	
@@ -51,5 +51,5 @@ public interface BoardService {
 	
 	String editComment(CommentDTO comment);
 	
-	String deleteComment(Integer comment_seq);
+	Boolean deleteComment(Integer comment_seq);
 }

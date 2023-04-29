@@ -12,12 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
 
 import sai.pork.board.model.BoardDTO;
 import sai.pork.board.model.CommentDTO;
@@ -43,7 +40,7 @@ public class BoardController {
 		List<String> creationDateTimeList = boardService.getBoardsCreationDateTimeList(boards);
 		List<Boolean> isBoardWithFiles = boardService.getBoardsWithFiles(boards);
 		PaginationVO page = boardService.getPaginationVO(null, 10, boards.size());
-				
+		
 		model.addAttribute("boards", boards);
 		model.addAttribute("boardWriteDate", creationDateTimeList);
 		model.addAttribute("isBoardWithFiles", isBoardWithFiles);
@@ -100,14 +97,14 @@ public class BoardController {
 	@PostMapping("/board/edit")
 	public String editPasswordCheck(Model model, HttpServletRequest req, @RequestParam Map<String,String> parameters) throws NumberFormatException, ParseException {
 		
-		String result = boardService.boardPasswordCheck(parameters);
+		Boolean result = boardService.boardPasswordCheck(1, "");
 		
-		if(result == "pw_checked") {
+		if(result == true) {
 			model.addAttribute("purpose", "edit");
 			boardService.readBoard(req, Integer.parseInt(parameters.get("board_seq")));
 			return "write/board_write";
 		} else {
-			model.addAttribute("status", "edit_" + result);
+			model.addAttribute("status", "edit_wrong_pw");
 			model.addAttribute("board_seq", parameters.get("board_seq"));
 			return "redirect:/board/read";
 		}
@@ -131,10 +128,9 @@ public class BoardController {
 		String result = boardService.writeComment(comment);
 		List<CommentDTO> comments = boardService.showComments(comment.getBoard_seq());
 		
-		model.addAttribute("board_seq", comment.getBoard_seq());
 		model.addAttribute("status", result);
 		model.addAttribute("comments", comments);
-		return "redirect:/board/read";
+		return "redirect:/board/read/"+ comment.getBoard_seq();
 	}
 	
 	// 댓글 수정 전 비밀번호 확인
@@ -154,29 +150,6 @@ public class BoardController {
 			model.addAttribute("status", "edit_comment_wrong_pw");
 			return "redirect:/board/read/" + board_seq;
 		}
-	}
-	
-	// 댓글 삭제
-	@PostMapping("/board/delete_comment")
-	public String deleteComment(Model model, String input_pw, Integer comment_seq, Integer board_seq) {
-		
-		System.out.println("deleteCommentPwCheck : " + input_pw + " " + comment_seq);
-		// 1. 댓글의 비밀번호를 가져온다.
-		Boolean isCorrect = boardService.commentPasswordCheck(input_pw, comment_seq);
-		
-		// 2. 댓글의 비밀번호와 입력한 비밀번호를 비교한 뒤 결과에 맞게 처리해 준다.
-		if(isCorrect == true) {
-			// 3-1. 비밀번호가 같다면 댓글을 지운다
-			String result = boardService.deleteComment(comment_seq);
-			model.addAttribute("status", result);
-		} else {
-			// 3-2. 비밀번호가 틀리다면 지우지 않는다.
-			model.addAttribute("status", "delete_comment_wrong_pw");
-		}
-		// 4. 다시 게시글 보기 페이지로 돌아가기 위해 댓글과 게시글 번호를 readBoard()에 파라미터로 전달한다.
-		model.addAttribute("comments", boardService.showComments(board_seq));
-		
-		return "redirect:/board/read/" + board_seq;
 	}
 	
 	// 댓글 수정

@@ -125,26 +125,48 @@ public class BoardRESTController {
 	// 게시글 삭제
 	// input_pw 일반 텍스트로 받을수 있는 파라미터로 바꾸고 Ajax도 수정처리 하기!!
 	@PostMapping("/board/delete/{seq}")
-	public String deleteBoard(Model model,@PathVariable("seq") String board_seq, @RequestParam Map<String,String> parameters) {
+	public String deleteBoard(Model model,@PathVariable("seq") Integer board_seq, @RequestParam("input_pw") String input_pw) {
 			
 		// 파라미터 확인용
 		System.out.println("delete_board_seq: " + board_seq);
-		System.out.println("delete_board: " + parameters);
+		System.out.println("delete_board: " + input_pw);
 		
-		parameters.put("board_seq", board_seq);
-		String result = boardService.boardPasswordCheck(parameters);
+		Boolean result = boardService.boardPasswordCheck(board_seq, input_pw);
 			
-		if(result == "pw_checked") {
-			Boolean result2 = boardService.deleteBoard(parameters);
+		if(result == true) {
+			Boolean result2 = boardService.deleteBoard(board_seq);
 			if(result2 == true) {
-				return "redirect:/board?status=delete_board_success";
+				return "board_deletion_success";
 			} else {
-				model.addAttribute("status", "delete_" + result);
-				return "redirect:/board/read/" + board_seq;
+				return "board_deletion_failed";
 			}
 		} else {
-			model.addAttribute("status", "delete_" + result);
-			return "redirect:/board/read/" + board_seq;
+			return "delete_wrong_pw";
+		}
+	}
+	
+	// 댓글 삭제
+	@PostMapping("/board/delete_comment/{comment_seq}")
+	public String deleteComment(Model model, @PathVariable("comment_seq") Integer comment_seq,
+											 @RequestParam("board_seq") Integer board_seq,
+											 @RequestParam("input_pw") String input_pw) {
+
+		System.out.println("deleteCommentPwCheck : " + input_pw + " " + comment_seq);
+		// 1. 댓글의 비밀번호를 가져온다.
+		Boolean isCorrect = boardService.commentPasswordCheck(input_pw, comment_seq);
+
+		// 2. 댓글의 비밀번호와 입력한 비밀번호를 비교한 뒤 결과에 맞게 처리해 준다.
+		if (isCorrect == true) {
+			// 3-1. 비밀번호가 같다면 댓글을 지운다
+			Boolean result = boardService.deleteComment(comment_seq);
+			if (result == true) {
+				return "comment_deletion_success";
+			} else {
+				return "comment_deletion_failed";				
+			}
+		} else {
+			// 3-2. 비밀번호가 틀리다면 지우지 않는다.
+			return "comment_delete_wrong_pw";
 		}
 	}
 }
