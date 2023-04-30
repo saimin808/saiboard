@@ -47,8 +47,6 @@
 				<h1 class="fw-bold text-center">글 쓰기</h1>
 			</div>
 			<div id="write-container" class="container-xxl">
-				<form id="board-form" action="<%= request.getContextPath()%>/board/write/write_board" method="POST"
-				enctype="multipart/form-data">
 					<div id="input-container" class="container-xxl">
 						<div class="mb-3 row">
 						   <label for="boardWriter-text" class="col-1 col-form-label text-center">글쓴이</label>
@@ -137,7 +135,6 @@
 							</div>
 						</div>
 					</div>
-				</form>
 			</div>
 		</c:when>
 		<c:when test="${purpose eq 'edit'}">
@@ -145,8 +142,6 @@
 				<h1 class="fw-bold text-center">글 수정</h1>
 			</div>
 			<div id="write-container" class="container-xxl">
-				<form id="board-form" action="<%= request.getContextPath()%>/board/write/write_board" method="POST"
-				enctype="multipart/form-data">
 					<div id="input-container" class="container-xxl">
 						<div class="mb-3 row">
 						   <label for="boardWriter-text" class="col-1 col-form-label text-center">글쓴이</label>
@@ -180,7 +175,7 @@
 						</div>
 						<div class="row">
 							<div class="col-12">
-								<textarea id="commentContent-text" class="form-control" name="board_content" rows="10" cols="70" wrap="hard"
+								<textarea id="boardContent-text" class="form-control" name="board_content" rows="10" cols="70" wrap="hard"
 									  placeholder="내용을 입력해주세요. (4 ~ 1000자)" onkeyup="content_checkText(this)"
 									  data-bs-container="body" data-bs-toggle="popover" data-bs-placement="bottom"
 									  data-bs-custom-class="warning-popover" data-bs-content="내용을 제대로 입력해주세요!">${board.board_content}</textarea>
@@ -196,22 +191,25 @@
 						<div class="mb-3 row">
 							<label for="boardUpload-file1" class="col-1 col-form-label">파일 1</label>
 							<div class="input-group col-5 w-50">
-								<input class="form-control" type="file" id="boardUpload-file1" name="upload_files">
-								<button class="btn btn-outline-secondary" type="button" id="uploadCancel-button1">Cancel</button>
+								<input class="form-control" type="file" id="boardUpload-file1" name="upload_files" disabled>
+								<button class="btn btn-outline-secondary" type="button" id="uploadCancel-button1" disabled>Cancel</button>
+							</div>
+							<div class="col-4">
+							
 							</div>
 						</div>
 						<div class="mb-3 row">
 							<label for="boardUpload-file2" class="col-1 col-form-label">파일 2</label>
 							<div class="col-5 input-group w-50">
-								<input class="form-control" type="file" id="boardUpload-file2" name="upload_files">
-								<button class="btn btn-outline-secondary" type="button" id="uploadCancel-button2" >Cancel</button>
+								<input class="form-control" type="file" id="boardUpload-file2" name="upload_files" disabled>
+								<button class="btn btn-outline-secondary" type="button" id="uploadCancel-button2" disabled>Cancel</button>
 							</div>
 						</div>
 						<div class="mb-3 row">
 							<label for="boardUpload-file3" class="col-1 col-form-label">파일 3</label>
 							<div class="col-5 input-group w-50">
-								<input class="form-control" type="file" id="boardUpload-file3" name="upload_files">
-								<button class="btn btn-outline-secondary" type="button" id="uploadCancel-button3">Cancel</button>
+								<input class="form-control" type="file" id="boardUpload-file3" name="upload_files" disabled>
+								<button class="btn btn-outline-secondary" type="button" id="uploadCancel-button3" disabled>Cancel</button>
 							</div>
 						</div>
 					</div>
@@ -238,7 +236,6 @@
 							</div>
 						</div>
 					</div>
-				</form>
 			</div>
 		</c:when>
 	</c:choose>
@@ -246,7 +243,10 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
 <script>
-	contextPath = '<%=request.getContextPath()%>';
+	const contextPath = '<%=request.getContextPath()%>';
+	
+	const purpose = '<%=request.getAttribute("purpose")%>';
+	const board_seq = '<%=request.getAttribute("board_seq")%>';
 </script>
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>

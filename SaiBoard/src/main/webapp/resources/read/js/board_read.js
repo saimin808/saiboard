@@ -162,6 +162,9 @@ for(let i = 1; i <= 5; i++) {
 		$('h5[id=commentPwCheck-title' + i + ']').text('댓글 수정');
 		$('input[id=commentPwCheckPassword-text' + i + ']').val('');
 		
+		let seq = $('input[id=commentSeq' + i + ']').val();
+		$('button[id=commentPwCheckSubmit-button' + i + ']').attr('onclick', 'editPasswordCheck(' + seq + ', ' + i + ')');
+		
 		$('dialog[id=commentPwCheck-dialog' + i + ']').attr('open', 'open');	
 	});
 	// 삭제 버튼 action
@@ -476,6 +479,91 @@ function deleteComment(seq, cnt) {
 	    		location.href = contextPath + '/board/read/' + bseq + '?status=' + data;
 	    	} else if (data == 'comment_delete_wrong_pw') {
 	    		$('#commentWarning' + dseq + '').html('잘못된 비밀번호입니다!');
+	    	} else {
+	    		location.href = contextPath + '/board/read/' + bseq + '?status=' + data;
+	    	}
+		});
+}
+
+// 댓글 수정 전 비밀번호 확인
+function editPasswordCheck(seq, cnt) {
+	
+	const pw = $('input[id=commentPwCheckPassword-text' + cnt + ']').val();
+	const bseq = $('input[id=boardSeq' + cnt + ']').val();
+	const dseq = $('input[id=dialogSeq' + cnt + ']').val();
+	
+	console.log(pw);
+	console.log(bseq);
+	console.log(dseq);
+	
+	if(pw == null || pw == "") {
+		$('#commentWarning' + seq + '').html('비밀번호를 입력해 주세요!');
+		return;
+	}
+	
+	// String data를 넘길 때는 data 항목에 직접 {}로 입력해준다. 
+	$.ajax({
+		type: 'POST',
+	    url: contextPath + '/board/edit_comment_pw_check/'+ seq,
+	    data : { board_seq : bseq,
+	    		 dialog_seq : dseq,  
+	    		 comment_input_pw : pw }
+	 })
+	    .fail( function(e) {
+	    	console.log(e);
+	    	alert("통신 오류 error");
+	    })
+	    .done(function(data) {
+	    
+	    console.log('통신 성공!');
+	    	
+	    console.log(data);	
+	    	
+	    	if(data == 'pw_checked') {
+	    		$('dialog[id=editComment-dialog' + cnt + ']').attr('open', 'open');
+	    	} else if (data == 'wrong_pw') {
+	    		$('#commentWarning' + dseq + '').html('잘못된 비밀번호입니다!');
+	    	}
+		});
+}
+
+// 댓글 수정
+function editComment(seq, cnt) {
+
+	const commentId = $('input[id=editCommentId-text' + cnt  + ']').val();
+	const commentPw = $('input[id=editCommentPassword-text' + cnt  + ']').val();
+	const commentContent = $('textarea[id=editCommentContent-text' + cnt  + ']').val();
+	
+	const comment = {
+		comment_seq : seq,
+		comment_id : commentId,
+	    comment_pw : commentPw,  
+	    comment_content : commentContent
+	}
+	
+	console.log(comment);
+
+	const bseq = $('input[id=boardSeq' + cnt + ']').val();
+
+	$.ajax({
+		type: 'POST',
+	    url: contextPath + '/board/edit_comment/'+ seq,
+	    contentType: 'application/json;charset=UTF-8',
+	    data : JSON.stringify(comment),
+	    progress : true
+	 })
+	    .fail( function(e) {
+	    	console.log(e);
+	    	alert("통신 오류 error");
+	    })
+	    .done(function(data) {
+	    
+	    console.log('통신 성공!');
+	    	
+	    console.log(data);	
+	    	
+	    	if(data == 'edit_comment_success') {
+	    		location.href = contextPath + '/board/read/' + bseq + '?status=' + data;
 	    	} else {
 	    		location.href = contextPath + '/board/read/' + bseq + '?status=' + data;
 	    	}

@@ -12,7 +12,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import sai.pork.board.model.BoardDTO;
 import sai.pork.board.model.CommentDTO;
-import sai.pork.board.model.FileDTO;
 import sai.pork.board.model.PaginationVO;
 
 public interface BoardService {
@@ -39,7 +38,7 @@ public interface BoardService {
 	
 	Boolean boardPasswordCheck(Integer board_seq, String input_pw);
 	
-	String editBoard(BoardDTO board, List<FileDTO> files);
+	Boolean editBoard(BoardDTO board, List<MultipartFile> files) throws IllegalStateException, IOException;
 	
 	Boolean deleteBoard(Integer board_seq);
 	
@@ -49,7 +48,8 @@ public interface BoardService {
 	
 	String writeComment(CommentDTO comment);
 	
-	String editComment(CommentDTO comment);
+	Boolean editComment(CommentDTO comment);
 	
 	Boolean deleteComment(Integer comment_seq);
+
 }

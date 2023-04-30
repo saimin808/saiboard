@@ -279,8 +279,7 @@
 					      		<div class="row text-center">
 					        		<p class="text-info">비밀번호를 입력하세요</p>
 					        	</div>
-					        	<form id="editForm" class="row justify-content-center" action="<%= request.getContextPath()%>/board/edit" method="POST">
-					        		<input type="hidden" name="board_seq" value="${board.board_seq}"/>
+					        	<form id="editForm" class="row justify-content-center" action="<%= request.getContextPath()%>/board/edit/${board.board_seq}" method="POST">
 					        		<input id="editPassword" type="password" name="input_pw" class="form-control text-center w-75" />
 					        	</form>
 					        	<c:if test="${not empty param.status && param.status eq 'edit_wrong_pw'}">
@@ -403,7 +402,7 @@
 														maxlength="6" class="form-control" placeholder="Password">
 											</div>
 											<div class="mb-0">
-												<textarea id="commentContent-text${i.count}" class="form-control" rows="1" cols="40" wrap="hard"
+												<textarea id="editCommentContent-text${i.count}" class="form-control" rows="1" cols="40" wrap="hard"
 													 name="comment_content" placeholder="내용을 입력해주세요. (4 ~ 40자)"
 													 onkeyup="edit_content_checkText(this)">${comment.comment_content}</textarea>
 											</div>
@@ -415,7 +414,8 @@
 										</div>
 										<div class="text-center">
 											<button id="editCommentCancel-button${i.count}" class="btn btn-light">취소</button>
-											<button id="editCommentSubmit-button${i.count}" class="btn btn-secondary">확인</button>
+											<button id="editCommentSubmit-button${i.count}" class="btn btn-secondary"
+														onclick="editComment(${comment.comment_seq},${i.count})">확인</button>
 										</div>
 									</dialog>
 								</div>

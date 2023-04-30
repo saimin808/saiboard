@@ -1,3 +1,6 @@
+// url parameter를 불러온 변수
+const urlParams = new URLSearchParams(location.search);
+
 // 게시글 글쓴이 작성 글자 제한
 function writer_checkText(obj){
 	const maxlength = 10; //최대 10자
@@ -129,70 +132,101 @@ $('#boardSubmit-button').click(function() {
 		$('#boardPassword-text').popover('dispose');
 	}
 	
-	let upload_files = new Array;
-	if($('#boardUpload-file1').val() != null) {
-		upload_files.push($('#boardUpload-file1').val());
-	}
-	if($('#boardUpload-file2').val() != null) {
-		upload_files.push($('#boardUpload-file2').val());
-	}
-	if($('#boardUpload-file3').val() != null) {
-		upload_files.push($('#boardUpload-file3').val());
-	}
-	
-	console.log(upload_files);
-	
-	const board = {
-		board_category : $('#boardCategory-select').val(),
-		board_writer : $('#boardWriter-text').val(),
-		board_title : $('#boardTitle-text').val(),
-		board_content : $('#boardContent-text').val(),
-		board_pw : $('#boardPassword-text').val(),
-	}
-	let formData = new FormData();
-	
-	// input name 값 
-	let fileInput = $('input[name=upload_files]');
-	console.log(fileInput);
-	// fileInput 개수를 구한다.
-	for (let i = 0; i < fileInput.length; i++) {
-		if (fileInput[i].files.length > 0) {
-			for (let j = 0; j < fileInput[i].files.length; j++) {
-				console.log(" fileInput[i].files[j] :::"+ fileInput[i].files[j]);
-				
-				// formData에 'upload_files'이라는 키값으로 fileInput 값을 append 시킨다.  
-				formData.append('upload_files', $('input[name=upload_files]')[i].files[j]);
+		// 작성한 게시글 항목들 모아주고
+		const board = {
+			board_category : $('#boardCategory-select').val(),
+			board_writer : $('#boardWriter-text').val(),
+			board_title : $('#boardTitle-text').val(),
+			board_content : $('#boardContent-text').val(),
+			board_pw : $('#boardPassword-text').val(),
+		}
+		
+		// upload할 파일들 모으고
+		let upload_files = new Array;
+		
+		if($('#boardUpload-file1').val() != null) {
+			upload_files.push($('#boardUpload-file1').val());
+		}
+		if($('#boardUpload-file2').val() != null) {
+			upload_files.push($('#boardUpload-file2').val());
+		}
+		if($('#boardUpload-file3').val() != null) {
+			upload_files.push($('#boardUpload-file3').val());
+		}
+		
+		// 업로드한 파일과 게시글 항목들의 형태가 다르니
+		// 다른 형태를 한꺼번에 모아서 보낼 수 있는 formData 형식으로 다른 형식의 데이터를 모아준다.
+		let formData = new FormData();
+		
+		// 'key'라는 이름으로 위에서 담은 board를 formData에 append한다. type은 json  
+		formData.append('board', new Blob([ JSON.stringify(board) ], {type : "application/json"}));
+		
+		if(purpose == 'write') {
+		
+		// input name 값 
+		let fileInput = $('input[name=upload_files]');
+		console.log(fileInput);
+		// fileInput 개수를 구한다.
+		for (let i = 0; i < fileInput.length; i++) {
+			if (fileInput[i].files.length > 0) {
+				for (let j = 0; j < fileInput[i].files.length; j++) {
+					console.log(" fileInput[i].files[j] :::"+ fileInput[i].files[j]);
+					
+					// formData에 'upload_files'이라는 키값으로 fileInput 값을 append 시킨다.  
+					formData.append('upload_files', $('input[name=upload_files]')[i].files[j]);
+				}
 			}
 		}
+		
+		console.log(formData.get('board'));
+		//console.log(form);
+		$.ajax({
+			type: 'POST',
+		    url: contextPath + '/board/write/write_board',
+		    contentType: false,
+		    processData: false,
+		    enctype : 'multipart/form-data',
+		    data : formData
+		})
+			.fail( function(e) {
+		    	console.log(e);
+		    	alert("통신 오류 error");
+		    })
+		    .done(function(data) {
+		    	
+		    	console.log('통신 성공!');
+		    	
+		    	if(data == 'true') {
+		    		location.href = contextPath + '/board?status=board_write_success';
+		    	} else {
+		    		location.href = contextPath + '/board?status=board_write_fail';
+		    	}
+		    });
+	} else if (purpose == 'edit') {
+		
+		$.ajax({
+			type: 'POST',
+		    url: contextPath + '/board/edit_board/' + board_seq,
+		    contentType: false,
+		    processData: false,
+		    enctype : 'multipart/form-data',
+		    data : formData
+		})
+			.fail( function(e) {
+		    	console.log(e);
+		    	alert("통신 오류 error");
+		    })
+		    .done(function(data) {
+		    	
+		    	console.log('통신 성공!');
+		    	
+		    	if(data == 'true') {
+		    		location.href = contextPath + '/board?status=board_edit_success';
+		    	} else {
+		    		location.href = contextPath + '/board?status=board_write_failed';
+		    	}
+		    });
 	}
-	
-	// 'key'라는 이름으로 위에서 담은 board를 formData에 append한다. type은 json  
-	formData.append('board', new Blob([ JSON.stringify(board) ], {type : "application/json"}));
-	
-	console.log(formData.get('board'));
-	//console.log(form);
-	$.ajax({
-		type: 'POST',
-	    url: contextPath + '/board/write/write_board',
-	    contentType: false,
-	    processData: false,
-	    enctype : 'multipart/form-data',
-	    data : formData
-	})
-		.fail( function(e) {
-	    	console.log(e);
-	    	alert("통신 오류 error");
-	    })
-	    .done(function(data) {
-	    	
-	    	console.log('통신 성공!');
-	    	
-	    	if(data == 'true') {
-	    		location.href = contextPath + '/board?status=board_write_success';
-	    	} else {
-	    		location.href = contextPath + '/board?status=board_write_fail';
-	    	}
-	    });
 });
 
 //

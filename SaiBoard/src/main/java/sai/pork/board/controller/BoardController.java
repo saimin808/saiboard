@@ -94,31 +94,20 @@ public class BoardController {
 	}
 	
 	// 게시글 수정 페이지로 이동
-	@PostMapping("/board/edit")
-	public String editPasswordCheck(Model model, HttpServletRequest req, @RequestParam Map<String,String> parameters) throws NumberFormatException, ParseException {
+	@PostMapping("/board/edit/{board_seq}")
+	public String editPasswordCheck(Model model, HttpServletRequest req, String input_pw,
+									@PathVariable("board_seq") Integer board_seq) throws NumberFormatException, ParseException {
 		
-		Boolean result = boardService.boardPasswordCheck(1, "");
+		Boolean result = boardService.boardPasswordCheck(board_seq, input_pw);
 		
 		if(result == true) {
 			model.addAttribute("purpose", "edit");
-			boardService.readBoard(req, Integer.parseInt(parameters.get("board_seq")));
+			boardService.readBoard(req, board_seq);
 			return "write/board_write";
 		} else {
 			model.addAttribute("status", "edit_wrong_pw");
-			model.addAttribute("board_seq", parameters.get("board_seq"));
-			return "redirect:/board/read";
+			return "redirect:/board/read/" + board_seq;
 		}
-	}
-	
-	// 게시글 수정
-	@PostMapping("/board/edit/do")
-	public String editBoard(Model model, HttpServletRequest req, BoardDTO board, List<FileDTO> files) {
-		
-		String result = boardService.editBoard(board, files);
-		
-		model.addAttribute("status", result);
-		
-		return "redirect:/board";
 	}
 	
 	// 댓글 작성
@@ -131,39 +120,6 @@ public class BoardController {
 		model.addAttribute("status", result);
 		model.addAttribute("comments", comments);
 		return "redirect:/board/read/"+ comment.getBoard_seq();
-	}
-	
-	// 댓글 수정 전 비밀번호 확인
-	@PostMapping("/board/edit_comment_pw_check")
-	public String editCommentPasswordCheck(Model model, String comment_input_pw, Integer dialog_seq,  Integer comment_seq, Integer board_seq) {
-		
-		// 파라미터 확인용
-		System.out.println("editCommentPwCheck : " + comment_input_pw + "" + comment_seq);
-		// 1. 댓글의 비밀번호 확인
-		Boolean isCorrect = boardService.commentPasswordCheck(comment_input_pw, comment_seq);
-		
-		// 2. 비밀번호 확인 후  
-		if(isCorrect == true) {
-			model.addAttribute("status", "edit_comment_pw_checked" + dialog_seq);
-			return "redirect:/board/read/" + board_seq;
-		} else {
-			model.addAttribute("status", "edit_comment_wrong_pw");
-			return "redirect:/board/read/" + board_seq;
-		}
-	}
-	
-	// 댓글 수정
-	@PostMapping("/board/edit_comment")
-	public String editComment(Model model, CommentDTO comment) {
-		
-		System.out.println("editComment : " + comment);
-		
-		List<CommentDTO> comments = boardService.showComments(comment.getBoard_seq());
-		String result = boardService.editComment(comment);
-		
-		model.addAttribute("comments", comments);
-		model.addAttribute("status", result);
-		return "redirect:/board/read/" + comment.getBoard_seq();
 	}
 	
 	// 파일 다운로드

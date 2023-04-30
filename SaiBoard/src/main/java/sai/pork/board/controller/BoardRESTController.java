@@ -6,6 +6,7 @@ import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONObject;
@@ -21,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import sai.pork.board.model.BoardDTO;
 import sai.pork.board.model.CommentDTO;
+import sai.pork.board.model.FileDTO;
 import sai.pork.board.model.PaginationVO;
 import sai.pork.board.service.BoardService;
 
@@ -101,7 +103,7 @@ public class BoardRESTController {
 	//하지만 File과 Dto를 같이 받기 위해서는 @RequestPart라는 어노테이션을 사용한다.
 	@PostMapping("/board/write/write_board")
 	public String writeBoard(Model model, HttpServletResponse resp, @RequestPart(name = "board") BoardDTO board,
-							@RequestPart(name = "upload_files") List<MultipartFile> upload_files) throws IllegalStateException, IOException {
+							@RequestPart(name = "upload_files", required = false) List<MultipartFile> upload_files) throws IllegalStateException, IOException {
 			
 		// 파라미터 확인용 
 		System.out.println("board : " + board);
@@ -167,6 +169,57 @@ public class BoardRESTController {
 		} else {
 			// 3-2. 비밀번호가 틀리다면 지우지 않는다.
 			return "comment_delete_wrong_pw";
+		}
+	}
+	
+	// 게시글 수정
+	@PostMapping("/board/edit_board/{board_seq}")
+	public String editBoard(Model model, @PathVariable("board_seq") Integer board_seq,  @RequestPart(name = "board") BoardDTO board,
+							@RequestPart(name = "upload_files", required = false) List<MultipartFile> files) throws IllegalStateException, IOException {
+		
+		board.setBoard_seq(board_seq);
+		
+		System.out.println(board);
+		
+		Boolean result = boardService.editBoard(board, files);
+
+		model.addAttribute("status", result);
+
+		return "redirect:/board";
+	}
+	
+	// 댓글 수정 전 비밀번호 확인
+	@PostMapping("/board/edit_comment_pw_check/{comment_seq}")
+	public String editCommentPasswordCheck(Model model, @PathVariable("comment_seq") Integer comment_seq,
+														@RequestParam("comment_input_pw") String comment_input_pw,
+														@RequestParam("dialog_seq") Integer dialog_seq,
+														@RequestParam("board_seq") Integer board_seq) {
+
+		// 파라미터 확인용
+		System.out.println("editCommentPwCheck : " + comment_seq);
+		// 1. 댓글의 비밀번호 확인
+		Boolean isCorrect = boardService.commentPasswordCheck(comment_input_pw, comment_seq);
+
+		// 2. 비밀번호 확인 후
+		if (isCorrect == true) {
+			return "pw_checked";
+		} else {
+			return "wrong_pw";
+		}
+	}
+	
+	// 댓글 수정
+	@PostMapping("/board/edit_comment/{comment_seq}")
+	public String editComment(Model model, @RequestBody CommentDTO comment) {
+
+		System.out.println("editComment : " + comment);
+		
+		Boolean result = boardService.editComment(comment);
+		
+		if(result == true) {
+			return "edit_comment_success";
+		} else {
+			return "edit_comment_failed";
 		}
 	}
 }

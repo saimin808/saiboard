@@ -84,14 +84,14 @@
 	
 	<update id="editBoard" parameterType="sai.pork.board.model.BoardDTO">
 		UPDATE boards
-		SET board_category = #{board_category}, board_writer = #{board_writer}, board_title = #{board_title},
-		board_content = #{board_content}, board_pw = #{board_pw},
+		SET board_category = #{board_category}, board_title = #{board_title}, board_writer = #{board_writer},
+		board_content = #{board_content}, board_pw = #{board_pw}
 		WHERE board_seq = #{board_seq}
 	</update>
 	
 	<update id="editFile" parameterType="sai.pork.board.model.FileDTO">
 		UPDATE files
-		SET file_name = #{file_name} ,file_src = #{file_src}
+		SET file_name = #{file_name} , file_src = #{file_src}
 		WHERE file_seq = #{file_seq} 
 	</update> 
 	

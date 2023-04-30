@@ -245,10 +245,14 @@ public class BoardServiceImpl implements BoardService {
 		List<FileDTO> uploadFiles = new ArrayList<FileDTO>();
 		
 		// 파일 저장 경로
-		String uploadPath = "C:/Users/east/git/saiboard/SaiBoard/src/main/webapp/resources/upload_files";
+		String uploadPath = "C:/Users/minbong/git/saiboard/SaiBoard/src/main/webapp/resources/upload_files2";
+//		String uploadPath = "C:/Users/east/git/saiboard/SaiBoard/src/main/webapp/resources/upload_files";
 		
-		Path directoryPath = Paths.get(uploadPath + File.separator + newBoard_seq);
+		
 		// 새롭게 업로드한 파일을 저장할 board_seq 이름으로 새로운 폴더 생성
+		// first : 경로 , more : 추가할 경로
+		// Paths.get(String first, String more);
+		Path directoryPath = Paths.get(uploadPath + File.separator + newBoard_seq);
 		Files.createDirectory(directoryPath);
 		System.out.println(directoryPath + " 디렉토리가 생성되었습니다.");
 		
@@ -372,21 +376,95 @@ public class BoardServiceImpl implements BoardService {
 	}
 	
 	@Override
-	public String editBoard(BoardDTO board, List<FileDTO> files) {
+	public Boolean editBoard(BoardDTO board, List<MultipartFile> files) throws IllegalStateException, IOException {
 		
-		Integer board_result = boardMapper.editBoard(board);
-		Integer file_result = 0;
-		for(int i = 0; i < files.size(); i++) {
-			file_result += boardMapper.editFile(files.get(i));
+		if(files.size() > 0) {
+			List<FileDTO> uploadFiles = boardMapper.getFiles(board.getBoard_seq());
+			
+			// 업로드한 파일을 지우기 위해 만들 File 객체
+			File uploaded_file = null;
+			// 파일을 제거할 때마다 1씩 증가시킬 cnt
+			Integer file_delete_cnt = 0;
+			// 업로드한 파일이 있을 경우 파일 삭제를 실행한다.
+			if(uploadFiles.size() > 0 || uploadFiles != null) {
+				for (int i = 0; i < uploadFiles.size(); i++) {
+					// 2. 파일 먼저 하나씩 지운다
+					// - DB에 저장했던 파일 경로를 가지고 하나의 File객체로 만들어준다.
+					uploaded_file = new File(uploadFiles.get(i).getFile_src());
+	
+					// file.delete() - 파일을 제거하는 메소드 (boolean 타입 반환)
+					boolean delete_result = uploaded_file.delete();
+					// - 하나씩 지울 때마다 cnt를 1씩 증가 시킨다.
+					if (delete_result) {
+						file_delete_cnt += 1;
+					}
+				}
+	
+				System.out.println("file_delete_cnt : " + file_delete_cnt);
+			}
+			
+			// 업로드 했었던 파일을 다 지웠으면
+			// 새로운 파일을 담아준다
+			// 파일 저장 경로
+			String directoryPath = "C:/Users/minbong/git/saiboard/SaiBoard/src/main/webapp/resources/upload_files2/" + board.getBoard_seq();
+	//		String directoryPath = "C:/Users/east/git/saiboard/SaiBoard/src/main/webapp/resources/upload_files" + board.getBoard_seq();
+					
+			// 파일 이름 저장할 배열
+			String[] fileName = new String[3];
+	
+			// 새로운 파일정보를 담을 리스트
+			uploadFiles.clear();
+			for (int i = 0; i < files.size(); i++) {
+				// getOriginalFilename()으로 원래 파일 이름 받아오기
+				fileName[i] = files.get(i).getOriginalFilename();
+				// 파일을 uploadPath에 fileName[i]으로 저장
+				File saveFile = new File(directoryPath, fileName[i]);
+	
+				if (i == 0 && !files.get(i).isEmpty()) {
+					FileDTO file1 = new FileDTO();
+					files.get(i).transferTo(saveFile);
+					file1.setBoard_seq(board.getBoard_seq());
+					file1.setFile_name(files.get(i).getOriginalFilename());
+					file1.setFile_src(directoryPath.toString() + File.separator + fileName[i]);
+					uploadFiles.add(file1);
+	
+				} else if (i == 1 && !files.get(i).isEmpty()) {
+					FileDTO file2 = new FileDTO();
+					files.get(i).transferTo(saveFile);
+					file2.setBoard_seq(board.getBoard_seq());
+					file2.setFile_name(files.get(i).getOriginalFilename());
+					file2.setFile_src(directoryPath.toString() + File.separator + fileName[i]);
+					uploadFiles.add(file2);
+	
+				} else if (i == 2 && !files.get(i).isEmpty()) {
+					FileDTO file3 = new FileDTO();
+					files.get(i).transferTo(saveFile);
+					file3.setBoard_seq(board.getBoard_seq());
+					file3.setFile_name(files.get(i).getOriginalFilename());
+					file3.setFile_src(directoryPath.toString() + File.separator + fileName[i]);
+					uploadFiles.add(file3);
+				}
+			}
+			
+			Integer file_result = 0;
+			
+			if(uploadFiles.size() > 0) {
+				for(int i = 0; i < uploadFiles.size(); i++) {
+					file_result += boardMapper.editFile(uploadFiles.get(i));
+				}
+			}
+			
+			System.out.println("file_result : " + file_result);
 		}
 		
-		System.out.println("board_result : " + board_result);
-		System.out.println("file_result : " + file_result);
+		Integer board_result = boardMapper.editBoard(board);
 		
-		if(board_result > 0 && file_result >= files.size()) {			
-			return "edit_board_success";
+		System.out.println("board_result : " + board_result);
+		
+		if(board_result > 0) {			
+			return true;
 		} else {
-			return "edit_board_failed";
+			return false;
 		}
 		
 	}
@@ -475,14 +553,14 @@ public class BoardServiceImpl implements BoardService {
 	}
 	
 	@Override
-	public String editComment(CommentDTO comment) {
+	public Boolean editComment(CommentDTO comment) {
 		
 		Integer result = boardMapper.editComment(comment);
 		
 		if(result > 0) {
-			return "edit_comment_success";
+			return true;
 		} else {
-			return "edit_comment_failed";
+			return false;
 		}
 	}
 	
