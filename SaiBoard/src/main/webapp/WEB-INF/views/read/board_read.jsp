@@ -309,7 +309,7 @@
 				<form id="writeComment-form" name="writeComment-form" action="<%=request.getContextPath()%>/board/write_comment" method="POST">
 					<input type="hidden" name="board_seq" form="writeComment-form" value="${board.board_seq}"/> 
 					<div id="commentTitle" class="row row-cols-1 w-100">
-						<h3 class="fw-bold">댓글 ${commentSize}개</h3>
+						<h3 class="fw-bold">댓글 ${totalCommentSize}개</h3>
 					</div>
 					<div id="commentInput" class="row row-cols-6 w-100">
 						<div class="col-auto text-center">
@@ -351,7 +351,7 @@
 			<div id="comment_list-container" class="container-lg w-100">
 				<div id="comment_table-container" class="container-lg w-100">
 					<c:choose>
-						<c:when test="${not empty comments}">
+						<c:when test="${not empty comments && comments.size() > 0}">
 							<c:forEach items="${comments}" var="comment" varStatus="i">
 								<div class="row row-cols-3 pb-0">
 									<div class="col-2">

@@ -177,10 +177,10 @@ function getBoard(page) {
 					content2 += '	<a class="page-link" style="color: white; background-color: #6c757d;';
 					content2 += '		pointer-event: none; cursor: default;">' + i + '</a>';
 				} else {
-					if(i * 10 > totalBoardSize) {
-						break;
-					}
-					content2 += '	<a class="page-link" style="cursor: pointer;" onclick="getBoard('+i+')">' + i + '</a>';
+					//if(i * 10 > totalBoardSize) {
+					//	break;
+					//}
+					content2 += '	<a class="page-link" style="cursor: pointer;" onclick="getBoard('+ i +')">' + i + '</a>';
 				}
 				content2 += '</li>';
 	    	}

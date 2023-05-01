@@ -163,7 +163,7 @@ for(let i = 1; i <= 5; i++) {
 		$('input[id=commentPwCheckPassword-text' + i + ']').val('');
 		
 		let seq = $('input[id=commentSeq' + i + ']').val();
-		$('button[id=commentPwCheckSubmit-button' + i + ']').attr('onclick', 'editPasswordCheck(' + seq + ', ' + i + ')');
+		$('button[id=commentPwCheckSubmit-button' + i + ']').attr('onclick', 'editCommentPasswordCheck(' + seq + ', ' + i + ')');
 		
 		$('dialog[id=commentPwCheck-dialog' + i + ']').attr('open', 'open');	
 	});
@@ -486,7 +486,7 @@ function deleteComment(seq, cnt) {
 }
 
 // 댓글 수정 전 비밀번호 확인
-function editPasswordCheck(seq, cnt) {
+function editCommentPasswordCheck(seq, cnt) {
 	
 	const pw = $('input[id=commentPwCheckPassword-text' + cnt + ']').val();
 	const bseq = $('input[id=boardSeq' + cnt + ']').val();

@@ -17,26 +17,26 @@
 	<select id="getSpecificBoards" parameterType="Map" resultType="sai.pork.board.model.BoardDTO">
 		SELECT * FROM boards
 		WHERE board_category = #{category}
-		ORDER BY ${orderBy} DESC
+		ORDER BY #{orderBy} DESC
 	</select>
 	
 	<!-- 카테고리가 전체 일때 -->
 	<select id="getTotalSpecificBoards" parameterType="Map" resultType="sai.pork.board.model.BoardDTO">
 		SELECT * FROM boards
-		ORDER BY ${orderBy} DESC
+		ORDER BY #{orderBy} DESC
 	</select>	
 	
 	<select id="getSearchedBoards" parameterType="Map" resultType="sai.pork.board.model.BoardDTO">
 		SELECT * FROM boards
 		WHERE board_category = #{category} AND ${searchCategory} LIKE '%'||#{searchKeyword}||'%'
-		ORDER BY ${orderBy} DESC
+		ORDER BY #{orderBy} DESC
 	</select>
 	
 	<!-- 카테고리가 전체 일때 -->
 	<select id="getTotalSearchedBoards" parameterType="Map" resultType="sai.pork.board.model.BoardDTO">
 		SELECT * FROM boards
-		WHERE ${searchCategory} LIKE '%'||#{searchKeyword}||'%'
-		ORDER BY ${orderBy} DESC
+		WHERE #{searchCategory} LIKE '%'||#{searchKeyword}||'%'
+		ORDER BY #{orderBy} DESC
 	</select>
 	
 	<select id="getBoard" parameterType="Integer" resultType="sai.pork.board.model.BoardDTO">
