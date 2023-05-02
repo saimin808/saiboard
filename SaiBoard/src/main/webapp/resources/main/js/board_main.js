@@ -89,10 +89,14 @@ function getBoard(page) {
 	    	writeDate = data.boardWriteDate; // 가져온 게시글 작성일 리스트
 	    	files = data.isBoardWithFiles; // 가져온 첨부파일 리스트
 	    	
-	    	let currentPage = parseInt(data.currentPage); // 현재 페이지
+	    	const currentPage = parseInt(data.currentPage); // 현재 페이지
 	    	paginationStart = parseInt(data.paginationStart); // 페이지네이션 시작 번호
 	    	paginationEnd = parseInt(data.paginationEnd); // 페이지네이션 마지막 번호
-	    	let totalBoardSize = parseInt(data.totalBoardSize); // 가져온 게시글 총 갯수
+	    	const totalBoardSize = parseInt(data.totalBoardSize); // 가져온 게시글 총 갯수
+	    	const startIndex = parseInt(data.startIndex);
+	    	const endIndex = parseInt(data.endIndex);
+		    console.log(startIndex);
+		    console.log(endIndex);
 		    
 		    let content = '';
 	    	if(boards.length > 0) {
@@ -112,7 +116,7 @@ function getBoard(page) {
 					content += '		<th scope="col">조회수</th>';
 					content += '		<th scope="col">작성일</th>';
 					content += '	</tr>';
-		    	for(let i = 0; i < boards.length; i++) {
+		    	for(let i = startIndex; i < endIndex; i++) {
 					content += '	<tr>';
 					content += '		<td>' + boards[i].board_seq + '</td>';
 					content += '		<td>' + boards[i].board_category + '</td>';

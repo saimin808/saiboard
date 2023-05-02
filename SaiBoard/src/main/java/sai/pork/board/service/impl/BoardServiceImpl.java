@@ -102,7 +102,6 @@ public class BoardServiceImpl implements BoardService {
 		// 선택한 페이지 숫자를 불러옴
 		// Map.get(key) : 입력한 key값이 존재하면 key에 해당하는 value값을, 없으면 null값을 준다.
 
-		System.out.println("getAllBoard");
 		System.out.println("Service parameters : " + parameters);
 		
 		List<BoardDTO> boards = null;
@@ -114,6 +113,7 @@ public class BoardServiceImpl implements BoardService {
 				&& parameters.get("searchCategory") == null) {
 			System.out.println("getAllBoards");
 			boards = boardMapper.getAllBoards();
+			System.out.println(boards);
 		// 들어온 파라미터 중 searchKeyword값(검색어)이 없으면 getSpecificBoards(검색어 없이 board 조회) 메서드로
 		// searchKeyword값이 있으면 getSearchedBoards(검색한 제목의 board만 조회) 메서드로 파라미터를 전달한다.
 		} else if (parameters.get("category") != null && parameters.get("orderBy") != null
@@ -136,11 +136,12 @@ public class BoardServiceImpl implements BoardService {
 					// 들어온 파라미터 중 category(카테고리)값이 total(전체)이면 Query문에서 board_category 조건을 빼야하기 때문에
 					// 그 조건을 제거한 Mapper로 연결해 준다.
 					boards = boardMapper.getTotalSpecificBoards(parameters);
+					System.out.println(boards);
 				} else {
 					System.out.println("getAllBoards");
 					boards = boardMapper.getAllBoards();
 				}
-			} else if (!searchKeyword.equals("null") || searchKeyword.equals("")) {
+			} else if (!searchKeyword.equals("null") || !searchKeyword.equals("")) {
 				System.out.println("searchKeyword : " + searchKeyword);
 				if (category.equals("news")) {
 					System.out.println("getSearchedBoards - 공지");
@@ -245,8 +246,8 @@ public class BoardServiceImpl implements BoardService {
 		List<FileDTO> uploadFiles = new ArrayList<FileDTO>();
 		
 		// 파일 저장 경로
-		String uploadPath = "C:/Users/minbong/git/saiboard/SaiBoard/src/main/webapp/resources/upload_files2";
-//		String uploadPath = "C:/Users/east/git/saiboard/SaiBoard/src/main/webapp/resources/upload_files";
+//		String uploadPath = "C:/Users/minbong/git/saiboard/SaiBoard/src/main/webapp/resources/upload_files2";
+		String uploadPath = "C:/Users/east/git/saiboard/SaiBoard/src/main/webapp/resources/upload_files";
 		
 		
 		// 새롭게 업로드한 파일을 저장할 board_seq 이름으로 새로운 폴더 생성

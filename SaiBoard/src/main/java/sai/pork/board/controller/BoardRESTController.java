@@ -38,7 +38,6 @@ public class BoardRESTController {
 		System.out.println("Controller parameters : " + parameters);
 		
 		System.out.println("Controller currentPage : " + currentPage);
-		parameters.put("page", currentPage);
 		
 		List<BoardDTO> boards = boardService.showBoards(parameters);
 		List<String> creationDateTimeList = boardService.getBoardsCreationDateTimeList(boards);
@@ -51,9 +50,13 @@ public class BoardRESTController {
 		System.out.println(page.getPaginationStart());
 		System.out.println(page.getPaginationEnd());
 		
-		obj.put("boards", boards.subList(page.getStartIndex(), page.getEndIndex()));
-		obj.put("boardWriteDate", creationDateTimeList.subList(page.getStartIndex(), page.getEndIndex()));
-		obj.put("isBoardWithFiles",  isBoardWithFiles.subList(page.getStartIndex(), page.getEndIndex()));
+		// .subList(page.getStartIndex(), page.getEndIndex())
+		obj.put("boards", boards);
+		obj.put("boardWriteDate", creationDateTimeList);
+		obj.put("isBoardWithFiles",  isBoardWithFiles);
+		
+		obj.put("startIndex", page.getStartIndex());
+		obj.put("endIndex", page.getEndIndex());
 		obj.put("currentPage", page.getCurrentPage());
 		obj.put("paginationStart", page.getPaginationStart());
 		obj.put("paginationEnd", page.getPaginationEnd());
