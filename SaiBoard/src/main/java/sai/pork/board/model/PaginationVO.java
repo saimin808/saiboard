@@ -4,7 +4,7 @@ public class PaginationVO {
 
 	// currentPage : 현재 페이지 번호
 	private Integer currentPage;
-	// boardCountPerPage : 한 페이지에 한번에 출력할 글 갯수
+	// sizePerPage : 한 페이지에 한번에 출력할 글 갯수
 	private Integer sizePerPage;
 	// totalSize : 전체 글 수
 	private Integer totalSize;
@@ -20,8 +20,6 @@ public class PaginationVO {
 	private Integer paginationStart;
 	// paginationEnd : 현재 출력된 페이지 리스트의 마지막 번호
 	private Integer paginationEnd;
-	// paginationTotal : 전체 페이지 사이즈
-//	private Integer paginationTotal;
 	// nextPage : 현재 페이지에서 다음 페이지
 	private Integer nextPage;
 	// prevPage : 현재 페이지에서 이전 페이지

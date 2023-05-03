@@ -1,3 +1,5 @@
+// 초기 js
+
 // url parameter를 불러온 변수
 const urlParams = new URLSearchParams(location.search);
 

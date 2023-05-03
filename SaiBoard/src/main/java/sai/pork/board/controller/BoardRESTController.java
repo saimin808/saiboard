@@ -88,9 +88,10 @@ public class BoardRESTController {
 		System.out.println(page.getPaginationStart());
 		System.out.println(page.getPaginationEnd());
 		
-		obj.put("comments", comments.subList(page.getStartIndex(), page.getEndIndex()));
-		obj.put("commentWriteDate", creationDateTimeList.subList(page.getStartIndex(), page.getEndIndex()));
-		obj.put("currentPage", page.getCurrentPage());
+		obj.put("comments", comments);
+		obj.put("commentWriteDate", creationDateTimeList);
+		obj.put("commentPage", page);
+		obj.put("currentPage", currentPage);
 		obj.put("paginationStart", page.getPaginationStart());
 		obj.put("paginationEnd", page.getPaginationEnd());
 		obj.put("totalCommentSize", page.getTotalSize());
@@ -120,9 +121,9 @@ public class BoardRESTController {
 				Integer newBoard_seq = boards.get(0).getBoard_seq();		
 				boardService.uploadFiles(newBoard_seq, upload_files);
 			}
-			return "true";
+			return "write_success";
 		} else {
-			return "false";
+			return "write_failed";
 		}
 	}
 	

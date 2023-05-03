@@ -1,238 +1,52 @@
-// url parameter를 불러온 변수
-const urlParams = new URLSearchParams(location.search);
+// ------------------------------ 게시글 파트 -------------------------------------
 
-// url parameter에서 받아온 값(status)으로 모달의 경고 메세지 표시
-if(urlParams.get('status') == 'delete_wrong_pw') {
+// 게시글 삭제 function
+function deleteBoard(seq) {
 	
-	// alert로 대체
-	//alert('글 삭제 실패 : 잘못된 비밀번호');
-
-	// 왠지 모를 오류로 구현 못함
-	//$('#deleteModal').show();
+	let pw = $('#deletePassword').val();
 	
-}
-
-// url parameter에서 받아온 값(status)으로 모달의 경고 메세지 표시
-if(urlParams.get('status') == 'edit_wrong_pw') {
-	// alert으로 대체
-	alert('글 수정 실패 : 잘못된 비밀번호');
-	
-	// 왠지 모를 오류로 구현 못함
-	//$('#editModal').show();
-}
-
-// 모달의 버튼들 action
-// 모달의 취소버튼을 누르면 status 파라미터 제거 (경고 메세지 표시 제거)
-$('#delete_cancel-button').click(function() {
-	urlParams.delete('status');
-});
-$('#edit_cancel-button').click(function() {
-	urlParams.delete('status');
-});
-
-// 모달의 확인 버튼 action
-$('#edit_submit-button').click(function() {
-	if($('#editPassword').val() == null || $('#editPassword').val() == "") {
-		$('#editWarningMsg').text('영문, 숫자, 기호 포함 4~16자로 입력해 주세요!');
-	} else {
-		$('#editForm').submit();
+	if(pw == null || pw == "") {
+		$('#deleteWarningMsg').html('비밀번호를 입력해 주세요!');
+		return;
 	}
-});
+	
+	$.ajax({
+		type: 'POST',
+	    url: contextPath + "/board/delete/"+ seq,
+		// String data를 넘길 때는 data 항목에 직접 {}로 입력해준다. 
+	    data : { input_pw : pw },
+	 })
+	    .fail( function(e) {
+	    	console.log(e);
+	    	alert("통신 오류 error");
+	    })
+	    .done(function(data) {
+	    
+	    console.log('통신 성공!');
+	    	
+	    console.log(data);	
+	    	
+	    	if(data == 'board_deletion_success') {
+	    		location.href = contextPath + '/board?status=' + data;
+	    	} else if (data == 'delete_wrong_pw') {
+	    		$('#deleteWarningMsg').html('잘못된 비밀번호입니다!');
+	    	} else {
+	    		location.href = contextPath + '/board?status=' + data;
+	    	}
+		});
+}
 
-// 목록 버튼 action
-$('#home-button').click(function() {
-	// 새롭게 board_main으로 넘어가기
-	location.href = contextPath + '/board';
-});
-
-// file
+// file 다운로드 function
 function file_download(num) {
 	let url = contextPath + '/board/file_download/' + num;
 	window.open(url);
 }
 
-// comment
+// -----------------------------------------------------------------------------------
 
-// 댓글 작성 글자 제한 byte
-function content_checkText(obj){
-	const maxlength = 40; //최대 40자
-    const text_val = obj.value; //입력한 문자
-    const text_len = text_val.length; //입력한 문자수
-    
-    let total=0;
-    for(let i=0; i<text_len; i++){
-    	const each_char = text_val.charAt(i);
-        
-        // 글자 수만큼 증가 (+1)
-        total += each_char.length;
-    }
-    
-    // 글자가 넘어가면 알림 후 maxlength 글자까지만 substr
-    if(total > maxlength) {
-    	alert('최대 40자까지만 입력가능합니다.');
-       	document.getElementById("nowLetter").innerText = total;
-        document.getElementById("nowLetter").style.color = "red";
-        $(obj).val($(obj).val().substr(0, $(obj).attr('maxlength')));
-    } else {
-       	document.getElementById("nowLetter").innerText = total;
-        document.getElementById("nowLetter").style.color = "green";
-    }
-}
+// ------------------------------ 댓글 파트 -------------------------------------------
 
-// 댓글 수정(edit) 글자 제한 byte
-function edit_content_checkText(obj) {
-	const maxlength = 40; //최대 40자
-    const text_val = obj.value; //입력한 문자
-    const text_len = text_val.length; //입력한 문자수
-    
-    let total=0;
-    for(let i=0; i<text_len; i++){
-    	const each_char = text_val.charAt(i);
-        
-        // 글자 수만큼 증가 (+1)
-        total += each_char.length;
-    }
-    
-    // 글자가 넘어가면 알림 후 maxlength 글자까지만 substr
-    if(total > maxlength){
-    	alert('최대 40자까지만 입력가능합니다.');
-        document.getElementById("edit_nowLetter").innerText = total;
-        document.getElementById("edit_nowLetter").style.color = "red";
-        $(obj).val($(obj).val().substr(0, $(obj).attr('maxlength')));
-    }else{
-       	document.getElementById("edit_nowLetter").innerText = total;
-        document.getElementById("edit_nowLetter").style.color = "green";
-    }
-}
-
-// 댓글 '쓰기' 버튼 action (팝오버)
-
-// 글쓴이 정규식 : 2 ~ 8자 한글, 영문 허용
-const writerRegExp = /^[a-zA-Zㄱ-힣][a-zA-Zㄱ-힣 ]{2,8}$/;
-// 비밀번호 정규식 : 4 ~ 6자 영문, 숫자, 특수문자 허용
-const pwRegExp = /^[a-zA-z][0-9][$`~!@$!%*#^?&\\(\\)\-_=+]{4,6}$/;
-
-$('#writeCommentSubmit-button').click(function() {
-	if($('#commentId-text').val().length < 2 && writerRegExp.test($('#commentId-text')) == false) {
-	
-		$('input[id=commentId-text]').popover('show');
-		$('input[id=commentId-text]').focus();
-		
-		return;
-	}
-
-	$('input[id=commentId-text]').popover('hide');
-		
-	if($('#commentPw-text').val().length < 4 && pwRegExp.test($('#commentPw-text')) == false) {
-	
-		$('input[id=commentPw-text]').popover('show');
-		$('input[id=commentPw-text]').focus();
-		
-		return;
-	}
-	
-	$('input[id=commentPw-text]').popover('hide');
-	
-	console.log($('#commentContent-text').val().length);
-	if($('#commentContent-text').val().length < 4) {
-	
-		$('textarea[id=commentContent-text]').popover('show');
-		$('textarea[id=commentContent-text]').focus();
-		
-		return;
-	}
-	
-	$('input[id=commentContent-text]').popover('hide');
-	
-	let commentContent = $('#commentContent-text').val().replace(/(?:\r\n|\r|\n)/g,'<br/>');
-	$('#commentContent-hidden').val(commentContent);
-	
-	$('#writeComment-form').submit();
-});
-
-
-console.log(commentSize);
-
-for(let i = 1; i <= 5; i++) {
-	// 수정 버튼 action
-	$('button[id=editComment' + i + ']').click(function() {
-		console.log('edit click');
-		$('dialog').removeAttr('open');
-		
-		$('h5[id=commentPwCheck-title' + i + ']').text('댓글 수정');
-		$('input[id=commentPwCheckPassword-text' + i + ']').val('');
-		
-		let seq = $('input[id=commentSeq' + i + ']').val();
-		$('button[id=commentPwCheckSubmit-button' + i + ']').attr('onclick', 'editCommentPasswordCheck(' + seq + ', ' + i + ')');
-		
-		$('dialog[id=commentPwCheck-dialog' + i + ']').attr('open', 'open');	
-	});
-	// 삭제 버튼 action
-	$('button[id=deleteComment' + i + ']').click(function() {
-		console.log('delete click');
-		$('dialog').removeAttr('open');
-		
-		$('h5[id=commentPwCheck-title' + i + ']').text('댓글 삭제');
-		$('input[id=commentPwCheckPassword-text' + i + ']').val('');
-		
-		let seq = $('input[id=commentSeq' + i + ']').val();
-		$('button[id=commentPwCheckSubmit-button' + i + ']').attr('onclick', 'deleteComment(' + seq + ', ' + i + ')');
-		
-		$('dialog[id=commentPwCheck-dialog' + i + ']').attr('open', 'open');	
-	});
-	
-	// 댓글 수정, 삭제 비번 확인 dialog 취소 버튼 action
-	$('button[id=commentPwCheckCancel-button' + i + ']').click(function(){
-		$('dialog[id=commentPwCheck-dialog' + i + ']').removeAttr('open');
-	});
-	
-	// 댓글 수정, 삭제 비번 확인 dialog 확인 버튼 action
-	$('button[id=commentPwCheckSubmit-button' + i + ']').click(function(){
-		if($('input[id=commentPwCheckPassword-text' + i + ']').val() > 0) {
-			$('form[id=commentPwCheck-form' + i + ']').submit();			
-		}
-	});
-	
-	// 댓글 수정 dialog 켜기
-	let hidden_value = 'edit_comment_pw_checked' + i;
-	if($('input[id=editCommentStatus-hidden' + i +']').val() == hidden_value) {
-		console.log(hidden_value);
-		$('dialog[id=editComment-dialog' + i + ']').attr('open', 'open');
-	}
-	
-	// 댓글 수정 dialog 취소 버튼 action
-	$('button[id=editCommentCancel-button' + i + ']').click(function(){
-		$('dialog[id=editComment-dialog' + i + ']').removeAttr('open');
-	});
-	
-	// 댓글 수정 dialog 확인 버튼 action
-	$('button[id=editCommentSubmit-button' + i + ']').click(function(){
-		let commentId = $('input[id=editCommentId-text' + i + ']').val(); 
-		let commentPw = $('input[id=editCommentPassword-text' + i + ']').val();
-		let commentContent = $('input[id=editCommentContent-text' + i + ']').val();
-		
-		$('#input[id=commentContent-hidden' + i + ']').val(commentContent);
-	
-		if(commentId <= 0) {
-			$('input[id=editCommentId-text' + i + ']').focus();
-			return;
-		}
-		
-		if(commentPw <= 0) {
-			$('input[id=editCommentPassword-text' + i + ']').focus();
-			return;
-		}
-		
-		if(commentContent <= 0) {
-			$('input[id=editCommentContent-text' + i + ']').focus();
-			return;
-		}
-		
-		$('form[id=editComment-form' + i + ']').submit();			
-	});
-}
-
-// 게시판 내용들 (td)
+// 댓글 전체 컨테이너 (td)
 const comment_container = document.getElementById('comment_table-container');
 
 // 페이지네이션 틀 (ul)
@@ -240,14 +54,14 @@ const pagination_ul = document.getElementById('pagination-ul');
 
 // comment 페이지네이션 action
 // ajax로 데이터 전송
-function getComments(seq, page) {
+function getComments(seq, currentPage) {
 	const parameters = {
 		board_seq : seq
 	}
 	
 	$.ajax({
 		type: 'POST',
-	    url: contextPath + "/board/read/" + seq + "/"+ page,
+	    url: contextPath + "/board/read/" + seq + "/"+ currentPage,
 	    contentType: 'application/json;charset=UTF-8',
 	    data : JSON.stringify(parameters),
 	    dataType : 'json',
@@ -268,16 +82,34 @@ function getComments(seq, page) {
 	    	comments = data.comments; // 가져온 게시글 리스트
 	    	writeDate = data.commentWriteDate; // 가져온 게시글 작성일 리스트
 	    	
-	    	let currentPage = parseInt(data.currentPage); // 현재 페이지
-	    	paginationStart = parseInt(data.paginationStart); // 페이지네이션 시작 번호
-	    	paginationEnd = parseInt(data.paginationEnd); // 페이지네이션 마지막 번호
 	    	let totalCommentSize = parseInt(data.totalCommentSize); // 가져온 게시글 총 갯수
+	    	
+	    	let sizePerPage = 5; // 한 페이지에 출력할 게시글 수
+	    	let paginationSize = 5; // 한 페이지에 출력할 페이지네이션 수
+	    	
+	    	// currentPage, sizePerPage, totalSize, paginationSize
+	    	const paginationVO = getPaginationVO(currentPage, 5, totalCommentSize, paginationSize);
+	    	
+	    	// getPaginationVO를 통해 받아온 페이지네이션 정보들 받아주는 변수들
+	    	const startIndex = paginationVO.startIndex;
+	    	const endIndex = paginationVO.endIndex;
+	    	paginationStart = paginationVO.paginationStart;
+	    	paginationEnd = paginationVO.paginationEnd;
+	    	const nextPage = paginationVO.nextPage;
+	    	const prevPage = paginationVO.prevPage;
+			
+			console.log('script startIndex : ' + startIndex);
+			console.log('script endIndex : ' + endIndex);
+			console.log('script paginationStart : ' + paginationStart);
+			console.log('script patinationEnd : ' + paginationEnd);
+			console.log('script nextPage : ' + nextPage);
+			console.log('script prevPage : ' + prevPage);
 			
 			// 댓글 노가다 작업 필요!!
 			
 			let content= '';
 			if(comments.length > 0) {
-				for(let i = 0; i < comments.length; i++) {
+				for(let i = startIndex; i < endIndex; i++) {
 					content += '	<div class="row row-cols-3 pb-0">';
 					content += '		<div class="col-2">';
 					content += '			<p class="fs-6">' + comments[i].comment_id + '</p>';
@@ -353,8 +185,6 @@ function getComments(seq, page) {
 	    	let content2 = '';
 				content2 +=	'	<li class="page-item">';
 				
-			let prevPage = paginationStart - 1;
-			
 			if(paginationStart > 5) {
 				content2 +=	'				<a id="prev-link" class="page-link" aria-label="Previous"';
 				content2 += '					style="cursor: pointer;" onclick="getComments('+ seq + ', ' + prevPage + ')">';
@@ -385,8 +215,6 @@ function getComments(seq, page) {
 	    	
 	    		content2 += '<li class="page-item">';
 				
-			let nextPage = paginationEnd + 1;
-			
 			if(paginationEnd % 5 == 0 && totalCommentSize > paginationEnd * 10) {
 				content2 +=	'			<a id="next-link" class="page-link" aria-label="Next"';
 				content2 +=	'				style="cursor: pointer;" onclick="getComments(' + seq + ', ' + nextPage + ')">';
@@ -403,42 +231,6 @@ function getComments(seq, page) {
 			
 			pagination_ul.innerHTML = content2;
 	   	});
-}
-
-// 게시글 삭제 function
-function deleteBoard(seq) {
-	
-	let pw = $('#deletePassword').val();
-	
-	if(pw == null || pw == "") {
-		$('#deleteWarningMsg').html('비밀번호를 입력해 주세요!');
-		return;
-	}
-	
-	$.ajax({
-		type: 'POST',
-	    url: contextPath + "/board/delete/"+ seq,
-		// String data를 넘길 때는 data 항목에 직접 {}로 입력해준다. 
-	    data : { input_pw : pw },
-	 })
-	    .fail( function(e) {
-	    	console.log(e);
-	    	alert("통신 오류 error");
-	    })
-	    .done(function(data) {
-	    
-	    console.log('통신 성공!');
-	    	
-	    console.log(data);	
-	    	
-	    	if(data == 'board_deletion_success') {
-	    		location.href = contextPath + '/board?status=' + data;
-	    	} else if (data == 'delete_wrong_pw') {
-	    		$('#deleteWarningMsg').html('잘못된 비밀번호입니다!');
-	    	} else {
-	    		location.href = contextPath + '/board?status=' + data;
-	    	}
-		});
 }
 
 // 댓글 삭제 function
@@ -569,3 +361,4 @@ function editComment(seq, cnt) {
 	    	}
 		});
 }
+// ----------------------------------------------------------------------------

@@ -1,0 +1,169 @@
+/* 전체 컨테이너 */
+#container {
+	margin: 5% auto;
+	width: 1230px;
+}
+
+/* 게시판 컨테이너 */
+#board-container {
+	margin-top: 3rem;
+}
+
+/* 게시판의 테이블 컨테이너  */
+#table-container table tr {
+	border-bottom: 2px solid lightgrey;
+}
+
+/* 테이블 th td */
+th, td {
+	padding: 0.3rem 1.2rem;
+}
+
+/* 게시판 내용 컨테이너 */
+#content-container {
+	margin: 2rem 0;
+}
+
+/* 버튼 모음 컨테이너 */
+#button-container {
+	margin: 1rem 0;
+}
+
+/* 버튼들 */
+#button-container button {
+	margin-left: 1rem;
+}
+
+/* 모달의 버튼들 들어있는 footer */
+.modal-footer {
+	padding: 0;
+	height: 60px;
+}
+
+/* footer > div  */
+.modal-footer div {
+	margin: 0;
+}
+
+/* 모달의 버튼들 개별 div(col) */
+.modal-footer div div {
+	padding: 0;
+	display: flex;
+}
+
+/* 모달의 버튼들 개별 div(col)중 첫번째 */
+.modal-footer div div:first-child {
+	border-right: 1px solid lightgrey;
+}
+
+/* 모달의 버튼 */
+.modal-footer div div button {
+	border-top-left-radius: 0;
+	border-top-right-radius: 0;
+	width: 100%;
+	height: 100%;
+}
+
+/* 모달의 취소 버튼 */
+#delete_cancel-button, #edit_cancel-button {
+	border-bottom-right-radius: 0;
+}
+
+/* 모달의 확인 버튼 */
+#delete_submit-button, #edit_submit-button {
+	border-bottom-left-radius: 0;
+}
+
+/* 모달의 버튼 hover */
+.modal-footer div div button:hover {
+	background-color: lightgray;
+}
+
+/* comment(댓글) 입력 컨테이너 */
+#comment-container {
+	margin: 0 0.7rem;
+	width: 60%;
+}
+
+/* 댓글 입력 container와 그 내부의 container들 */
+#comment_input-container, #comment_input-container div {
+	margin: 0.4rem 0;
+}
+
+/* 비밀번호 input text */
+#commentPw-text {
+	width: 15rem;
+}
+
+/* 팝 오버 CSS */
+.warning-popover { -
+	-bs-popover-bg: var(- -bs-warning); -
+	-bs-popover-body-color: var(- -bs-danger);
+	font-size: 20px;
+	font-weight: bold;
+}
+
+/* 댓글 리스트 container */
+#comment_list-container {
+	margin: 1rem 0;
+}
+
+/* 댓글 리스트의 행들 */
+#comment_list-container .row {
+	padding-top: 0.8rem;
+	padding-bottom: 0.8rem;
+	margin: 0;
+}
+
+#comment_table-container .row.row-cols-1.container-lg.w-100.pt-0 {
+	border-bottom: 2px solid lightgrey;
+}
+
+/* 댓글 리스트의 첫번째 행 */
+#comment_table-container .row:first-child {
+	border-top: 2px solid lightgrey;
+}
+
+/* 수정, 삭제 링크 hover */
+#editComment:hover, #deleteComment:hover {
+	cursor: pointer;
+}
+
+/* 댓글 수정 삭제 비밀번호 확인 dialog */
+.pwCheck-dialog {
+	width: 250px;
+	background-color: rgb(235, 235, 235);
+	border: none;
+	position: absolute;
+	left: 500px;
+}
+
+/* 댓글 수정 dialog */
+.editComment-dialog {
+	width: 700px;
+	background-color: rgb(235, 235, 235);
+	border: none;
+	position: absolute;
+	left: 400px;
+}
+
+/* 페이지네이션 */
+.page-link {
+	color: #000;
+	background-color: #fff;
+	border: 1px solid #6c757d;
+}
+
+.page-item.active .page-link {
+	z-index: 1;
+	color: #555;
+	font-weight: bold;
+	background-color: #f1f1f1;
+	border-color: #6c757d;
+}
+
+.page-link:focus, .page-link:hover {
+	color: white;
+	background-color: #6c757d;
+	border-color: #6c757d;
+}

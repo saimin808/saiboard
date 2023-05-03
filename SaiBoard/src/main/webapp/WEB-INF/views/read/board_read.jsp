@@ -8,179 +8,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>글 보기</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
-<style>
-	/* 전체 컨테이너 */
-	#container {
-		margin: 5% auto;
-		width: 1230px;
-	}
-	
-	/* 게시판 컨테이너 */
-	#board-container {
-		margin-top: 3rem;
-	}
-	
-	/* 게시판의 테이블 컨테이너  */
-	#table-container table tr {
-		border-bottom: 2px solid lightgrey;
-	}
-	
-	/* 테이블 th td */
-	th, td {
-		padding: 0.3rem 1.2rem;
-	}
-	
-	/* 게시판 내용 컨테이너 */
-	#content-container {
-		margin: 2rem 0;
-	}
-	
-	/* 버튼 모음 컨테이너 */
-	#button-container {
-		margin: 1rem 0;
-	}
-	
-	/* 버튼들 */
-	#button-container button {
-		margin-left: 1rem;
-	}
-	
-	/* 모달의 버튼들 들어있는 footer */
-	.modal-footer {
-		padding: 0;
-		height: 60px;
-	}
-	
-	/* footer > div  */
-	.modal-footer div {
-		margin: 0;
-	}
-	
-	/* 모달의 버튼들 개별 div(col) */
-	.modal-footer div div {
-		padding: 0;
-		display: flex;
-	}
-	
-	/* 모달의 버튼들 개별 div(col)중 첫번째 */
-	.modal-footer div div:first-child {
-		border-right: 1px solid lightgrey;
-	}
-	
-	/* 모달의 버튼 */
-	.modal-footer div div button {
-		border-top-left-radius: 0;
-		border-top-right-radius: 0;
-		width: 100%;
-		height: 100%;
-	}
-	
-	/* 모달의 취소 버튼 */
-	#delete_cancel-button, #edit_cancel-button {
-		border-bottom-right-radius: 0;
-	}
-	
-	/* 모달의 확인 버튼 */
-	#delete_submit-button, #edit_submit-button {
-		border-bottom-left-radius: 0;
-	}
-	
-	/* 모달의 버튼 hover */
-	.modal-footer div div button:hover {
-		background-color: lightgray;
-	}
-	
-	/* comment(댓글) 입력 컨테이너 */
-	#comment-container  {
-		margin: 0 0.7rem;
-		width: 60%;
-	}
-	
-	/* 댓글 입력 container와 그 내부의 container들 */
-	#comment_input-container, #comment_input-container div {
-		margin: 0.4rem 0;
-	}
-	
-	/* 비밀번호 input text */
-	#commentPw-text {
-		width: 15rem;
-	}
-	
-	/* 팝 오버 CSS */
-	.warning-popover {
-		--bs-popover-bg: var(--bs-warning);
-		--bs-popover-body-color: var(--bs-danger);
-		font-size: 20px;
-		font-weight: bold;
-	}
-	
-	/* 댓글 리스트 container */
-	#comment_list-container {
-		margin: 1rem 0;
-	}
-	
-	/* 댓글 리스트의 행들 */
-	#comment_list-container .row {
-		padding-top: 0.8rem;
-		padding-bottom: 0.8rem;
-		margin: 0;
-	}
-	
-	#comment_table-container .row.row-cols-1.container-lg.w-100.pt-0 {
-		border-bottom: 2px solid lightgrey;
-	}
-	
-	/* 댓글 리스트의 첫번째 행 */
-	#comment_table-container .row:first-child {
-		border-top: 2px solid lightgrey;
-	}
-	
-	/* 수정, 삭제 링크 hover */
-	#editComment:hover, #deleteComment:hover {
-		cursor: pointer;
-	}
-	
-	/* 댓글 수정 삭제 비밀번호 확인 dialog */
-	.pwCheck-dialog {
-		width: 250px;
-		background-color: rgb(235,235,235);
-		border: none;
-		position: absolute;
-		left: 500px;
-	}
-	
-	/* 댓글 수정 dialog */
-	.editComment-dialog {
-		width: 700px;
-		background-color: rgb(235,235,235);
-		border: none;
-		position: absolute;
-		left: 400px;
-	}
-	
-	/* 페이지네이션 */
-	.page-link {
-	  color: #000; 
-	  background-color: #fff;
-	  border: 1px solid #6c757d; 
-	}
-	
-	.page-item.active .page-link {
-	 z-index: 1;
-	 color: #555;
-	 font-weight:bold;
-	 background-color: #f1f1f1;
-	 border-color: #6c757d;
-	 
-	}
-	
-	.page-link:focus, .page-link:hover {
-	  color: white;
-	  background-color: #6c757d; 
-	  border-color: #6c757d;
-	}
-	
-</style>
+<link href="<%=request.getContextPath()%>/resources/read/css/board_read.css" rel="stylesheet"/>
 </head>
 <body>
 	<div id="container" class="container-xxl">
@@ -409,13 +237,13 @@
 											<div class="w-100 mt-0">
 												<div class="mt-0 text-end">(<span id="edit_nowLetter">0</span>/40자)</div>
 											</div>
-											<input type="hidden" name="comment_seq" value="${comment.comment_seq}"/>
-											<input type="hidden" name="board_seq" value="${board.board_seq}"/>
+											<input type="hidden" id="commentSeq${i.count}" value="${comment.comment_seq}"/>
+											<input type="hidden" id="boardSeq${i.count}" value="${board.board_seq}"/>
+											<input type="hidden" id="dialogSeq${i.count}" value="${i.count}"/>
 										</div>
 										<div class="text-center">
 											<button id="editCommentCancel-button${i.count}" class="btn btn-light">취소</button>
-											<button id="editCommentSubmit-button${i.count}" class="btn btn-secondary"
-														onclick="editComment(${comment.comment_seq},${i.count})">확인</button>
+											<button id="editCommentSubmit-button${i.count}" class="btn btn-secondary">확인</button>
 										</div>
 									</dialog>
 								</div>
@@ -496,8 +324,26 @@
 	const commentSize = parseInt('<%=request.getAttribute("totalCommentSize")%>');
 	let paginationStart = '<%=request.getAttribute("paginationStart")%>';
 	let paginationEnd = '<%=request.getAttribute("paginationEnd")%>';
+	
+	// url parameter를 불러온 변수
+	const urlParams = new URLSearchParams(location.search);
+
+	// url parameter에서 받아온 값(status)으로 모달의 경고 메세지 표시
+	if(urlParams.get('status') == 'edit_wrong_pw') {
+		// alert으로 대체
+		alert('글 수정 실패 : 잘못된 비밀번호');
+		
+		// 왠지 모를 오류로 구현 못함
+		//$('#editModal').show();
+	}
 </script>
-<!-- board_read.js -->
-<script src="<%=request.getContextPath()%>/resources/read/js/board_read.js"></script>
+<!-- pagination.js : 페이지네이션 script -->
+<script src="<%=request.getContextPath()%>/resources/public/js/pagination.js"></script>
+<!-- elements_actions.js : 각 요소의 액션들을 모아놓은 script  -->
+<script src="<%=request.getContextPath()%>/resources/read/js/read_elements_actions.js"></script>
+<!-- input_limits.js : 입력 제한 function들을 모아놓은 script  -->
+<script src="<%=request.getContextPath()%>/resources/read/js/read_input_limits.js"></script>
+<!-- main_conditions.js : 가장 main이 되는 function들을 모아놓은 script (게시글 수정, 삭제 등)  -->
+<script src="<%=request.getContextPath()%>/resources/read/js/read_main_functions.js"></script>
 </body>
 </html>

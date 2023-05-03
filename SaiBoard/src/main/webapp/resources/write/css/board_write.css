@@ -1,0 +1,28 @@
+/* 전체 컨테이너 */
+#container {
+	margin: 5% auto;
+	width: 1230px;
+}
+
+/* 게시판 컨테이너 */
+#write-container {
+	margin-top: 3rem;
+}
+
+/* 글쓴이 & 비밀번호 input text, 카테고리 select  */
+.col-2 {
+	width: 210px;
+}
+
+/* 팝 오버 CSS */
+.warning-popover {
+	--bs-popover-bg: var(--bs-warning);
+	--bs-popover-body-color: var(--bs-danger);
+	font-size: 18px;
+	font-weight: bold;
+}
+
+/* 취소 작성 버튼 */
+#boardCancel-button, #boardSubmit-button {
+	width: 100px;
+}

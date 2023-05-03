@@ -8,36 +8,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>글 쓰기</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
-<style>
-/* 전체 컨테이너 */
-#container {
-	margin: 5% auto;
-	width: 1230px;
-}
-
-/* 게시판 컨테이너 */
-#write-container {
-	margin-top: 3rem;
-}
-
-/* 글쓴이 & 비밀번호 input text, 카테고리 select  */
-.col-2 {
-	width: 210px;
-}
-
-/* 팝 오버 CSS */
-.warning-popover {
-	--bs-popover-bg: var(--bs-warning);
-	--bs-popover-body-color: var(--bs-danger);
-	font-size: 18px;
-	font-weight: bold;
-}
-
-/* 취소 작성 버튼 */
-#boardCancel-button, #boardSubmit-button {
-	width: 100px;
-}
-</style>
+<link href="<%=request.getContextPath()%>/resources/write/css/board_write.css" rel="stylesheet"/>
 </head>
 <body>
 <div id="container" class="container-xxl">
@@ -232,7 +203,7 @@
 								<button type="button" class="btn btn-light" id="boardCancel-button">취소</button>
 							</div>
 							<div class="col-6 text-start">
-								<button type="button" class="btn btn-secondary" id="boardSubmit-button">작성</button>
+								<button type="button" class="btn btn-secondary" id="boardSubmit-button">수정</button>
 							</div>
 						</div>
 					</div>
@@ -247,10 +218,18 @@
 	
 	const purpose = '<%=request.getAttribute("purpose")%>';
 	const board_seq = '<%=request.getAttribute("board_seq")%>';
+	
+	// url parameter를 불러온 변수
+	const urlParams = new URLSearchParams(location.search);
 </script>
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
-<!-- board_write.js -->
-<script src="<%=request.getContextPath()%>/resources/write/js/board_write.js"></script>
+<!-- elements_actions.js : 각 요소의 액션들을 모아놓은 script  -->
+<script src="<%=request.getContextPath()%>/resources/write/js/write_elements_actions.js"></script>
+<!-- input_limits.js : 입력 제한 function들을 모아놓은 script  -->
+<script src="<%=request.getContextPath()%>/resources/write/js/write_input_limits.js"></script>
+<!-- main_conditions.js : 가장 main이 되는 function들을 모아놓은 script (게시글 수정, 삭제 등)  -->
+<script src="<%=request.getContextPath()%>/resources/write/js/write_main_functions.js"></script>
+
 </body>
 </html>
