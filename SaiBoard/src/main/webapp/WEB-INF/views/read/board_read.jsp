@@ -164,11 +164,10 @@
 					</div>
 					<div id="commentContent" class="row row-cols-1 mb-0 w-100">
 						<div class="col-12 mb-0">
-							<textarea id="commentContent-text" class="form-control" rows="1" cols="40" wrap="hard"
-									  placeholder="내용을 입력해주세요. (4 ~ 40자)" onkeyup="content_checkText(this)"
+							<textarea id="commentContent-text" class="form-control" name="comment_content" rows="1" cols="40" wrap="hard"
+									  placeholder="내용을 입력해주세요. (4 ~ 40자)" onkeyup="content_checkText(this)" 
 									  data-bs-container="body" data-bs-toggle="popover" data-bs-placement="right"
 									  data-bs-custom-class="warning-popover" data-bs-content="내용을 제대로 입력해주세요!"></textarea>
-							<input type="hidden" id="commentContent-hidden" name="comment_content" form="writeComment-form"/>
 						</div>
 					</div>
 				</form>
@@ -282,7 +281,7 @@
 																	pointer-event: none; cursor: default;">${i}</a>
 											</c:when>
 											<c:otherwise>
-												<a id="page${i}" class="page page-link" style="cursor: pointer;" onclick="getComments(${board.board_seq},${i})">${i}</a>
+												<a id="page${i}" class="page page-link" style="cursor: pointer;" onclick="listComments(${board.board_seq},${i})">${i}</a>
 											</c:otherwise>
 										</c:choose>
 									</li>
@@ -290,7 +289,7 @@
 								<li class="page-item">
 									<c:choose>
 										<c:when test="${paginationEnd % 5 == 0 && totalCommentSize > paginationEnd * 5}">
-											<a id="next-link" class="page-link" aria-label="Next" onclick="getComments(6)">
+											<a id="next-link" class="page-link" aria-label="Next" onclick="listComments(6)">
 												<span aria-hidden="true">&raquo;</span>
 											</a>
 										</c:when>

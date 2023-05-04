@@ -67,34 +67,23 @@ public class BoardRESTController {
 	}
 	
 	@PostMapping("/board/read/{seq}/{page}")
-	public String showCommentSelectedPage(HttpServletResponse resp, @PathVariable("seq") String board_seq, 
-				@PathVariable("page") String currentPage, @RequestBody Map<String, String> parameters) throws ParseException, IOException {
+	public String showCommentSelectedPage(HttpServletResponse resp, @PathVariable("seq") Integer board_seq, 
+																	@PathVariable("page") Integer currentPage) throws ParseException, IOException {
 		
 		// parameter를 Map으로 받았을때 key값은 있고 value값이 null이라면
 		// value가 비어있는게 아닌 String값인 "null"이 들어있는 것이다.
-		System.out.println("Controller parameters : " + parameters);
-		
 		System.out.println("Controller currentPage : " + currentPage);
-		parameters.put("board_seq", board_seq);
-		parameters.put("page", currentPage);
 		
-		List<CommentDTO> comments = boardService.showComments(Integer.parseInt(board_seq));
+		List<CommentDTO> comments = boardService.showComments(board_seq);
 		List<String> creationDateTimeList = boardService.getCommentsCreationDateTimeList(comments);
-		PaginationVO page = boardService.getPaginationVO(Integer.parseInt(currentPage), 5, comments.size());
 		
 		JSONObject obj = new JSONObject();
 		PrintWriter out = resp.getWriter(); 
 		
-		System.out.println(page.getPaginationStart());
-		System.out.println(page.getPaginationEnd());
-		
 		obj.put("comments", comments);
 		obj.put("commentWriteDate", creationDateTimeList);
-		obj.put("commentPage", page);
 		obj.put("currentPage", currentPage);
-		obj.put("paginationStart", page.getPaginationStart());
-		obj.put("paginationEnd", page.getPaginationEnd());
-		obj.put("totalCommentSize", page.getTotalSize());
+		obj.put("totalCommentSize", comments.size());
 		
 		out.print(obj);
 		return null;
@@ -153,7 +142,6 @@ public class BoardRESTController {
 	// 댓글 삭제
 	@PostMapping("/board/delete_comment/{comment_seq}")
 	public String deleteComment(Model model, @PathVariable("comment_seq") Integer comment_seq,
-											 @RequestParam("board_seq") Integer board_seq,
 											 @RequestParam("input_pw") String input_pw) {
 
 		System.out.println("deleteCommentPwCheck : " + input_pw + " " + comment_seq);
@@ -194,14 +182,12 @@ public class BoardRESTController {
 	// 댓글 수정 전 비밀번호 확인
 	@PostMapping("/board/edit_comment_pw_check/{comment_seq}")
 	public String editCommentPasswordCheck(Model model, @PathVariable("comment_seq") Integer comment_seq,
-														@RequestParam("comment_input_pw") String comment_input_pw,
-														@RequestParam("dialog_seq") Integer dialog_seq,
-														@RequestParam("board_seq") Integer board_seq) {
+														@RequestParam("input_pw") String input_pw) {
 
 		// 파라미터 확인용
 		System.out.println("editCommentPwCheck : " + comment_seq);
 		// 1. 댓글의 비밀번호 확인
-		Boolean isCorrect = boardService.commentPasswordCheck(comment_input_pw, comment_seq);
+		Boolean isCorrect = boardService.commentPasswordCheck(input_pw, comment_seq);
 
 		// 2. 비밀번호 확인 후
 		if (isCorrect == true) {

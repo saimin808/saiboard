@@ -31,7 +31,7 @@ function edit_content_checkText(obj) {
     const text_len = text_val.length; //입력한 문자수
     
     let total=0;
-    for(let i=0; i<text_len; i++){
+    for(let i=0; i < text_len; i++){
     	const each_char = text_val.charAt(i);
         
         // 글자 수만큼 증가 (+1)

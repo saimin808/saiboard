@@ -36,7 +36,11 @@ const writerRegExp = /^[a-zA-Zㄱ-힣][a-zA-Zㄱ-힣 ]{2,8}$/;
 // 비밀번호 정규식 : 4 ~ 6자 영문, 숫자, 특수문자 허용
 const pwRegExp = /^[a-zA-z][0-9][$`~!@$!%*#^?&\\(\\)\-_=+]{4,6}$/;
 
+// 댓글 쓰기 버튼 action
 $('#writeCommentSubmit-button').click(function() {
+ 	// 입력 조건을 충족하지 못하면 popover를 출력하고 포커싱한다.
+ 	
+ 	// 댓글 아이디
 	if($('#commentId-text').val().length < 2 && writerRegExp.test($('#commentId-text')) == false) {
 	
 		$('input[id=commentId-text]').popover('show');
@@ -45,8 +49,10 @@ $('#writeCommentSubmit-button').click(function() {
 		return;
 	}
 
+	// 충족하면 popover를 숨긴다.
 	$('input[id=commentId-text]').popover('hide');
-		
+	
+	// 댓글 비밀번호
 	if($('#commentPw-text').val().length < 4 && pwRegExp.test($('#commentPw-text')) == false) {
 	
 		$('input[id=commentPw-text]').popover('show');
@@ -57,6 +63,7 @@ $('#writeCommentSubmit-button').click(function() {
 	
 	$('input[id=commentPw-text]').popover('hide');
 	
+	// 댓글 내용
 	console.log($('#commentContent-text').val().length);
 	if($('#commentContent-text').val().length < 4) {
 	
@@ -68,9 +75,7 @@ $('#writeCommentSubmit-button').click(function() {
 	
 	$('input[id=commentContent-text]').popover('hide');
 	
-	let commentContent = $('#commentContent-text').val().replace(/(?:\r\n|\r|\n)/g,'<br/>');
-	$('#commentContent-hidden').val(commentContent);
-	
+	// 모든 입력 조건을 전부 충족했다면 form submit
 	$('#writeComment-form').submit();
 });
 
@@ -78,12 +83,17 @@ for(let i = 1; i <= 5; i++) {
 	// 수정 버튼 action
 	$('button[id=editComment' + i + ']').click(function() {
 		console.log('edit click');
+		// 1. 모든 dialog를 다 끈다.
+		// (1번 댓글의 dialog를 켜놓은 상태로 다른 댓글의 수정 버튼을 누르면 1번 댓글의 dialog가 꺼진다)
 		$('dialog').removeAttr('open');
 		
+		// 2. dialog 제목을 댓글 수정으로 바꾼다
+		// (댓글 삭제도 같은 dialog를 쓰기 때문에 버튼을 누를 때마다 바꿔준다.)
 		$('h5[id=commentPwCheck-title' + i + ']').text('댓글 수정');
 		$('input[id=commentPwCheckPassword-text' + i + ']').val('');
 		
 		let seq = $('input[id=commentSeq' + i + ']').val();
+		// 3. 
 		$('button[id=commentPwCheckSubmit-button' + i + ']').attr('onclick', 'editCommentPasswordCheck(' + seq + ', ' + i + ')');
 		
 		$('dialog[id=commentPwCheck-dialog' + i + ']').attr('open', 'open');	
