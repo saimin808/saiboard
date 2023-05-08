@@ -47,7 +47,7 @@ function file_download(num) {
 // ------------------------------------- 댓글 파트 -------------------------------------------
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~ 댓글 리스팅 파트 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// 댓글 리스팅 Function
+// 페이지 링크 클릭시 댓글 리스팅 Function
 function listComments(seq, currentPage) {
 	
 	$.ajax({
@@ -77,7 +77,7 @@ function listComments(seq, currentPage) {
 	    	let paginationSize = 5; // 한 페이지에 출력할 페이지네이션 수
 	    	
 	    	// currentPage, sizePerPage, totalSize, paginationSize
-	    	const paginationVO = getPaginationVO(currentPage, 5, totalCommentSize, paginationSize);
+	    	const paginationVO = getPaginationVO(currentPage, sizePerPage, totalCommentSize, paginationSize);
 	    	
 	    	// getPaginationVO를 통해 받아온 페이지네이션 정보들 받아주는 변수들
 	    	const startIndex = paginationVO.startIndex;
@@ -97,7 +97,7 @@ function listComments(seq, currentPage) {
 			// 게시판 리스팅 & 페이지네이션 작업 구간 (위에서 가져온 댓글 목록이 존재할 경우 진행한다.)
 			if (comments.length > 0) {
 				// 새롭게 리스팅할 게시판
-				const content = listBoard(startIndex, endIndex, comments, writeDate);
+				const content = createComments(startIndex, endIndex, comments, writeDate);
 				// 새로운 페이지네이션
 				const page = createPagination(paginationVO, totalCommentSize, seq);
 				
@@ -116,7 +116,7 @@ function listComments(seq, currentPage) {
 }
 
 // 게시판 리스팅 function
-function listBoard(startIndex, endIndex, comments, writeDate) {
+function createComments(startIndex, endIndex, comments, writeDate) {
 
 	// 가져온 매개변수들로 게시판을 구현한다.
     let content = '';

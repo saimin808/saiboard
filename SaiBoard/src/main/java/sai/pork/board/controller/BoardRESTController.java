@@ -50,17 +50,11 @@ public class BoardRESTController {
 		System.out.println(page.getPaginationStart());
 		System.out.println(page.getPaginationEnd());
 		
-		// .subList(page.getStartIndex(), page.getEndIndex())
 		obj.put("boards", boards);
 		obj.put("boardWriteDate", creationDateTimeList);
+		obj.put("currentPage", currentPage);
 		obj.put("isBoardWithFiles",  isBoardWithFiles);
-		
-		obj.put("startIndex", page.getStartIndex());
-		obj.put("endIndex", page.getEndIndex());
-		obj.put("currentPage", page.getCurrentPage());
-		obj.put("paginationStart", page.getPaginationStart());
-		obj.put("paginationEnd", page.getPaginationEnd());
-		obj.put("totalBoardSize", page.getTotalSize());
+		obj.put("totalBoardSize", boards.size());
 		
 		out.print(obj);
 		return null;
@@ -144,7 +138,7 @@ public class BoardRESTController {
 	public String deleteComment(Model model, @PathVariable("comment_seq") Integer comment_seq,
 											 @RequestParam("input_pw") String input_pw) {
 
-		System.out.println("deleteCommentPwCheck : " + input_pw + " " + comment_seq);
+		System.out.println("deleteCommentPwCheck : " + input_pw + ", commentSeq : " + comment_seq);
 		// 1. 댓글의 비밀번호를 가져온다.
 		Boolean isCorrect = boardService.commentPasswordCheck(input_pw, comment_seq);
 

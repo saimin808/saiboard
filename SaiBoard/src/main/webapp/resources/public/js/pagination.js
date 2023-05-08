@@ -1,3 +1,5 @@
+// 페이지네이션 데이터 생성 js
+
 	// currentPage : 현재 페이지 번호
 	// sizePerPage : 한 페이지에 한번에 출력할 글 갯수
 	// totalSize : 전체 글 수
@@ -21,15 +23,20 @@ function getPaginationVO(currentPage, sizePerPage, totalSize, paginationSize) {
 	// endIndex가 더 크면 boardSize로 boardSize가 더 크거나 같으면 endIndex 그대로 대입해준다.
 	endIndex = endIndex > totalSize ? totalSize : endIndex;
 	
-	maxPagination = totalSize % sizePerPage == 0 ? totalSize / sizePerPage : totalSize / sizePerPage + 1;
+	maxPagination = totalSize % sizePerPage == 0 ? Math.floor(totalSize / sizePerPage) : Math.floor(totalSize / sizePerPage) + 1;
 	
-	// 자바스크립트에선 정수(Integer), 소수(Double)만 개별적으로 받아주는 변수는 없어서
-	// 로직을 java와는 다르게 처리해야한다. 
+	// JS에선 정수(Integer), 소수(Double)만 가질수 있는 변수는 없다.
+	
+	// JS는 '/'(나누기)를 할 경우 대상이 정수값 또는 소수값인 것과 상관없이 나머지가 0이 될때까지 나누기 때문에
+	// 소수(Double)인 결과가 나올 수도 있다.
+	
+	// 그래서 내가 원하는 결과를 얻기 위해선 나누고 소수인 값은 버려야한다.
 	// Math.floor() - 소수점 버림
 	paginationStart = Math.floor(currentPage / paginationSize) * paginationSize + 1;
 	paginationStart = Math.floor(currentPage % paginationSize) == 0 ? currentPage - 4 : paginationStart;
 	
-	paginationEnd = (currentPage / paginationSize + 1) * paginationSize;
+	paginationEnd = (Math.floor(currentPage / paginationSize) + 1) * paginationSize;
+	
 	if(currentPage % paginationSize == 0) {
 		paginationEnd = paginationEnd - paginationSize;
 	} else {

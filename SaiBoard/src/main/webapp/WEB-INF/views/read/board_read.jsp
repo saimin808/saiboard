@@ -336,7 +336,7 @@
 		//$('#editModal').show();
 	}
 </script>
-<!-- pagination.js : 페이지네이션 script -->
+<!-- pagination.js : 페이지네이션 Data script -->
 <script src="<%=request.getContextPath()%>/resources/public/js/pagination.js"></script>
 <!-- elements_actions.js : 각 요소의 액션들을 모아놓은 script  -->
 <script src="<%=request.getContextPath()%>/resources/read/js/read_elements_actions.js"></script>

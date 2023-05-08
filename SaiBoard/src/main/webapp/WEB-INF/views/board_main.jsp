@@ -56,12 +56,12 @@
 							<div class="col-9">
 								<div class="input-group mb-3">
 									<button id="search-button" class="btn btn-outline-secondary"
-										type="button" onclick="getBoard(1)">
+										type="button" onclick="listBoards(1)">
 										<i class="fa-solid fa-magnifying-glass"></i>
 									</button>
 									<input type="text" id="search-text" name="searchKeyword"
 										class="form-control" aria-describedby="search-button"
-										onKeypress="if (window.event.keyCode == 13) {getBoard(1)}">
+										onKeypress="if (window.event.keyCode == 13) {listBoards(1)}">
 								</div>
 							</div>
 						</div>
@@ -134,7 +134,7 @@
 															pointer-event: none; cursor: default;">${i}</a>
 									</c:when>
 									<c:otherwise>
-										<a id="page${i}" class="page page-link" style="cursor: pointer;" onclick="getBoard(${i})">${i}</a>
+										<a id="page${i}" class="page page-link" style="cursor: pointer;" onclick="listBoards(${i})">${i}</a>
 									</c:otherwise>
 								</c:choose>
 							</li>
@@ -174,7 +174,13 @@
 	let paginationEnd = parseInt('<%= request.getAttribute("paginationEnd")%>');
 	
 </script>
-<!-- board_main.js -->
-<script src="<%=request.getContextPath()%>/resources/main/js/board_main.js"></script>
+<!-- pagination.js : 페이지네이션 Data script -->
+<script src="<%=request.getContextPath()%>/resources/public/js/pagination.js"></script>
+<!-- default_categories.js : open 또는 redirect할 때마다 기본적으로 세팅되는 카테고리들 및 검색어를 모아놓은 script  -->
+<script src="<%=request.getContextPath()%>/resources/main/js/main_default_categories.js"></script>
+<!-- elements_actions.js : 각 요소의 액션들을 모아놓은 script  -->
+<script src="<%=request.getContextPath()%>/resources/main/js/main_elements_actions.js"></script>
+<!-- main_conditions.js : 가장 main이 되는 function들을 모아놓은 script (게시글 수정, 삭제 등)  -->
+<script src="<%=request.getContextPath()%>/resources/main/js/main_main_functions.js"></script>
 </body>
 </html>

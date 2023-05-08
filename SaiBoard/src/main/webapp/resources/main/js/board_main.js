@@ -215,4 +215,3 @@ function getBoard(page) {
 $('#write-button').click(function() {
 	location.href = contextPath + "/board/write";
 });
-
