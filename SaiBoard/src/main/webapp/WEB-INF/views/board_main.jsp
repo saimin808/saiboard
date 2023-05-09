@@ -41,6 +41,10 @@
 									<option value="board_view">조회 수</option>
 								</select>
 							</div>
+							<div class="col-3">
+								<input type="number" id="sizePerPage-number" class="form-control"
+									value="${sizePerPage}" min="5" max="10">
+							</div>
 						</div>
 					</div>
 					<div class="col-5"></div>
@@ -111,6 +115,11 @@
 				</table>
 			</div>
 			<div id="button-container" class="container-xxl d-flex justify-content-end">
+				<input type="hidden" id="totalBoardSize" value="${totalBoardSize}"/>
+				<select id="paginationSize-select" class="form-select">
+					<option value="5" selected>5page</option>
+					<option value="10">10page</option>
+				</select>
 				<button id="write-button" type="button" class="btn btn-secondary">글 쓰기</button>
 			</div>
 			<div id="pagination-container" class="container-xxl">
@@ -172,7 +181,6 @@
 	
 	let paginationStart = parseInt('<%= request.getAttribute("paginationStart")%>');
 	let paginationEnd = parseInt('<%= request.getAttribute("paginationEnd")%>');
-	
 </script>
 <!-- pagination.js : 페이지네이션 Data script -->
 <script src="<%=request.getContextPath()%>/resources/public/js/pagination.js"></script>

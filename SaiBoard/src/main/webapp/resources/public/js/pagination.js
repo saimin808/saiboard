@@ -47,6 +47,13 @@ function getPaginationVO(currentPage, sizePerPage, totalSize, paginationSize) {
 	prevPage = paginationStart - 1;
 	// ---------------------------------------------------------------------------------
 	
+	console.log('script startIndex : ' + startIndex);
+   	console.log('script endIndex : ' + endIndex);
+    console.log('script paginationStart : ' + paginationStart);
+    console.log('script patinationEnd : ' + paginationEnd);
+    console.log('script nextPage : ' + nextPage);
+    console.log('script prevPage : ' + prevPage);
+	
 	const paginationVO = {
 		currentPage : currentPage,
 		sizePerPage : sizePerPage,

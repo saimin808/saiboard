@@ -39,12 +39,15 @@ public class BoardController {
 		List<BoardDTO> boards = boardService.showBoards(parameters);
 		List<String> creationDateTimeList = boardService.getBoardsCreationDateTimeList(boards);
 		List<Boolean> isBoardWithFiles = boardService.getBoardsWithFiles(boards);
-		PaginationVO page = boardService.getPaginationVO(null, 10, boards.size());
+		// 2023-05-09 (화) 한페이지에 출력할 게시글 선택기능 추가
+		Integer sizePerPage = 10; // 한 페이지에 출력할 게시글 갯수
+		PaginationVO page = boardService.getPaginationVO(null, sizePerPage, boards.size());
 		
 		model.addAttribute("boards", boards);
 		model.addAttribute("boardWriteDate", creationDateTimeList);
 		model.addAttribute("isBoardWithFiles", isBoardWithFiles);
 		// 페이지네이션 전달
+		model.addAttribute("sizePerPage", sizePerPage); // 2023-05-09 (화) 한페이지에 출력할 게시글 선택기능 추가
 		model.addAttribute("currentPage", page.getCurrentPage());
 		model.addAttribute("totalBoardSize", page.getTotalSize());
 		model.addAttribute("startIndex", page.getStartIndex());

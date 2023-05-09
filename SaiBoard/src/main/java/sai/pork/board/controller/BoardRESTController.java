@@ -39,17 +39,14 @@ public class BoardRESTController {
 		
 		System.out.println("Controller currentPage : " + currentPage);
 		
-		List<BoardDTO> boards = boardService.showBoards(parameters);
-		List<String> creationDateTimeList = boardService.getBoardsCreationDateTimeList(boards);
-		List<Boolean> isBoardWithFiles = boardService.getBoardsWithFiles(boards);
-		PaginationVO page = boardService.getPaginationVO(Integer.parseInt(currentPage), 10, boards.size());
+		List<BoardDTO> boards = boardService.showBoards(parameters); // 불러온 모든 게시글
+		List<String> creationDateTimeList = boardService.getBoardsCreationDateTimeList(boards); // 불러온 모든 게시글의 날짜 표시
+		List<Boolean> isBoardWithFiles = boardService.getBoardsWithFiles(boards); // 불러온 모든 게시글의 첨부파일 유무
 		
 		JSONObject obj = new JSONObject();
 		PrintWriter out = resp.getWriter(); 
 		
-		System.out.println(page.getPaginationStart());
-		System.out.println(page.getPaginationEnd());
-		
+		// 2023-05-09 (화) 한페이지에 출력할 게시글 선택기능 추가 
 		obj.put("boards", boards);
 		obj.put("boardWriteDate", creationDateTimeList);
 		obj.put("currentPage", currentPage);

@@ -29,6 +29,10 @@
 #orderBy-select {
 	width: 6.5rem;
 }
+/* 게시글 출력 갯수 input number */
+#sizePerPage-number {
+	width: 4rem;
+}
 
 /* 검색 카테고리 select */
 #searchCategory-select {
