@@ -44,15 +44,17 @@ function listBoards(currentPage) {
             //*************************************************************
 
             // 페이지네이션 데이터를 구성하기 위해 필요한 데이터 **********************************
-            const sizePerPage = data.sizePerPage; // 한 페이지에 출력할 게시글 수
-            let paginationSize = 5; // 한 페이지에 출력할 페이지네이션 수
-            const totalBoardSize = data.totalBoardSize; // 조회된 게시글 총 갯수
+           	const sizePerPage = $('#sizePerPage-number').val(); // 한 페이지에 출력할 게시글 갯수
+            const totalBoardSize = $('#totalBoardSize').val(); // 조회된 게시글 총 갯수
+			const paginationSize = $('#paginationSize-select option:selected').val(); // 한 페이지에 출력할 페이지네이션 링크 갯수
             //**************************************************************
 
             // 페이지네이션 데이터 ****************************************************
             // currentPage, sizePerPage, totalSize, paginationSize
             console.log('currentPage : ' + currentPage);
+            console.log('sizePerPage : ' + sizePerPage);
             console.log('totalBoardSize : ' + totalBoardSize);
+            console.log('paginationSize : ' + paginationSize);
             const paginationVO = getPaginationVO(currentPage, sizePerPage, totalBoardSize, paginationSize);
 
             // getPaginationVO를 통해 받아온 페이지네이션 정보들 받아주는 변수들
@@ -84,37 +86,6 @@ function listBoards(currentPage) {
                 pagination_ul.innerHTML = page;
             }
         })
-}
-
-// 페이지네이션 재구성 function
-function listPagination(currentPage) {
-
-            // 페이지네이션 데이터를 재구성하기 위해 필요한 데이터 **********************************
-           	const sizePerPage = $('#sizePerPage-number').val(); // 한 페이지에 출력할 게시글 갯수
-            const totalBoardSize = $('#totalBoardSize').val(); // 조회된 게시글 총 갯수
-			const paginationSize = $('#paginationSize-select option:selected').val(); // 한 페이지에 출력할 페이지네이션 링크 갯수
-            //**************************************************************
-
-            // 페이지네이션 데이터 ****************************************************
-            console.log('currentPage : ' + currentPage);
-            console.log('totalBoardSize : ' + totalBoardSize);
-            console.log('paginationSize : ' + paginationSize);
-            const paginationVO = getPaginationVO(currentPage, sizePerPage, totalBoardSize, paginationSize);
-			
-            //*********************************************************************
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-            // 게시판 리스팅 & 페이지네이션 작업 구간 (위에서 가져온 댓글 목록이 존재할 경우 진행한다.)
-            if (totalBoardSize > 0) {
-                // 새로운 페이지네이션
-                const page = createPagination(paginationVO, totalBoardSize);
-
-                // 페이지네이션 틀 (ul)
-                const pagination_ul = document.getElementById('pagination-ul');
-
-                // 페이지네이션 컨테이너(ul) 안에 새로운 페이지네이션 입력
-                pagination_ul.innerHTML = page;
-            }
 }
 
 // 게시판 조회에 필요한 데이터 모으기 function
@@ -267,4 +238,35 @@ function createPagination(paginationVO, totalBoardSize) {
 	
 	// 만들어준 데이터를 return한다.
     return page;
+}
+
+// 페이지네이션 재구성 function
+function listPagination(currentPage) {
+
+    // 페이지네이션 데이터를 재구성하기 위해 필요한 데이터 **********************************
+    const sizePerPage = $('#sizePerPage-number').val(); // 한 페이지에 출력할 게시글 갯수
+    const totalBoardSize = $('#totalBoardSize').val(); // 조회된 게시글 총 갯수
+    const paginationSize = $('#paginationSize-select option:selected').val(); // 한 페이지에 출력할 페이지네이션 링크 갯수
+    //**************************************************************
+
+    // 페이지네이션 데이터 ****************************************************
+    console.log('currentPage : ' + currentPage);
+    console.log('totalBoardSize : ' + totalBoardSize);
+    console.log('paginationSize : ' + paginationSize);
+    const paginationVO = getPaginationVO(currentPage, sizePerPage, totalBoardSize, paginationSize);
+
+    //*********************************************************************
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    // 게시판 리스팅 & 페이지네이션 작업 구간 (위에서 가져온 댓글 목록이 존재할 경우 진행한다.)
+    if (totalBoardSize > 0) {
+        // 새로운 페이지네이션
+        const page = createPagination(paginationVO, totalBoardSize);
+
+        // 페이지네이션 틀 (ul)
+        const pagination_ul = document.getElementById('pagination-ul');
+
+        // 페이지네이션 컨테이너(ul) 안에 새로운 페이지네이션 입력
+        pagination_ul.innerHTML = page;
+    }
 }

@@ -33,9 +33,11 @@ function getPaginationVO(currentPage, sizePerPage, totalSize, paginationSize) {
 	// 그래서 내가 원하는 결과를 얻기 위해선 나누고 소수인 값은 버려야한다.
 	// Math.floor() - 소수점 버림
 	paginationStart = Math.floor(currentPage / paginationSize) * paginationSize + 1;
-	paginationStart = Math.floor(currentPage % paginationSize) == 0 ? currentPage - 4 : paginationStart;
+	paginationStart = Math.floor(currentPage % paginationSize) == 0 ? currentPage - (paginationSize - 1) : paginationStart;
 	
 	paginationEnd = (Math.floor(currentPage / paginationSize) + 1) * paginationSize;
+	
+	
 	
 	if(currentPage % paginationSize == 0) {
 		paginationEnd = paginationEnd - paginationSize;
@@ -44,7 +46,10 @@ function getPaginationVO(currentPage, sizePerPage, totalSize, paginationSize) {
 	}
 	
 	nextPage = paginationEnd + 1;
-	prevPage = paginationStart - 1;
+	// 만약 이전 페이지의 paginationStart가 1일 경우 -1을 처리해버리면 0페이지가 되어 오류가 나기 때문에
+	// 그때를 방지하기 위해 3항 연산자를 사용하여 paginationStart - 1 == 0이 true 이면 1로
+	// false면 연산식의 결과값 그대로를 대입하여준다.
+	prevPage = paginationStart - 1 == 0 ? 1 : paginationStart - 1;
 	// ---------------------------------------------------------------------------------
 	
 	console.log('script startIndex : ' + startIndex);
