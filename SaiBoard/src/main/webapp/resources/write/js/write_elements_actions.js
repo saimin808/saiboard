@@ -71,10 +71,10 @@ $('#boardSubmit-button').click(function() {
 	// 2. 모든 항목이 각자의 조건을 충족했다면 글 쓰기는 writeBoard(), 글 수정은 editBoard()를 실행한다.
 	if(purpose == 'write') {
 			
-		writeBoard(); // 구현 위치 : main_function.js
+		writeBoard(); // 구현 위치 : write_main_function.js
 		
 	} else if (purpose == 'edit') {
 		
-		editBoard(); // 구현 위치 : main_function.js
+		editBoard(); // 구현 위치 : write_main_function.js
 	}
 });

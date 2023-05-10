@@ -23,7 +23,6 @@ function listBoards(currentPage) {
             contentType: 'application/json;charset=UTF-8',
             data: JSON.stringify(parameters),
             dataType: 'json',
-            progress: true
         })
         .fail(function(e) {
             console.log(e);
@@ -44,17 +43,22 @@ function listBoards(currentPage) {
             //*************************************************************
 
             // 페이지네이션 데이터를 구성하기 위해 필요한 데이터 **********************************
+            // 새롭게 추가한 게시글 갯수 조절 기능! ===========================
            	const sizePerPage = $('#sizePerPage-number').val(); // 한 페이지에 출력할 게시글 갯수
+           	// =========================================================
             const totalBoardSize = $('#totalBoardSize').val(); // 조회된 게시글 총 갯수
+            // 새롭게 추가한 페이지네이션 링크 조절 기능! =============================
 			const paginationSize = $('#paginationSize-select option:selected').val(); // 한 페이지에 출력할 페이지네이션 링크 갯수
+			// ===============================================================
             //**************************************************************
 
             // 페이지네이션 데이터 ****************************************************
-            // currentPage, sizePerPage, totalSize, paginationSize
             console.log('currentPage : ' + currentPage);
             console.log('sizePerPage : ' + sizePerPage);
             console.log('totalBoardSize : ' + totalBoardSize);
             console.log('paginationSize : ' + paginationSize);
+            
+            // getPaginationVO(페이지네이션 데이터 생성 function)
             const paginationVO = getPaginationVO(currentPage, sizePerPage, totalBoardSize, paginationSize);
 
             // getPaginationVO를 통해 받아온 페이지네이션 정보들 받아주는 변수들

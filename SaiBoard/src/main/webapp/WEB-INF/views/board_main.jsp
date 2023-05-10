@@ -41,10 +41,12 @@
 									<option value="board_view">조회 수</option>
 								</select>
 							</div>
+							<!-- 새롭게 구현한 게시글 사이즈 조절 파트!!!!!!!!!! -->
 							<div class="col-3">
 								<input type="number" id="sizePerPage-number" class="form-control"
 									value="${sizePerPage}" min="5" max="10">
 							</div>
+							<!-- 새롭게 구현한 게시글 사이즈 조절 파트!!!!!!!!!! -->
 						</div>
 					</div>
 					<div class="col-5"></div>
@@ -114,13 +116,16 @@
 						</c:choose>
 				</table>
 			</div>
-			<div id="button-container" class="container-xxl d-flex justify-content-end">
+			<div id="button-container" class="container-xxl row">
 				<input type="hidden" id="totalBoardSize" value="${totalBoardSize}"/>
-				<select id="paginationSize-select" class="form-select">
-					<option value="5" selected>5page</option>
-					<option value="10">10page</option>
-				</select>
-				<button id="write-button" type="button" class="btn btn-secondary">글 쓰기</button>
+				<div class="col-9"></div>
+				<div class="col">
+					<select id="paginationSize-select" class="form-select w-50 float-start">
+						<option value="5" selected>5page</option>
+						<option value="10">10page</option>
+					</select>
+					<button id="write-button" type="button" class="btn btn-secondary float-end">글 쓰기</button>
+				</div>
 			</div>
 			<div id="pagination-container" class="container-xxl">
 				<nav>
@@ -184,8 +189,8 @@
 </script>
 <!-- pagination.js : 페이지네이션 Data script -->
 <script src="<%=request.getContextPath()%>/resources/public/js/pagination.js"></script>
-<!-- default_categories.js : open 또는 redirect할 때마다 기본적으로 세팅되는 카테고리들 및 검색어를 모아놓은 script  -->
-<script src="<%=request.getContextPath()%>/resources/main/js/main_default_categories.js"></script>
+<!-- init_functions : 페이지를 새롭게 open하거나 redirect 할때마다 실행 될 기능을 모아놓은 script  -->
+<script src="<%=request.getContextPath()%>/resources/main/js/main_init_functions.js"></script>
 <!-- elements_actions.js : 각 요소의 액션들을 모아놓은 script  -->
 <script src="<%=request.getContextPath()%>/resources/main/js/main_elements_actions.js"></script>
 <!-- main_conditions.js : 가장 main이 되는 function들을 모아놓은 script (게시글 수정, 삭제 등)  -->
