@@ -7,6 +7,11 @@
 // 페이지네이션 작업 function
 function getPaginationVO(currentPage, sizePerPage, totalSize, paginationSize) {
 
+	console.log('currentPage : ' + currentPage);
+    console.log('sizePerPage : ' + sizePerPage);
+    console.log('totalSize : ' + totalSize);
+    console.log('paginationSize : ' + paginationSize);
+	
 	let startIndex; // startIndex : 출력할 10개의 게시글 중에서 첫 글 순서 번호
 	let endIndex; // endIndex : 출력할 10개의 게시글 중에서 마지막 글의 순서 번호
 	let maxPagination; // maxPagination : 전체 페이지 갯수
@@ -15,7 +20,7 @@ function getPaginationVO(currentPage, sizePerPage, totalSize, paginationSize) {
 	let nextPage; // nextPage : 현재 페이지에서 다음 페이지
 	let prevPage; // prevPage : 현재 페이지에서 이전 페이지
 	
-	// 페이지 네이션 로직 파트 ------------------------------------------------------------
+	// 페이지네이션 로직 파트 ------------------------------------------------------------
 	startIndex = (currentPage - 1) * sizePerPage;
 	endIndex = currentPage * sizePerPage;
 	// 마지막 페이지에 표시되는 게시글들은 딱 10개로 떨어지지 않을 수도 있으니
@@ -31,15 +36,23 @@ function getPaginationVO(currentPage, sizePerPage, totalSize, paginationSize) {
 	// Math.floor() - 소수점 버림
 	maxPagination = totalSize % sizePerPage == 0 ? Math.floor(totalSize / sizePerPage) : Math.floor(totalSize / sizePerPage) + 1;
 	
+	// 7 / 2 = 3
+	// 현재 출력할 페이지네이션 첫번째 링크 = (현재 페이지 / 페이지네이션 사이즈) * 페이지네이션 사이즈 + 1  
 	paginationStart = Math.floor(currentPage / paginationSize) * paginationSize + 1;
+	
+	// 만약 현재 페이지가 페이지네이션 사이즈의 배수나 약수면 위 로직에서의 결과가 구해주려는 값보다 더 오버가 될 수 있기 때문에
+	// 그것을 방지하기 위해 배수인 경우 현재 페이지 - (페이지네이션 사이즈 - 1)을 해주어 첫번째 페이지로 출력되게끔 강제한다.
 	paginationStart = Math.floor(currentPage % paginationSize) == 0 ? currentPage - (paginationSize - 1) : paginationStart;
 	
+	// 현재 출력할 페이지네이션 마지막 링크 = ((현재 페이지 / 페이지네이션 사이즈) + 1) * 페이지네이션 사이즈 
 	paginationEnd = (Math.floor(currentPage / paginationSize) + 1) * paginationSize;
 	
+	// paginationStart와 마찬가지로 페이지네이션 사이즈의 배수나 약수면 구해주려는 값의 두배가 되어버리기 때문에
+	// 배수이면 두배인 값을 반으로 줄여준다.
 	if(currentPage % paginationSize == 0) {
 		paginationEnd = paginationEnd - paginationSize;
 	} else {
-		// 
+		// 마지막 페이지에
 		paginationEnd = paginationEnd > maxPagination ? maxPagination : paginationEnd;
 	}
 	

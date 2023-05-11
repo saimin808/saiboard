@@ -43,15 +43,25 @@ public class BoardRESTController {
 		List<String> creationDateTimeList = boardService.getBoardsCreationDateTimeList(boards); // 불러온 모든 게시글의 날짜 표시
 		List<Boolean> isBoardWithFiles = boardService.getBoardsWithFiles(boards); // 불러온 모든 게시글의 첨부파일 유무
 		
+		// 2023-05-08(월) PaginationVO 기능 RestController에서 삭제
+//		PaginationVO page = boardService.getPaginationVO(Integer.parseInt(currentPage), 10, boards.size());
+		
 		JSONObject obj = new JSONObject();
 		PrintWriter out = resp.getWriter(); 
 		
-		// 2023-05-09 (화) 한페이지에 출력할 게시글 선택기능 추가 
 		obj.put("boards", boards);
 		obj.put("boardWriteDate", creationDateTimeList);
 		obj.put("currentPage", currentPage);
 		obj.put("isBoardWithFiles",  isBoardWithFiles);
 		obj.put("totalBoardSize", boards.size());
+		
+		// 2023-05-08(월) PaginationVO 기능 RestController에서 삭제
+//		obj.put("startIndex", page.getStartIndex());
+//		obj.put("endIndex", page.getEndIndex());
+//		obj.put("currentPage", page.getCurrentPage());
+//		obj.put("paginationStart", page.getPaginationStart());
+//		obj.put("paginationEnd", page.getPaginationEnd());
+//		obj.put("totalBoardSize", page.getTotalSize());
 		
 		out.print(obj);
 		return null;
@@ -71,10 +81,18 @@ public class BoardRESTController {
 		JSONObject obj = new JSONObject();
 		PrintWriter out = resp.getWriter(); 
 		
+		// 2023-05-08(월) PaginationVO 기능 RestController에서 삭제
+//		PaginationVO page = boardService.getPaginationVO(Integer.parseInt(currentPage), 5, comments.size());
+		
 		obj.put("comments", comments);
 		obj.put("commentWriteDate", creationDateTimeList);
 		obj.put("currentPage", currentPage);
 		obj.put("totalCommentSize", comments.size());
+		
+		// 2023-05-08(월) PaginationVO 기능 RestController에서 삭제
+//		obj.put("paginationStart", page.getPaginationStart());
+//		obj.put("paginationEnd", page.getPaginationEnd());
+//		obj.put("totalCommentSize", page.getTotalSize());
 		
 		out.print(obj);
 		return null;
@@ -82,8 +100,9 @@ public class BoardRESTController {
 	
 	// 게시글 쓰기
 	// 보통 Controller로 요청이 온 JSON을 DTO로 바인딩 할 때는 @RequestBody를 주로 사용한다.
-	//그리고 File을 받을 때는 MultipartFile 객체를 사용하고 @RequestParam을 사용한다.
-	//하지만 File과 Dto를 같이 받기 위해서는 @RequestPart라는 어노테이션을 사용한다.
+	// 하지만 “multipart/form-data” 요청으로 넘어온 데이터를 받기 때문에 @RequestPart를 사용한다.
+	// RequestPart - “multipart/form-data” 요청의 일부를 메소드 인수와 연결하는 데 사용할 수 있는 어노테이션이다."
+	// 참고 - https://somuchthings.tistory.com/160?category=983431
 	@PostMapping("/board/write/write_board")
 	public String writeBoard(Model model, HttpServletResponse resp, @RequestPart(name = "board") BoardDTO board,
 							@RequestPart(name = "upload_files", required = false) List<MultipartFile> upload_files) throws IllegalStateException, IOException {

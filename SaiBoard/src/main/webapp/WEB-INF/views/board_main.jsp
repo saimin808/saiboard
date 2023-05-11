@@ -120,10 +120,12 @@
 				<input type="hidden" id="totalBoardSize" value="${totalBoardSize}"/>
 				<div class="col-9"></div>
 				<div class="col">
+					<!-- 새롭게 구현한 페이지네이션 링크 조절 기능!!!!!!!!!!!! -->
 					<select id="paginationSize-select" class="form-select w-50 float-start">
 						<option value="5" selected>5page</option>
 						<option value="10">10page</option>
 					</select>
+					<!-- 새롭게 구현한 페이지네이션 링크 조절 기능!!!!!!!!!!!! -->
 					<button id="write-button" type="button" class="btn btn-secondary float-end">글 쓰기</button>
 				</div>
 			</div>

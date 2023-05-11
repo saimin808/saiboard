@@ -87,17 +87,10 @@ function listComments(seq, currentPage) {
 	    	const nextPage = paginationVO.nextPage;
 	    	const prevPage = paginationVO.prevPage;
 			
-			console.log('script startIndex : ' + startIndex);
-			console.log('script endIndex : ' + endIndex);
-			console.log('script paginationStart : ' + paginationStart);
-			console.log('script patinationEnd : ' + paginationEnd);
-			console.log('script nextPage : ' + nextPage);
-			console.log('script prevPage : ' + prevPage);
-			
 			// 게시판 리스팅 & 페이지네이션 작업 구간 (위에서 가져온 댓글 목록이 존재할 경우 진행한다.)
 			if (comments.length > 0) {
 				// 새롭게 리스팅할 게시판
-				const content = createComments(startIndex, endIndex, comments, writeDate);
+				const content = createCommentList(startIndex, endIndex, comments, writeDate);
 				// 새로운 페이지네이션
 				const page = createPagination(paginationVO, totalCommentSize, seq);
 				
@@ -116,7 +109,7 @@ function listComments(seq, currentPage) {
 }
 
 // 게시판 리스팅 function
-function createComments(startIndex, endIndex, comments, writeDate) {
+function createCommentList(startIndex, endIndex, comments, writeDate) {
 
 	// 가져온 매개변수들로 게시판을 구현한다.
     let content = '';
@@ -188,6 +181,7 @@ function createComments(startIndex, endIndex, comments, writeDate) {
             content += '	</div>';
         }
 
+	// 다 만든 게시판을 변수에 담아 리턴한다.
     return content;
 }
 
@@ -235,12 +229,13 @@ function createPagination(paginationVO, totalCommentSize, boardSeq) {
             page += '	<a class="page-link" style="color: white; background-color: #6c757d;';
             page += '		pointer-event: none; cursor: default;">' + i + '</a>';
         } else {
+            page += '	<a class="page-link" style="cursor: pointer;" onclick="listComments(' + boardSeq + ', ' + i + ')">' + i + '</a>';
+            
         	// 페이지(i) * 한 페이지당 출력할 글의 수(sizePerPage) > 전체 댓글의 수(totalCommentSize)
         	// true 이면 페이지 링크를 더이상 생성하면 안되므로 break
             if (i * sizePerPage > totalCommentSize) {
                 break;
             }
-            page += '	<a class="page-link" style="cursor: pointer;" onclick="listComments(' + boardSeq + ', ' + i + ')">' + i + '</a>';
         }
         page += '</li>';
     }
@@ -269,34 +264,6 @@ function createPagination(paginationVO, totalCommentSize, boardSeq) {
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~ 댓글 UPDATE & DELETE 파트 ~~~~~~~~~~~~~~~~~~~~~~~~
-
-// 삭제/수정 전 비밀번호 확인 function
-function passwordCheck(cnt){
-	
-	// 댓글 삭제에 필요한 데이터들
-	let pw = $('input[id=commentPwCheckPassword-text' + cnt + ']').val(); // 입력한 비밀번호
-	let bseq = $('input[id=boardSeq' + cnt + ']').val(); // 게시글 번호
-	let dseq = $('input[id=dialogSeq' + cnt + ']').val();// 댓글 삭제 dialog의 번호
-	// 비밀번호가 틀리면 돌아가서 해당 dialog를 다시 켜야하기 때문에 필요함
-	
-	console.log(pw);
-	console.log(bseq);
-	console.log(dseq);
-	
-	// 비밀번호를 입력하지 않았다면 false를 return
-	if(pw == null || pw == "") {
-		return false;
-	}
-	
-	// 데이터들을 JSON type으로 모아준다.
-	const info = {
-		boardSeq : bseq,
-	    dialogSeq : dseq,  
-	    inputPw : pw
-	}
-	
-	return info;
-}
 
 // 댓글 삭제 function
 function deleteComment(seq, cnt) {
@@ -425,6 +392,34 @@ function editComment(seq, cnt) {
 	    		location.href = contextPath + '/board/read/' + bseq + '?status=' + data;
 	    	}
 		});
+}
+
+// 삭제/수정 전 비밀번호 확인 function
+function passwordCheck(cnt){
+	
+	// 댓글 삭제에 필요한 데이터들
+	let pw = $('input[id=commentPwCheckPassword-text' + cnt + ']').val(); // 입력한 비밀번호
+	let bseq = $('input[id=boardSeq' + cnt + ']').val(); // 게시글 번호
+	let dseq = $('input[id=dialogSeq' + cnt + ']').val();// 댓글 삭제 dialog의 번호
+	// 비밀번호가 틀리면 돌아가서 해당 dialog를 다시 켜야하기 때문에 필요함
+	
+	console.log(pw);
+	console.log(bseq);
+	console.log(dseq);
+	
+	// 비밀번호를 입력하지 않았다면 false를 return
+	if(pw == null || pw == "") {
+		return false;
+	}
+	
+	// 데이터들을 JSON type으로 모아준다.
+	const info = {
+		boardSeq : bseq,
+	    dialogSeq : dseq,  
+	    inputPw : pw
+	}
+	
+	return info;
 }
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // --------------------------------------------------------------------------------------

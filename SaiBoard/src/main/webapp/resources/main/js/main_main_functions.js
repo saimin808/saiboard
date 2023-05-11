@@ -46,18 +46,15 @@ function listBoards(currentPage) {
             // 새롭게 추가한 게시글 갯수 조절 기능! ===========================
            	const sizePerPage = $('#sizePerPage-number').val(); // 한 페이지에 출력할 게시글 갯수
            	// =========================================================
+           	
             const totalBoardSize = $('#totalBoardSize').val(); // 조회된 게시글 총 갯수
+            
             // 새롭게 추가한 페이지네이션 링크 조절 기능! =============================
 			const paginationSize = $('#paginationSize-select option:selected').val(); // 한 페이지에 출력할 페이지네이션 링크 갯수
 			// ===============================================================
             //**************************************************************
 
             // 페이지네이션 데이터 ****************************************************
-            console.log('currentPage : ' + currentPage);
-            console.log('sizePerPage : ' + sizePerPage);
-            console.log('totalBoardSize : ' + totalBoardSize);
-            console.log('paginationSize : ' + paginationSize);
-            
             // getPaginationVO(페이지네이션 데이터 생성 function)
             const paginationVO = getPaginationVO(currentPage, sizePerPage, totalBoardSize, paginationSize);
 
@@ -211,12 +208,13 @@ function createPagination(paginationVO, totalBoardSize) {
             page += '	<a class="page-link" style="color: white; background-color: #6c757d;';
             page += '		pointer-event: none; cursor: default;">' + i + '</a>';
         } else {
+            page += '	<a class="page-link" style="cursor: pointer;" onclick="listBoards(' + i + ')">' + i + '</a>';
+            
             // 페이지(i) * 한 페이지당 출력할 글의 수(sizePerPage) > 전체 게시글의 수(totalBoardSize)
             // true 이면 페이지 링크를 더이상 생성하면 안되므로 break
             if (i * sizePerPage > totalBoardSize) {
                 break;
             }
-            page += '	<a class="page-link" style="cursor: pointer;" onclick="listBoards(' + i + ')">' + i + '</a>';
         }
         page += '</li>';
     }
