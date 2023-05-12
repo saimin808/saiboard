@@ -53,7 +53,7 @@ public class BoardRESTController {
 		obj.put("boardWriteDate", creationDateTimeList);
 		obj.put("currentPage", currentPage);
 		obj.put("isBoardWithFiles",  isBoardWithFiles);
-		obj.put("totalBoardSize", boards.size());
+		obj.put("totalSize", boards.size());
 		
 		// 2023-05-08(월) PaginationVO 기능 RestController에서 삭제
 //		obj.put("startIndex", page.getStartIndex());
@@ -87,7 +87,7 @@ public class BoardRESTController {
 		obj.put("comments", comments);
 		obj.put("commentWriteDate", creationDateTimeList);
 		obj.put("currentPage", currentPage);
-		obj.put("totalCommentSize", comments.size());
+		obj.put("totalSize", comments.size());
 		
 		// 2023-05-08(월) PaginationVO 기능 RestController에서 삭제
 //		obj.put("paginationStart", page.getPaginationStart());

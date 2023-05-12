@@ -1,12 +1,20 @@
+// 전역변수 선언부 ************************
+let maxlength;// 최대로 입력 가능한 문자 수
+let text_val; // 입력한 문자
+let text_len; // 입력한 문자 수
+
+let each_char; // 글자 확인시 사용할 변수
+//**************************************
+
 // 게시글 글쓴이 작성 글자 제한
 function writer_checkText(obj){
-	const maxlength = 10; //최대 10자
-    const text_val = obj.value; //입력한 문자
-    const text_len = text_val.length; //입력한 문자수
+	maxlength = 10; //최대 10자
+    text_val = obj.value; //입력한 문자
+    text_len = text_val.length; //입력한 문자수
     
     let total=0;
     for(let i=0; i<text_len; i++){
-    	const each_char = text_val.charAt(i);
+    	each_char = text_val.charAt(i);
         
         // 글자 수만큼 증가 (+1)
         total += each_char.length;
@@ -21,13 +29,13 @@ function writer_checkText(obj){
 
 // 게시글 제목 작성 글자 제한
 function title_checkText(obj){
-	const maxlength = 50; //최대 10자
-    const text_val = obj.value; //입력한 문자
-    const text_len = text_val.length; //입력한 문자수
+	maxlength = 50; //최대 10자
+    text_val = obj.value; //입력한 문자
+    text_len = text_val.length; //입력한 문자수
     
     let total=0;
     for(let i=0; i<text_len; i++){
-    	const each_char = text_val.charAt(i);
+    	each_char = text_val.charAt(i);
         
         // 글자 수만큼 증가 (+1)
         total += each_char.length;
@@ -42,13 +50,13 @@ function title_checkText(obj){
 
 // 게시글 내용 작성 글자 제한 byte
 function content_checkText(obj){
-	const maxlength = 1000; //최대 1000자
-    const text_val = obj.value; //입력한 문자
-    const text_len = text_val.length; //입력한 문자수
+	maxlength = 1000; //최대 1000자
+    text_val = obj.value; //입력한 문자
+    text_len = text_val.length; //입력한 문자수
     
     let total=0;
     for(let i=0; i<text_len; i++){
-    	const each_char = text_val.charAt(i);
+    	each_char = text_val.charAt(i);
         
         // 글자 수만큼 증가 (+1)
         total += each_char.length;

@@ -1,8 +1,11 @@
 // 글 쓰기 function
+
+let formData; // formData 변수
+
 function writeBoard() {
 		
 		// 1. getherData 펑션을 통해 입력한 데이터들을 formData 형식으로 압축하여 불러와준다.
-		let formData = getherWriteData();
+		formData = getherWriteData();
 		
 		// 2. 압축한 form데이터를 BoardRESTController에 있는 writeBoard()에 매개 변수로 보내준다.
 		$.ajax({
@@ -40,7 +43,7 @@ function writeBoard() {
 function editBoard() {
 	
 	// 1. getherData 펑션을 통해 입력한 데이터들을 formData 형식으로 압축하여 불러와준다.
-	let formData = getherData();
+	formData = getherData();
 
 	// 2. 압축한 form데이터를 BoardRESTController에 있는 editBoard()에 매개 변수로 보내준다.
     $.ajax({

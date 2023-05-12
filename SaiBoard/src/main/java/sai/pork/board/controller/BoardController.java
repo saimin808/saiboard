@@ -49,7 +49,7 @@ public class BoardController {
 		// 페이지네이션 전달
 		model.addAttribute("sizePerPage", sizePerPage); // 2023-05-09 (화) 한페이지에 출력할 게시글 선택기능 추가
 		model.addAttribute("currentPage", page.getCurrentPage());
-		model.addAttribute("totalBoardSize", page.getTotalSize());
+		model.addAttribute("totalSize", page.getTotalSize());
 		model.addAttribute("startIndex", page.getStartIndex());
 		model.addAttribute("endIndex", page.getEndIndex());
 		model.addAttribute("paginationStart", page.getPaginationStart());

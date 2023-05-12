@@ -13,7 +13,7 @@ $("#orderBy-select").change(function() {
 // 한페이지 게시글 출력 갯수 number
 // 엔터로 입력가능
 $("#sizePerPage-number").change(function() {
-	const sizePerPage = $("#sizePerPage-number").val();
+	sizePerPage = $("#sizePerPage-number").val();
 	if(sizePerPage < 5) {
 		$("#sizePerPage-number").val(5);
 		alert('최소 5개 최대 10개씩만 출력 가능합니다!');

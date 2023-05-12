@@ -150,10 +150,8 @@ $('#writeCommentSubmit-button').click(function() {
 	$('#writeComment-form').submit();
 });
 
-
-console.log(commentSize);
-
 for(let i = 1; i <= 5; i++) {
+	let seq;
 	// 수정 버튼 action
 	$('button[id=editComment' + i + ']').click(function() {
 		console.log('edit click');
@@ -162,7 +160,7 @@ for(let i = 1; i <= 5; i++) {
 		$('h5[id=commentPwCheck-title' + i + ']').text('댓글 수정');
 		$('input[id=commentPwCheckPassword-text' + i + ']').val('');
 		
-		let seq = $('input[id=commentSeq' + i + ']').val();
+		seq = $('input[id=commentSeq' + i + ']').val();
 		$('button[id=commentPwCheckSubmit-button' + i + ']').attr('onclick', 'editCommentPasswordCheck(' + seq + ', ' + i + ')');
 		
 		$('dialog[id=commentPwCheck-dialog' + i + ']').attr('open', 'open');	
@@ -175,7 +173,7 @@ for(let i = 1; i <= 5; i++) {
 		$('h5[id=commentPwCheck-title' + i + ']').text('댓글 삭제');
 		$('input[id=commentPwCheckPassword-text' + i + ']').val('');
 		
-		let seq = $('input[id=commentSeq' + i + ']').val();
+		seq = $('input[id=commentSeq' + i + ']').val();
 		$('button[id=commentPwCheckSubmit-button' + i + ']').attr('onclick', 'deleteComment(' + seq + ', ' + i + ')');
 		
 		$('dialog[id=commentPwCheck-dialog' + i + ']').attr('open', 'open');	

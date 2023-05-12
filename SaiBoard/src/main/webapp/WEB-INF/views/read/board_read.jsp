@@ -137,7 +137,7 @@
 				<form id="writeComment-form" name="writeComment-form" action="<%=request.getContextPath()%>/board/write_comment" method="POST">
 					<input type="hidden" name="board_seq" form="writeComment-form" value="${board.board_seq}"/> 
 					<div id="commentTitle" class="row row-cols-1 w-100">
-						<h3 class="fw-bold">댓글 ${totalCommentSize}개</h3>
+						<h3 class="fw-bold">댓글 ${totalSize}개</h3>
 					</div>
 					<div id="commentInput" class="row row-cols-6 w-100">
 						<div class="col-auto text-center">
@@ -288,7 +288,7 @@
 								</c:forEach>
 								<li class="page-item">
 									<c:choose>
-										<c:when test="${paginationEnd % 5 == 0 && totalCommentSize > paginationEnd * 5}">
+										<c:when test="${paginationEnd % 5 == 0 && totalSize > paginationEnd * 5}">
 											<a id="next-link" class="page-link" aria-label="Next" onclick="listComments(6)">
 												<span aria-hidden="true">&raquo;</span>
 											</a>
@@ -320,10 +320,6 @@
 <script>
 	const contextPath = '<%=request.getContextPath()%>';
 	
-	const commentSize = parseInt('<%=request.getAttribute("totalCommentSize")%>');
-	let paginationStart = '<%=request.getAttribute("paginationStart")%>';
-	let paginationEnd = '<%=request.getAttribute("paginationEnd")%>';
-	
 	// url parameter를 불러온 변수
 	const urlParams = new URLSearchParams(location.search);
 
@@ -338,11 +334,11 @@
 </script>
 <!-- pagination.js : 페이지네이션 Data script -->
 <script src="<%=request.getContextPath()%>/resources/public/js/pagination.js"></script>
+<!-- main_conditions.js : 가장 main이 되는 function들을 모아놓은 script (게시글 수정, 삭제 등)  -->
+<script src="<%=request.getContextPath()%>/resources/read/js/read_main_functions.js"></script>
 <!-- elements_actions.js : 각 요소의 액션들을 모아놓은 script  -->
 <script src="<%=request.getContextPath()%>/resources/read/js/read_elements_actions.js"></script>
 <!-- input_limits.js : 입력 제한 function들을 모아놓은 script  -->
 <script src="<%=request.getContextPath()%>/resources/read/js/read_input_limits.js"></script>
-<!-- main_conditions.js : 가장 main이 되는 function들을 모아놓은 script (게시글 수정, 삭제 등)  -->
-<script src="<%=request.getContextPath()%>/resources/read/js/read_main_functions.js"></script>
 </body>
 </html>

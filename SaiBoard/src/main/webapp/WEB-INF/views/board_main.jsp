@@ -117,7 +117,6 @@
 				</table>
 			</div>
 			<div id="button-container" class="container-xxl row">
-				<input type="hidden" id="totalBoardSize" value="${totalBoardSize}"/>
 				<div class="col-9"></div>
 				<div class="col">
 					<!-- 새롭게 구현한 페이지네이션 링크 조절 기능!!!!!!!!!!!! -->
@@ -157,7 +156,7 @@
 						</c:forEach>
 						<li class="page-item">
 							<c:choose>
-								<c:when test="${paginationEnd % 5 == 0 && totalBoardSize > paginationEnd * 10}">
+								<c:when test="${paginationEnd % 5 == 0 && totalSize > paginationEnd * 10}">
 									<a id="next-link" class="page-link" aria-label="Next" style="cursor: pointer;">
 										<span aria-hidden="true">&raquo;</span>
 									</a>
@@ -176,6 +175,8 @@
 		</div>
 	</div>
 
+<!-- 불러온 총 게시글 수 -->
+<input type="hidden" id="totalSize" value="${totalSize}"/>
 <!-- *** bootstrap script -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
 <!-- FontAwesome script : 폰트어썸 아이콘 사용시 필요한 script -->
@@ -185,17 +186,14 @@
 <!-- contextPath 변수 선언과 pagenation 구현을 위한 script -->
 <script>
 	const contextPath = '<%=request.getContextPath()%>';
-	
-	let paginationStart = parseInt('<%= request.getAttribute("paginationStart")%>');
-	let paginationEnd = parseInt('<%= request.getAttribute("paginationEnd")%>');
 </script>
 <!-- pagination.js : 페이지네이션 Data script -->
 <script src="<%=request.getContextPath()%>/resources/public/js/pagination.js"></script>
+<!-- main_conditions.js : 가장 main이 되는 function들을 모아놓은 script (게시글 수정, 삭제 등)  -->
+<script src="<%=request.getContextPath()%>/resources/main/js/main_main_functions.js"></script>
 <!-- init_functions : 페이지를 새롭게 open하거나 redirect 할때마다 실행 될 기능을 모아놓은 script  -->
 <script src="<%=request.getContextPath()%>/resources/main/js/main_init_functions.js"></script>
 <!-- elements_actions.js : 각 요소의 액션들을 모아놓은 script  -->
 <script src="<%=request.getContextPath()%>/resources/main/js/main_elements_actions.js"></script>
-<!-- main_conditions.js : 가장 main이 되는 function들을 모아놓은 script (게시글 수정, 삭제 등)  -->
-<script src="<%=request.getContextPath()%>/resources/main/js/main_main_functions.js"></script>
 </body>
 </html>

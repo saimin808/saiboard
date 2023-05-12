@@ -1,9 +1,11 @@
 // ------------------------------ 게시글 파트 -------------------------------------
 
+let pw; // 글 비밀번호 변수
+
 // 게시글 삭제 function
 function deleteBoard(seq) {
 	
-	let pw = $('#deletePassword').val();
+	pw = $('#deletePassword').val();
 	
 	if(pw == null || pw == "") {
 		$('#deleteWarningMsg').html('비밀번호를 입력해 주세요!');
@@ -13,14 +15,13 @@ function deleteBoard(seq) {
 	$.ajax({
 		type: 'POST',
 	    url: contextPath + "/board/delete/"+ seq,
-		// String data를 넘길 때는 data 항목에 직접 {}로 입력해준다. 
-	    data : { input_pw : pw },
+	    data : { input_pw : pw }, // String data를 넘길 때는 data 항목에 직접 {}로 입력해준다. 
 	 })
-	    .fail( function(e) {
+	 .fail( function(e) {
 	    	console.log(e);
 	    	alert("통신 오류 error");
-	    })
-	    .done(function(data) {
+	 })
+	 .done(function(data) {
 	    
 	    console.log('통신 성공!');
 	    	
@@ -47,6 +48,19 @@ function file_download(num) {
 // ------------------------------------- 댓글 파트 -------------------------------------------
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~ 댓글 리스팅 파트 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+let sizePerPage; // sizePerPage : 한 페이지에 출력할 글 갯수
+let totalSize; // totalSize : 전체 글 수
+let paginationSize;	// paginationSize : 한페이지에 출력할 페이지네이션 사이즈
+let startIndex; // startIndex : 출력할 10개의 게시글 중에서 첫 글 순서 번호
+let endIndex; // endIndex : 출력할 10개의 게시글 중에서 마지막 글의 순서 번호
+let paginationStart; // paginationStart : 현재 출력된 페이지 리스트의 첫 페이지 번호
+let paginationEnd; // paginationEnd : 현재 출력된 페이지 리스트의 마지막 번호
+let nextPage; // nextPage : 현재 페이지에서 다음 페이지
+let prevPage; // prevPage : 현재 페이지에서 이전 페이지
+
+let paginationVO; // paginationVO : getPaginationVO()에서 생성되는 페이지네이션 데이터를 받아줄 변수
+
 // 페이지 링크 클릭시 댓글 리스팅 Function
 function listComments(seq, currentPage) {
 	
@@ -71,28 +85,28 @@ function listComments(seq, currentPage) {
 	    	comments = data.comments; // 가져온 게시글 리스트
 	    	writeDate = data.commentWriteDate; // 가져온 게시글 작성일 리스트
 	    	
-	    	const totalCommentSize = parseInt(data.totalCommentSize); // 가져온 게시글 총 갯수
+	    	totalSize = parseInt(data.totalSize); // 가져온 게시글 총 갯수
 	    	
-	    	let sizePerPage = 5; // 한 페이지에 출력할 게시글 수
-	    	let paginationSize = 5; // 한 페이지에 출력할 페이지네이션 수
+	    	sizePerPage = 5; // 한 페이지에 출력할 게시글 수
+	    	paginationSize = 5; // 한 페이지에 출력할 페이지네이션 수
 	    	
 	    	// currentPage, sizePerPage, totalSize, paginationSize
-	    	const paginationVO = getPaginationVO(currentPage, sizePerPage, totalCommentSize, paginationSize);
+	    	paginationVO = getPaginationVO(currentPage, sizePerPage, totalSize, paginationSize);
 	    	
 	    	// getPaginationVO를 통해 받아온 페이지네이션 정보들 받아주는 변수들
-	    	const startIndex = paginationVO.startIndex;
-	    	const endIndex = paginationVO.endIndex;
+	    	startIndex = paginationVO.startIndex;
+	    	endIndex = paginationVO.endIndex;
 	    	paginationStart = paginationVO.paginationStart;
 	    	paginationEnd = paginationVO.paginationEnd;
-	    	const nextPage = paginationVO.nextPage;
-	    	const prevPage = paginationVO.prevPage;
+	    	nextPage = paginationVO.nextPage;
+	    	prevPage = paginationVO.prevPage;
 			
 			// 게시판 리스팅 & 페이지네이션 작업 구간 (위에서 가져온 댓글 목록이 존재할 경우 진행한다.)
 			if (comments.length > 0) {
 				// 새롭게 리스팅할 게시판
 				const content = createCommentList(startIndex, endIndex, comments, writeDate);
 				// 새로운 페이지네이션
-				const page = createPagination(paginationVO, totalCommentSize, seq);
+				const page = createPagination(paginationVO, totalSize, seq);
 				
 				// 댓글 전체 컨테이너 (div)
 				const comment_container = document.getElementById('comment_table-container');
@@ -186,16 +200,16 @@ function createCommentList(startIndex, endIndex, comments, writeDate) {
 }
 
 // 페이지네이션 생성 function
-function createPagination(paginationVO, totalCommentSize, boardSeq) {
+function createPagination(paginationVO, totalSize, boardSeq) {
 	
 	// 페이지네이션에 필요한 데이터를 담아주는 변수들
 	const currentPage = paginationVO.currentPage; // 현재 페이지
-	const sizePerPage = paginationVO.sizePerPage; // 한 페이지당 출력할 글 갯수
-	const paginationSize = paginationVO.paginationSize; // 한번에 출력할 페이지네이션 갯수
+	sizePerPage = paginationVO.sizePerPage; // 한 페이지당 출력할 글 갯수
+	paginationSize = paginationVO.paginationSize; // 한번에 출력할 페이지네이션 갯수
     paginationStart = paginationVO.paginationStart; // 현재 출력된 페이지네이션의 시작 페이지
     paginationEnd = paginationVO.paginationEnd; // 현재 출력된 페이지네이션의 마지막 페이지
-    const nextPage = paginationVO.nextPage; // 현재 출력된 페이지네이션의 다음 페이지네이션
-    const prevPage = paginationVO.prevPage; // 현재 출력된 페이지네이션의 이전 페이지네이션
+    nextPage = paginationVO.nextPage; // 현재 출력된 페이지네이션의 다음 페이지네이션
+    prevPage = paginationVO.prevPage; // 현재 출력된 페이지네이션의 이전 페이지네이션
 
 	// 페이지네이션 링크 작업 구간
     let page = '';
@@ -231,9 +245,9 @@ function createPagination(paginationVO, totalCommentSize, boardSeq) {
         } else {
             page += '	<a class="page-link" style="cursor: pointer;" onclick="listComments(' + boardSeq + ', ' + i + ')">' + i + '</a>';
             
-        	// 페이지(i) * 한 페이지당 출력할 글의 수(sizePerPage) > 전체 댓글의 수(totalCommentSize)
+        	// 페이지(i) * 한 페이지당 출력할 글의 수(sizePerPage) > 전체 댓글의 수(totalSize)
         	// true 이면 페이지 링크를 더이상 생성하면 안되므로 break
-            if (i * sizePerPage > totalCommentSize) {
+            if (i * sizePerPage > totalSize) {
                 break;
             }
         }
@@ -243,9 +257,9 @@ function createPagination(paginationVO, totalCommentSize, boardSeq) {
     page += '<li class="page-item">';
 	
 	// 화면에 출력될 마지막 페이지(paginationEnd)가 한번에 출력할 페이지네이션 사이즈(paginationSize)의 배수이고
-	// 가져온 총 댓글 수(totalCommentSize)가 현재 출력된 마지막 페이지에서 출력할 수 있는 최대 글 수(paginationEnd * sizePerPage)
+	// 가져온 총 댓글 수(totalSize)가 현재 출력된 마지막 페이지에서 출력할 수 있는 최대 글 수(paginationEnd * sizePerPage)
 	// 보다 크면 '>>' 링크 활성화
-    if (paginationEnd % paginationSize == 0 && totalCommentSize > paginationEnd * sizePerPage) {
+    if (paginationEnd % paginationSize == 0 && totalSize > paginationEnd * sizePerPage) {
         page += '			<a id="next-link" class="page-link" aria-label="Next"';
         page += '				style="cursor: pointer;" onclick="listComments(' + boardSeq + ', ' + nextPage + ')">';
         page += '				<span aria-hidden="true">&raquo;</span>';
@@ -265,14 +279,20 @@ function createPagination(paginationVO, totalCommentSize, boardSeq) {
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~ 댓글 UPDATE & DELETE 파트 ~~~~~~~~~~~~~~~~~~~~~~~~
 
+let bseq;
+let dseq;
+
 // 댓글 삭제 function
 function deleteComment(seq, cnt) {
 
-	// 삭제 전 비밀번호 확인
-	const info = passwordCheck(cnt);
+	// 댓글 삭제에 필요한 데이터들
+	pw = $('input[id=commentPwCheckPassword-text' + cnt + ']').val(); // 입력한 비밀번호
+	bseq = $('input[id=boardSeq' + cnt + ']').val(); // 게시글 번호
+	dseq = $('input[id=dialogSeq' + cnt + ']').val();// 댓글 삭제 dialog의 번호
+	// 비밀번호가 틀리면 돌아가서 해당 dialog를 다시 켜야하기 때문에 필요함
 	
 	// 비밀번호를 입력하지 않았다면 경고메세지만 출력
-	if(info == false) {
+	if(pw == null || pw == "") {
 		$('#commentWarning' + seq + '').html('비밀번호를 입력해 주세요!');
 		return;
 	}
@@ -282,7 +302,7 @@ function deleteComment(seq, cnt) {
 	$.ajax({
 		type: 'POST',
 	    url: contextPath + '/board/delete_comment/'+ seq,
-	    data : { input_pw : info.inputPw },
+	    data : { input_pw : pw },
 	 })
 	    .fail( function(e) {
 	    	console.log(e);
@@ -297,13 +317,13 @@ function deleteComment(seq, cnt) {
 	    	// 결과 data에 따라 다른 결과를 준다.
 	    	if(data == 'comment_deletion_success') {
 	    		// 댓글 삭제에 성공하면 삭제된 후의 댓글 목록을 다시 보기 위해 게시글 상세보기 페이지로 돌아간다. 
-	    		location.href = contextPath + '/board/read/' + info.boardSeq + '?status=' + data;
+	    		location.href = contextPath + '/board/read/' + bseq + '?status=' + data;
 	    	} else if (data == 'comment_delete_wrong_pw') {
 	    		// 비밀번호가 틀리면 댓글을 삭제하지 않고 경고메세지만 출력한다.
-	    		$('#commentWarning' + info.dseq + '').html('잘못된 비밀번호입니다!');
+	    		$('#commentWarning' + dseq + '').html('잘못된 비밀번호입니다!');
 	    	} else {
 	    		// 그 이외에는 전부 게시글 상세보기 페이지로 돌아간다.
-	    		location.href = contextPath + '/board/read/' + info.boardSeq + '?status=' + data;
+	    		location.href = contextPath + '/board/read/' + bseq + '?status=' + data;
 	    	}
 		});
 }
@@ -311,11 +331,14 @@ function deleteComment(seq, cnt) {
 // 댓글 수정 전 비밀번호 확인
 function editCommentPasswordCheck(seq, cnt) {
 	
-	// 삭제 전 비밀번호 확인
-	const info = passwordCheck(cnt);
+	// 댓글 삭제에 필요한 데이터들
+	pw = $('input[id=commentPwCheckPassword-text' + cnt + ']').val(); // 입력한 비밀번호
+	bseq = $('input[id=boardSeq' + cnt + ']').val(); // 게시글 번호
+	dseq = $('input[id=dialogSeq' + cnt + ']').val();// 댓글 삭제 dialog의 번호
+	// 비밀번호가 틀리면 돌아가서 해당 dialog를 다시 켜야하기 때문에 필요함
 	
-	// 비밀번호를 입력하지 않았다면 경고메세지를 dialog에 추가한다.
-	if(info == false) {
+	// 비밀번호를 입력하지 않았다면 경고메세지만 출력
+	if(pw == null || pw == "") {
 		$('#commentWarning' + seq + '').html('비밀번호를 입력해 주세요!');
 		return;
 	}
@@ -325,7 +348,7 @@ function editCommentPasswordCheck(seq, cnt) {
 	$.ajax({
 		type: 'POST',
 	    url: contextPath + '/board/edit_comment_pw_check/'+ seq,
-	    data : { input_pw : info.inputPw },
+	    data : { input_pw : pw },
 	 })
 	    .fail( function(e) {
 	    	console.log(e);
@@ -342,7 +365,7 @@ function editCommentPasswordCheck(seq, cnt) {
 	    		$('dialog[id=editComment-dialog' + cnt + ']').attr('open', 'open');
 	    	} else if (data == 'wrong_pw') {
 	    	// 비밀번호가 틀리면 경고메세지를 dialog에 추가한다.
-	    		$('#commentWarning' + info.dseq + '').html('잘못된 비밀번호입니다!');
+	    		$('#commentWarning' + dseq + '').html('잘못된 비밀번호입니다!');
 	    	}
 		});
 }
@@ -350,17 +373,12 @@ function editCommentPasswordCheck(seq, cnt) {
 // 댓글 수정
 function editComment(seq, cnt) {
 	
-	// 댓글 수정에 필요한 데이터들
-	const commentId = $('input[id=editCommentId-text' + cnt  + ']').val();
-	const commentPw = $('input[id=editCommentPassword-text' + cnt  + ']').val();
-	const commentContent = $('textarea[id=editCommentContent-text' + cnt  + ']').val();
-	
-	// 그 데이터들을 모아준다.
+	// 댓글 수정에 필요한 데이터들을 모아준다.
 	const comment = {
 		comment_seq : seq, // 댓글 번호
-		comment_id : commentId, // 댓글 id
-	    comment_pw : commentPw, // 댓글 비밀번호
-	    comment_content : commentContent // 댓글 내용
+		comment_id : $('input[id=editCommentId-text' + cnt  + ']').val(), // 댓글 id
+	    comment_pw : $('input[id=editCommentPassword-text' + cnt  + ']').val(), // 댓글 비밀번호
+	    comment_content : $('textarea[id=editCommentContent-text' + cnt  + ']').val() // 댓글 내용
 	}
 	
 	console.log(comment);
@@ -383,43 +401,36 @@ function editComment(seq, cnt) {
 	    	
 	    console.log(data);
 	    
-	    	
-	    const bseq = $('input[id=boardSeq' + cnt + ']').val();
-	    	// 통신이 끝나면 게시글 상세보기로 redirect 한다.
-	    	if(data == 'edit_comment_success') {
-	    		location.href = contextPath + '/board/read/' + bseq + '?status=' + data;
-	    	} else {
-	    		location.href = contextPath + '/board/read/' + bseq + '?status=' + data;
-	    	}
-		});
+	    // 게시글 번호	
+	    bseq = $('input[id=boardSeq' + cnt + ']').val();
+	    
+	    // 통신이 끝나면 게시글 상세보기로 redirect 한다.
+	    if(data == 'edit_comment_success') {
+	    	location.href = contextPath + '/board/read/' + bseq + '?status=' + data;
+	    } else {
+	    	location.href = contextPath + '/board/read/' + bseq + '?status=' + data;
+	    }
+	});
 }
 
+// 2023-05-12 (금) 불필요한 function 제거
 // 삭제/수정 전 비밀번호 확인 function
-function passwordCheck(cnt){
+//function passwordCheck(cnt){
 	
 	// 댓글 삭제에 필요한 데이터들
-	let pw = $('input[id=commentPwCheckPassword-text' + cnt + ']').val(); // 입력한 비밀번호
-	let bseq = $('input[id=boardSeq' + cnt + ']').val(); // 게시글 번호
-	let dseq = $('input[id=dialogSeq' + cnt + ']').val();// 댓글 삭제 dialog의 번호
+	//let pw = $('input[id=commentPwCheckPassword-text' + cnt + ']').val(); // 입력한 비밀번호
+	//let bseq = $('input[id=boardSeq' + cnt + ']').val(); // 게시글 번호  
+	//let dseq = $('input[id=dialogSeq' + cnt + ']').val();// 댓글 삭제 dialog의 번호
 	// 비밀번호가 틀리면 돌아가서 해당 dialog를 다시 켜야하기 때문에 필요함
 	
-	console.log(pw);
-	console.log(bseq);
-	console.log(dseq);
+	//console.log(pw);
+	//console.log(bseq);
+	//console.log(dseq);
 	
 	// 비밀번호를 입력하지 않았다면 false를 return
-	if(pw == null || pw == "") {
-		return false;
-	}
-	
-	// 데이터들을 JSON type으로 모아준다.
-	const info = {
-		boardSeq : bseq,
-	    dialogSeq : dseq,  
-	    inputPw : pw
-	}
-	
-	return info;
-}
+	//if(pw == null || pw == "") {
+		//return false;
+	//}
+//}
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // --------------------------------------------------------------------------------------
